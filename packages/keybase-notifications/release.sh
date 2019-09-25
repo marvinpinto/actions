@@ -9,9 +9,7 @@ fi
 
 git checkout -b releases/$1
 rm -rf node_modules
-npm ci
-npm run build
-npm test
+./build_and_test.sh
 git add -f dist/index.js
 git commit -m "Update dist/index.js for $1"
 git push origin :refs/tags/$1
