@@ -1,16 +1,22 @@
 ---
-name: 'ci'
+name: 'keybase'
 
 on:
   - 'push'
   - 'pull_request'
+  - 'commit_comment'
+  - 'fork'
+  - 'issue_comment'
+  - 'issues'
+  - 'watch'
 
 jobs:
-  test:
+  keybase:
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v1'
       - run: './build_and_test.sh'
+
       - uses: ./
         with:
           milliseconds: 1000
