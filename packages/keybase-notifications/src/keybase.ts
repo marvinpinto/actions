@@ -1,5 +1,6 @@
 import Bot from 'keybase-bot';
 import * as path from 'path';
+import {get} from 'lodash';
 
 export default class Keybase {
   bot: Bot;
@@ -45,5 +46,28 @@ export default class Keybase {
     }
 
     await this.bot.chat.send(channel, {body: args.message});
+  }
+
+  public async getKeybaseUsername(githubUsername) {
+    let keybaseUsername = '';
+    if (!githubUsername) {
+      return keybaseUsername;
+    }
+
+    try {
+      const res = await this.bot.helpers.rawApiCall({
+        endpoint: 'user/lookup',
+        arg: {
+          github: githubUsername,
+          fields: 'basics',
+        },
+      });
+      keybaseUsername = get(res, 'them[0].basics.username', '');
+      console.debug(`Username lookup successful, found ${keybaseUsername}`);
+    } catch (error) {
+      console.log(`User ${githubUsername} not found: ${error.message}`);
+    }
+
+    return keybaseUsername;
   }
 }

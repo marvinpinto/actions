@@ -2,6 +2,7 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import {generateChatMessage} from './githubEvent';
 import Keybase from './keybase';
+import {get} from 'lodash';
 
 export async function main() {
   try {
@@ -17,7 +18,11 @@ export async function main() {
     const kb = new Keybase(keybaseUsername, keybasePaperKey);
     await kb.init();
 
-    const chatMessage: string = generateChatMessage(context);
+    // Attempt to determine the user's keybase username
+    const githubUsername = get(context, 'payload.sender.login', '');
+    const associatedKeybaseUsername = await kb.getKeybaseUsername(githubUsername);
+
+    const chatMessage: string = generateChatMessage({context, keybaseUsername: associatedKeybaseUsername});
     await kb.sendChatMessage({
       teamInfo: {
         channel: keybaseChannel,
