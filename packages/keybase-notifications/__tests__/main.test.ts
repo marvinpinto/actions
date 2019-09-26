@@ -79,4 +79,19 @@ describe('main handler', () => {
       'Repository `marvinpinto/keybase-notifications-action` starred by `marvinpinto` (1 :star:)',
     );
   });
+
+  it('is able to process push events', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'push.json');
+    process.env['GITHUB_EVENT_NAME'] = 'push';
+
+    await require('../src/main');
+
+    expect(mockSendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockSendChatMessage).toHaveBeenCalledWith(
+      'fakebob',
+      'this is a fake paper key',
+      {channel: 'funtimes', teamName: '', topicName: ''},
+      'GitHub user marvinpinto pushed 1 commit(s) to refs/heads/master (repo: marvinpinto/keybase-notifications-action). See https://github.com/marvinpinto/keybase-notifications-action/commit/811c5dd3500dabb4487444674669a1c885f38b61 for details.',
+    );
+  });
 });
