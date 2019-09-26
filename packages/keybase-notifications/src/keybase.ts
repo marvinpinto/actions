@@ -1,15 +1,33 @@
 import Bot from 'keybase-bot';
+import * as path from 'path';
 
-export async function sendChatMessage(username, paperKey, channelName, message) {
-  console.log('ACTUALLY CALLING');
+export async function sendChatMessage(username, paperKey, teamInfo, message) {
   const bot = new Bot();
-  await bot.init(username, paperKey, {verbose: true});
-  console.log('initialized!');
-  const channel = {name: 'marvinpinto,' + username, public: false, topicType: 'chat'};
-  const msg = {
-    body: message,
+  const kbLocation = path.join(__dirname, 'keybase');
+  console.log(`Setting keybase binary location to: ${kbLocation}`);
+
+  await bot.init(username, paperKey, {
+    verbose: false,
+    botLite: true,
+    disableTyping: true,
+    keybaseBinaryLocation: kbLocation,
+  });
+
+  const channel = {
+    public: false,
+    topicType: 'chat',
+    name: '',
+    membersType: '',
+    topicName: '',
   };
-  await bot.chat.send(channel, msg);
-  console.log('message sent?');
+  if (teamInfo.channel) {
+    channel['name'] = teamInfo.channel;
+  } else {
+    channel['name'] = teamInfo.teamName;
+    channel['membersType'] = 'team';
+    channel['topicName'] = teamInfo.topicName;
+  }
+
+  await bot.chat.send(channel, {body: message});
   await bot.deinit();
 }

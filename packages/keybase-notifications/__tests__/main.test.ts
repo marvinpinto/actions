@@ -8,6 +8,7 @@ describe('main handler', () => {
     jest.resetModules();
     process.env['INPUT_KEYBASE_USERNAME'] = 'fakebob';
     process.env['INPUT_KEYBASE_PAPER_KEY'] = 'this is a fake paper key';
+    process.env['INPUT_KEYBASE_CHANNEL'] = 'funtimes';
     process.env['GITHUB_EVENT_NAME'] = 'push';
 
     mockSendChatMessage = jest.fn(() => Promise.resolve());
@@ -24,7 +25,6 @@ describe('main handler', () => {
 
   it('throws an error when "keybase_username" is not supplied', async () => {
     delete process.env.INPUT_KEYBASE_USERNAME;
-    delete process.env.INPUT_KEYBASE_PAPER_KEY;
     const run = require('../src/main').run;
     await expect(run()).rejects.toThrow('Input required and not supplied: keybase_username');
   });
@@ -33,6 +33,14 @@ describe('main handler', () => {
     delete process.env.INPUT_KEYBASE_PAPER_KEY;
     const run = require('../src/main').run;
     await expect(run()).rejects.toThrow('Input required and not supplied: keybase_paper_key');
+  });
+
+  it('does not throw an error when "keybase_channel" is not supplied', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'force-push.json');
+    delete process.env.INPUT_KEYBASE_CHANNEL;
+    await require('../src/main');
+
+    expect(mockSendChatMessage).toHaveBeenCalledTimes(1);
   });
 
   it('throws an error when it encounters an unsupported GitHub event', async () => {
@@ -52,7 +60,7 @@ describe('main handler', () => {
     expect(mockSendChatMessage).toHaveBeenCalledWith(
       'fakebob',
       'this is a fake paper key',
-      'channel',
+      {channel: 'funtimes', teamName: '', topicName: ''},
       'GitHub user marvinpinto force-pushed 1 commit(s) to refs/heads/master (repo: marvinpinto/keybase-notifications-action). See https://github.com/marvinpinto/keybase-notifications-action/commit/8c1ccd210a0fb98e7f35213fc234f6def1eec9bc for details.',
     );
   });

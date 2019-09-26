@@ -2,7 +2,7 @@
   "name": "keybase-notifications-action",
   "version": "0.0.0",
   "private": true,
-  "description": "JavaScript template action",
+  "description": "Trigger Keybase chat notifications from GitHub actions",
   "main": "dist/index.js",
   "scripts": {
     "build": "ncc build src/main.ts",
@@ -17,8 +17,7 @@
   },
   "keywords": [
     "actions",
-    "node",
-    "setup"
+    "node"
   ],
   "author": "Marvin Pinto",
   "license": "MIT",
