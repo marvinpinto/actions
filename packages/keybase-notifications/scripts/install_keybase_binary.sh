@@ -8,6 +8,7 @@ if [ -f "${KEYBASE_BINARY}" ]; then
   exit 0
 fi
 
+mkdir -p ./dist
 curl --remote-name https://prerelease.keybase.io/keybase_amd64.deb
 dpkg --fsys-tarfile keybase_amd64.deb | tar xOf - ./usr/bin/keybase > ${KEYBASE_BINARY}
 rm -f keybase_amd64.deb

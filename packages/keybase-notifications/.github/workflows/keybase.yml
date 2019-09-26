@@ -15,7 +15,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v1'
-      - run: './build_and_test.sh'
+      - run: './scripts/build_and_test.sh'
 
       - uses: ./
         with:

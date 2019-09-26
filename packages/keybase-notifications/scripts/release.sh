@@ -9,7 +9,7 @@ fi
 
 git checkout -b releases/$1
 rm -rf node_modules
-./build_and_test.sh
+./scripts/build_and_test.sh
 git add -f dist/index.js
 git add -f dist/keybase
 git commit -m "Update release files for $1"

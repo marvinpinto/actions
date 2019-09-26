@@ -23,5 +23,4 @@ jobs:
           git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 
       - name: 'Generate the "latest" release'
-        run: |
-          ./release.sh latest
+        run: './scripts/release.sh latest'
