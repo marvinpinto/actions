@@ -1,24 +1,18 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import {wait} from './wait';
+import {generateChatMessage} from './githubEvent';
+import {sendChatMessage} from './keybase';
 
-async function run() {
+export async function run() {
   try {
     const context = github.context;
-    console.log(`Context is: " ${JSON.stringify(context)}`);
-
-    const ms = core.getInput('milliseconds');
-    console.log(`Waiting ${ms} milliseconds ...`);
-
-    core.debug(new Date().toTimeString());
-    wait(parseInt(ms));
-    core.debug(new Date().toTimeString());
-
-    core.setOutput('time', new Date().toTimeString());
-    return;
+    const keybaseUsername: string = core.getInput('keybase_username', {required: true});
+    const keybasePaperKey: string = core.getInput('keybase_paper_key', {required: true});
+    const chatMessage: string = generateChatMessage(context);
+    await sendChatMessage(keybaseUsername, keybasePaperKey, 'channel', chatMessage);
   } catch (error) {
     core.setFailed(error.message);
-    return;
+    throw error;
   }
 }
 
