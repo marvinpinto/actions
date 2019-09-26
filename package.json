@@ -1,0 +1,14 @@
+{
+  "name": "github-actions",
+  "version": "0.0.0",
+  "main": "index.js",
+  "author": "Marvin Pinto <git@pinto.im>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/**"
+  ],
+  "devDependencies": {
+    "lerna": "^3.16.4"
+  }
+}
