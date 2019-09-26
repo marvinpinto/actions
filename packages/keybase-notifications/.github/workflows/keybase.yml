@@ -19,4 +19,7 @@ jobs:
 
       - uses: ./
         with:
-          milliseconds: 1000
+          keybase_username: '${{ secrets.KeybaseUsername }}'
+          keybase_paper_key: '${{ secrets.KeybasePaperKey }}'
+          keybase_team_name: '${{ secrets.KeybaseTeamName }}'
+          keybase_topic_name: '${{ secrets.KeybaseTopicName }}'

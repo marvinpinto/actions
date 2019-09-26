@@ -1,10 +1,25 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Keybase Notifications'
+author: 'marvinpinto'
+description: 'Trigger Keybase chat notifications from GitHub actions'
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  keybase_username:
+    description: 'Keybase username'
+    required: true
+  keybase_paper_key:
+    description: 'Keybase paper key'
+    required: true
+  keybase_channel:
+    description: 'For peer channels, e.g. "marvinpinto,octocat"'
+    required: false
+  keybase_team_name:
+    description: 'Required for team channels'
+    required: false
+  keybase_topic_name:
+    description: 'Required for team channels, e.g. "general"'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'
+branding:
+  icon: 'key'
+  color: 'blue'
