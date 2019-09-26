@@ -11,11 +11,22 @@ function parsePushEvent(payload): string {
   return `GitHub user ${ghUser} ${forcedStr} ${numCommits} commit(s) to ${branchRef} (repo: ${repo}). See ${url} for details.`;
 }
 
+function parseRepoStarringEvent(payload): string {
+  const ghUser = get(payload, 'sender.login', 'UNKNOWN');
+  const repo = get(payload, 'repository.full_name', 'UNKNOWN');
+  const starCount = get(payload, 'repository.stargazers_count', 'n/a');
+  return `Repository \`${repo}\` starred by \`${ghUser}\` (${starCount} :star:)`;
+}
+
 export function generateChatMessage(context): string {
+  console.debug(`GitHub event: ${JSON.stringify(context)}`);
   if (get(context, 'eventName', null) === 'push') {
     return parsePushEvent(context.payload);
   }
 
-  console.log(`This is an unsupported GitHub event: ${JSON.stringify(context)}`);
+  if (get(context, 'eventName', null) === 'watch') {
+    return parseRepoStarringEvent(context.payload);
+  }
+
   throw new Error('Unsupported GitHub event');
 }

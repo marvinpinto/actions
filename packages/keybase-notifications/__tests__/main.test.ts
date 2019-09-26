@@ -64,4 +64,19 @@ describe('main handler', () => {
       'GitHub user marvinpinto force-pushed 1 commit(s) to refs/heads/master (repo: marvinpinto/keybase-notifications-action). See https://github.com/marvinpinto/keybase-notifications-action/commit/8c1ccd210a0fb98e7f35213fc234f6def1eec9bc for details.',
     );
   });
+
+  it('is able to process repo-starring events', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'repo-starring.json');
+    process.env['GITHUB_EVENT_NAME'] = 'watch';
+
+    await require('../src/main');
+
+    expect(mockSendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockSendChatMessage).toHaveBeenCalledWith(
+      'fakebob',
+      'this is a fake paper key',
+      {channel: 'funtimes', teamName: '', topicName: ''},
+      'Repository `marvinpinto/keybase-notifications-action` starred by `marvinpinto` (1 :star:)',
+    );
+  });
 });

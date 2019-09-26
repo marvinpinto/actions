@@ -7,4 +7,4 @@ npm ci
 npm run prettier
 npm run eslint
 npm run build
-npm test
+npm test -- --silent
