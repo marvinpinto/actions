@@ -20,14 +20,18 @@
     "build": "lerna run build --stream",
     "clean": "lerna run clean --stream && rm -rf node_modules yarn-error.log",
     "reinstall": "yarn clean; yarn install",
-    "lint": "lerna run lint --stream && yarn run lint:eslint && yarn run lint:prettier",
+    "lint": "lerna run lint --stream && yarn run lint:eslint && yarn run lint:prettier && yarn run lint:commits",
     "lint:eslint": "eslint  $npm_package_config_eslintPaths",
     "lint:prettier": "prettier --list-different $npm_package_config_prettierPaths",
+    "lint:commits": "commitlint --to .",
     "lintfix": "lerna run lintfix --stream && yarn run lintfix:eslint && yarn run lintfix:prettier",
     "lintfix:eslint": "eslint --fix  $npm_package_config_eslintPaths",
     "lintfix:prettier": "prettier --write $npm_package_config_prettierPaths"
   },
   "devDependencies": {
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
+    "@commitlint/config-lerna-scopes": "^8.2.0",
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.8",
     "@typescript-eslint/eslint-plugin": "^2.3.1",
@@ -43,5 +47,7 @@
     "ts-jest": "^24.1.0",
     "typescript": "^3.6.3"
   },
-  "eslintIgnore": ["!.*.js"]
+  "eslintIgnore": [
+    "!.*.js"
+  ]
 }
