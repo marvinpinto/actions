@@ -28,5 +28,6 @@ export function generateChatMessage({context, keybaseUsername}): string {
     return parseRepoStarringEvent({payload: context.payload, keybaseUsername});
   }
 
-  throw new Error('Unsupported GitHub event');
+  console.error('Ignoring this event as it is unsupported by this application.');
+  return '';
 }

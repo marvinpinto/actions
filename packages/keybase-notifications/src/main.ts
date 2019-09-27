@@ -23,14 +23,16 @@ export async function main() {
     const associatedKeybaseUsername = await kb.getKeybaseUsername(githubUsername);
 
     const chatMessage: string = generateChatMessage({context, keybaseUsername: associatedKeybaseUsername});
-    await kb.sendChatMessage({
-      teamInfo: {
-        channel: keybaseChannel,
-        teamName: keybaseTeamName,
-        topicName: keybaseTopicName,
-      },
-      message: chatMessage,
-    });
+    if (chatMessage) {
+      await kb.sendChatMessage({
+        teamInfo: {
+          channel: keybaseChannel,
+          teamName: keybaseTeamName,
+          topicName: keybaseTopicName,
+        },
+        message: chatMessage,
+      });
+    }
 
     await kb.deinit();
   } catch (error) {

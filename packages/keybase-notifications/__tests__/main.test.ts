@@ -58,11 +58,11 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
   });
 
-  it('throws an error when it encounters an unsupported GitHub event', async () => {
+  it('does not throw an error when it encounters an unsupported GitHub event', async () => {
     process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'invalid.json');
     delete process.env.GITHUB_EVENT_NAME;
     const inst = require('../src/main');
-    await expect(inst.main()).rejects.toThrow('Unsupported GitHub event');
+    await inst.main();
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(0);
   });
 
