@@ -57,6 +57,12 @@ on:
       types:
         - "started"
   - "push" # when someone pushes to a repository branch
+  pull_request:
+    types:
+      - "opened"
+      - "closed"
+      - "reopened"
+      - "synchronize"
 ```
 
 ## Filtering Notifications

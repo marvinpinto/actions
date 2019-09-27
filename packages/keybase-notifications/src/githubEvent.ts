@@ -18,6 +18,24 @@ function parseRepoStarringEvent({payload, keybaseUsername}): string {
   return `Repository \`${repo}\` starred by ${userStr} :+1: :star:`;
 }
 
+function parsePullRequestEvent({payload, keybaseUsername}): string {
+  const ghUser = get(payload, 'sender.login', 'UNKNOWN');
+  const url = get(payload, 'pull_request.html_url', 'N/A');
+  const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${ghUser}\``;
+  const action = get(payload, 'action', null);
+  const merged = get(payload, 'pull_request.merged', false);
+  const strNewPrPrefix = action === 'opened' ? 'New PR' : 'PR';
+  const strPastTense = action === 'opened' ? '' : ' has been';
+  const actionMap = {
+    synchronize: '*updated*',
+    opened: '*opened*',
+    closed: merged ? '*merged*' : '*closed*',
+    reopened: '*reopened*',
+  };
+  const actionStr = get(actionMap, action, 'n/a');
+  return `${strNewPrPrefix} ${url}${strPastTense} ${actionStr} by ${userStr}.`;
+}
+
 export function generateChatMessage({context, keybaseUsername}): string {
   console.debug(`GitHub event: ${JSON.stringify(context)}`);
   if (get(context, 'eventName', null) === 'push') {
@@ -26,6 +44,10 @@ export function generateChatMessage({context, keybaseUsername}): string {
 
   if (get(context, 'eventName', null) === 'watch') {
     return parseRepoStarringEvent({payload: context.payload, keybaseUsername});
+  }
+
+  if (get(context, 'eventName', null) === 'pull_request') {
+    return parsePullRequestEvent({payload: context.payload, keybaseUsername});
   }
 
   console.error('Ignoring this event as it is unsupported by this application.');

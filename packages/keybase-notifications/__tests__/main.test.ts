@@ -142,4 +142,75 @@ describe('main handler', () => {
       message: 'Repository `marvinpinto/keybase-notifications-action` starred by @keybasebob :+1: :star:',
     });
   });
+
+  it('is able to process a pull_request updated event', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'pull-request-synchronize.json');
+    process.env['GITHUB_EVENT_NAME'] = 'pull_request';
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message: 'PR https://github.com/marvinpinto/actions/pull/2 has been *updated* by GitHub user `marvinpinto`.',
+    });
+  });
+
+  it('is able to process a pull_request closed event', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'pull-request-closed.json');
+    process.env['GITHUB_EVENT_NAME'] = 'pull_request';
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message: 'PR https://github.com/marvinpinto/actions/pull/3 has been *closed* by GitHub user `marvinpinto`.',
+    });
+  });
+
+  it('is able to process a pull_request reopened event', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'pull-request-reopened.json');
+    process.env['GITHUB_EVENT_NAME'] = 'pull_request';
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message: 'PR https://github.com/marvinpinto/actions/pull/2 has been *reopened* by GitHub user `marvinpinto`.',
+    });
+  });
+
+  it('is able to process a pull_request merged event', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'pull-request-merged.json');
+    process.env['GITHUB_EVENT_NAME'] = 'pull_request';
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message: 'PR https://github.com/marvinpinto/actions/pull/3 has been *merged* by GitHub user `marvinpinto`.',
+    });
+  });
+
+  it('is able to process a pull_request opened event', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'pull-request-opened.json');
+    process.env['GITHUB_EVENT_NAME'] = 'pull_request';
+    mockKeybaseMethods.getKeybaseUsername = jest.fn(() => 'keybasebob');
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message: 'New PR https://github.com/marvinpinto/actions/pull/4 *opened* by @keybasebob.',
+    });
+  });
 });
