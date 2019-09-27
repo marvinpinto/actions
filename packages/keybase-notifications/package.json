@@ -1,68 +1,27 @@
 {
-  "name": "keybase-notifications-action",
+  "name": "keybase-notifications",
   "version": "0.0.0",
   "private": true,
   "description": "Trigger Keybase chat notifications from GitHub actions",
-  "main": "dist/index.js",
   "scripts": {
+    "preinstall": "./scripts/install_keybase_binary.sh",
     "build": "ncc build src/index.ts",
-    "test": "jest",
-    "prettier": "prettier --check \"src/**/*.ts\" \"__tests__/**/*.ts\"",
-    "prettier:fix": "prettier --write \"src/**/*.ts\" \"__tests__/**/*.ts\"",
-    "eslint": "eslint \"src/**/*.ts\" \"__tests__/**/*.ts\""
+    "test": "jest --silent",
+    "clean": "rm -rf  node_modules yarn-error.log dist",
+    "lint": "yarn run lint:prettier && yarn run lint:eslint",
+    "lint:prettier": "prettier --check \"src/**/*.ts\" \"__tests__/**/*.ts\"",
+    "lint:eslint": "eslint \"src/**/*.ts\" \"__tests__/**/*.ts\"",
+    "lintfix": "yarn run lintfix:prettier && yarn run lintfix:eslint",
+    "lintfix:prettier": "prettier --write \"src/**/*.ts\" \"__tests__/**/*.ts\"",
+    "lintfix:eslint": "eslint --fix \"src/**/*.ts\" \"__tests__/**/*.ts\""
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/marvinpinto/keybase-notifications-action.git"
-  },
-  "keywords": [
-    "actions",
-    "node"
-  ],
-  "author": "Marvin Pinto",
-  "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.0.0",
     "@actions/github": "^1.1.0",
     "@types/lodash": "^4.14.139",
     "keybase-bot": "^3.0.2"
   },
-  "devDependencies": {
-    "@types/jest": "^24.0.13",
-    "@types/node": "^12.0.4",
-    "@typescript-eslint/eslint-plugin": "^2.3.1",
-    "@typescript-eslint/parser": "^2.3.1",
-    "@zeit/ncc": "^0.20.5",
-    "eslint": "^6.4.0",
-    "eslint-config-prettier": "^6.3.0",
-    "eslint-plugin-prettier": "^3.1.1",
-    "jest": "^24.8.0",
-    "jest-circus": "^24.7.1",
-    "nock": "^11.3.5",
-    "prettier": "^1.18.2",
-    "ts-jest": "^24.0.2",
-    "typescript": "^3.5.1"
-  },
-  "eslintConfig": {
-    "parser": "@typescript-eslint/parser",
-    "extends": [
-      "plugin:@typescript-eslint/recommended",
-      "prettier/@typescript-eslint",
-      "plugin:prettier/recommended"
-    ],
-    "parserOptions": {
-      "ecmaVersion": 2018,
-      "sourceType": "module"
-    },
-    "rules": {
-      "@typescript-eslint/explicit-function-return-type": 0
-    }
-  },
-  "prettier": {
-    "semi": true,
-    "trailingComma": "all",
-    "bracketSpacing": false,
-    "singleQuote": true,
-    "printWidth": 120
-  }
+  "devDependencies": {},
+  "main": "index.js",
+  "license": "MIT"
 }
