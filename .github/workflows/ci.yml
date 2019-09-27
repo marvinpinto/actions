@@ -1,0 +1,20 @@
+---
+name: "ci"
+
+on:
+  - "push"
+  - "pull_request"
+
+jobs:
+  test:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Checkout source code"
+        uses: "actions/checkout@v1"
+
+      - name: "Build and run tests"
+        run: |
+          yarn run reinstall
+          yarn run lint
+          yarn run test
+          yarn run build

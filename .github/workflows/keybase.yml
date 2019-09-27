@@ -14,10 +14,17 @@ jobs:
   keybase:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "actions/checkout@v1"
-      - run: "./scripts/build_and_test.sh"
+      - name: "Checkout source code"
+        uses: "actions/checkout@v1"
 
-      - uses: ./
+      - name: "Build and run tests"
+        run: |
+          yarn run reinstall
+          yarn run lint
+          yarn run test
+          yarn run build
+
+      - uses: "./packages/keybase-notifications/"
         with:
           keybase_username: "${{ secrets.KeybaseUsername }}"
           keybase_paper_key: "${{ secrets.KeybasePaperKey }}"

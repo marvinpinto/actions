@@ -12,7 +12,8 @@ jobs:
     runs-on: "ubuntu-latest"
 
     steps:
-      - uses: "actions/checkout@v1"
+      - name: "Checkout source code"
+        uses: "actions/checkout@v1"
 
       - name: "Update git remotes"
         env:

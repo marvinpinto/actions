@@ -13,13 +13,13 @@
   },
   "config": {
     "eslintPaths": ".*.js *.js",
-    "prettierPaths": "*.{json,md,yaml,yml} !package.json"
+    "prettierPaths": "*.{json,md,yaml,yml} .github/**/*.{json,md,yaml,yml} !package.json"
   },
   "scripts": {
     "test": "lerna run test --stream --no-bail",
     "build": "lerna run build --stream",
     "clean": "lerna run clean --stream && rm -rf node_modules yarn-error.log",
-    "reinstall": "yarn clean && yarn install",
+    "reinstall": "yarn clean; yarn install",
     "lint": "lerna run lint --stream && yarn run lint:eslint && yarn run lint:prettier",
     "lint:eslint": "eslint  $npm_package_config_eslintPaths",
     "lint:prettier": "prettier --list-different $npm_package_config_prettierPaths",

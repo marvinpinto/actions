@@ -8,10 +8,12 @@ if [[ $# -ne 1 ]]; then
 fi
 
 git checkout -b releases/$1
-rm -rf node_modules
-./scripts/build_and_test.sh
-git add -f dist/index.js
-git add -f dist/keybase
+yarn run reinstall
+yarn run lint
+yarn run test
+yarn run build
+git add -f packages/keybase-notifications/dist/index.js
+git add -f packages/keybase-notifications/dist/keybase
 git commit -m "Update release files for $1"
 git push origin :refs/tags/$1
 git tag -fa $1 -m "Release $1"
