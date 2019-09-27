@@ -2,27 +2,33 @@
   "after": "811c5dd3500dabb4487444674669a1c885f38b61",
   "base_ref": null,
   "before": "76f01f322718fd16000ea0509182889b98156155",
-  "commits": [{
-    "added": ["__tests__/payloads/repo-starring.json"],
-    "author": {
-      "email": "git@pinto.im",
-      "name": "Marvin Pinto",
-      "username": "marvinpinto"
-    },
-    "committer": {
-      "email": "git@pinto.im",
-      "name": "Marvin Pinto",
-      "username": "marvinpinto"
-    },
-    "distinct": true,
-    "id": "811c5dd3500dabb4487444674669a1c885f38b61",
-    "message": "Add the functionality to deal with GitHub repo-starring events",
-    "modified": ["__tests__/main.test.ts", "scripts/build_and_test.sh", "src/githubEvent.ts"],
-    "removed": [],
-    "timestamp": "2019-09-26T14:05:05-04:00",
-    "tree_id": "3ee570e5a9281b079883058f7117ad9aabc0c623",
-    "url": "https://github.com/marvinpinto/keybase-notifications-action/commit/811c5dd3500dabb4487444674669a1c885f38b61"
-  }],
+  "commits": [
+    {
+      "added": ["__tests__/payloads/repo-starring.json"],
+      "author": {
+        "email": "git@pinto.im",
+        "name": "Marvin Pinto",
+        "username": "marvinpinto"
+      },
+      "committer": {
+        "email": "git@pinto.im",
+        "name": "Marvin Pinto",
+        "username": "marvinpinto"
+      },
+      "distinct": true,
+      "id": "811c5dd3500dabb4487444674669a1c885f38b61",
+      "message": "Add the functionality to deal with GitHub repo-starring events",
+      "modified": [
+        "__tests__/main.test.ts",
+        "scripts/build_and_test.sh",
+        "src/githubEvent.ts"
+      ],
+      "removed": [],
+      "timestamp": "2019-09-26T14:05:05-04:00",
+      "tree_id": "3ee570e5a9281b079883058f7117ad9aabc0c623",
+      "url": "https://github.com/marvinpinto/keybase-notifications-action/commit/811c5dd3500dabb4487444674669a1c885f38b61"
+    }
+  ],
   "compare": "https://github.com/marvinpinto/keybase-notifications-action/compare/76f01f322718...811c5dd3500d",
   "created": false,
   "deleted": false,
@@ -42,7 +48,11 @@
     "distinct": true,
     "id": "811c5dd3500dabb4487444674669a1c885f38b61",
     "message": "Add the functionality to deal with GitHub repo-starring events",
-    "modified": ["__tests__/main.test.ts", "scripts/build_and_test.sh", "src/githubEvent.ts"],
+    "modified": [
+      "__tests__/main.test.ts",
+      "scripts/build_and_test.sh",
+      "src/githubEvent.ts"
+    ],
     "removed": [],
     "timestamp": "2019-09-26T14:05:05-04:00",
     "tree_id": "3ee570e5a9281b079883058f7117ad9aabc0c623",

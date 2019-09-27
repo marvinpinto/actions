@@ -2,27 +2,34 @@
   "after": "8c1ccd210a0fb98e7f35213fc234f6def1eec9bc",
   "base_ref": null,
   "before": "4634efd8f1a46ebcf6cf9be423f19cfed95fc487",
-  "commits": [{
-    "added": [".github/workflows/keybase.yml"],
-    "author": {
-      "email": "git@pinto.im",
-      "name": "Marvin Pinto",
-      "username": "marvinpinto"
-    },
-    "committer": {
-      "email": "git@pinto.im",
-      "name": "Marvin Pinto",
-      "username": "marvinpinto"
-    },
-    "distinct": true,
-    "id": "8c1ccd210a0fb98e7f35213fc234f6def1eec9bc",
-    "message": "Run the generated action locally on specific events",
-    "modified": [".github/workflows/ci.yml", "package-lock.json", "package.json", "src/main.ts"],
-    "removed": [],
-    "timestamp": "2019-09-25T14:17:15-04:00",
-    "tree_id": "936d27686d05686a3d7338bd84c59cee1678469b",
-    "url": "https://github.com/marvinpinto/keybase-notifications-action/commit/8c1ccd210a0fb98e7f35213fc234f6def1eec9bc"
-  }],
+  "commits": [
+    {
+      "added": [".github/workflows/keybase.yml"],
+      "author": {
+        "email": "git@pinto.im",
+        "name": "Marvin Pinto",
+        "username": "marvinpinto"
+      },
+      "committer": {
+        "email": "git@pinto.im",
+        "name": "Marvin Pinto",
+        "username": "marvinpinto"
+      },
+      "distinct": true,
+      "id": "8c1ccd210a0fb98e7f35213fc234f6def1eec9bc",
+      "message": "Run the generated action locally on specific events",
+      "modified": [
+        ".github/workflows/ci.yml",
+        "package-lock.json",
+        "package.json",
+        "src/main.ts"
+      ],
+      "removed": [],
+      "timestamp": "2019-09-25T14:17:15-04:00",
+      "tree_id": "936d27686d05686a3d7338bd84c59cee1678469b",
+      "url": "https://github.com/marvinpinto/keybase-notifications-action/commit/8c1ccd210a0fb98e7f35213fc234f6def1eec9bc"
+    }
+  ],
   "compare": "https://github.com/marvinpinto/keybase-notifications-action/compare/4634efd8f1a4...8c1ccd210a0f",
   "created": false,
   "deleted": false,
@@ -42,7 +49,12 @@
     "distinct": true,
     "id": "8c1ccd210a0fb98e7f35213fc234f6def1eec9bc",
     "message": "Run the generated action locally on specific events",
-    "modified": [".github/workflows/ci.yml", "package-lock.json", "package.json", "src/main.ts"],
+    "modified": [
+      ".github/workflows/ci.yml",
+      "package-lock.json",
+      "package.json",
+      "src/main.ts"
+    ],
     "removed": [],
     "timestamp": "2019-09-25T14:17:15-04:00",
     "tree_id": "936d27686d05686a3d7338bd84c59cee1678469b",

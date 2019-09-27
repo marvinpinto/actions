@@ -1,13 +1,13 @@
 ---
-name: 'ci'
+name: "ci"
 
 on:
-  - 'push'
-  - 'pull_request'
+  - "push"
+  - "pull_request"
 
 jobs:
   test:
-    runs-on: 'ubuntu-latest'
+    runs-on: "ubuntu-latest"
     steps:
-      - uses: 'actions/checkout@v1'
-      - run: './scripts/build_and_test.sh'
+      - uses: "actions/checkout@v1"
+      - run: "./scripts/build_and_test.sh"

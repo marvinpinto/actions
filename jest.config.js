@@ -1,8 +1,5 @@
 module.exports = {
-  roots: [
-    "<rootDir>/src",
-    "<rootDir>/__tests__"
-  ],
+  roots: ['<rootDir>/src', '<rootDir>/__tests__'],
   clearMocks: true,
   moduleFileExtensions: ['js', 'ts'],
   testEnvironment: 'node',
@@ -13,14 +10,11 @@ module.exports = {
   },
   verbose: true,
   collectCoverage: true,
-  projects:
-  [
-  "<rootDir>/packages/*/jest.config.js"
-  ],
+  projects: ['<rootDir>/packages/*/jest.config.js'],
   coverageReporters: ['text'],
   coverageThreshold: {
     global: {
-      lines: 100
-    }
+      lines: 100,
+    },
   },
 };

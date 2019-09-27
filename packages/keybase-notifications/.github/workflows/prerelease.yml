@@ -1,20 +1,20 @@
 ---
-name: 'prerelease'
+name: "prerelease"
 
 on:
   push:
     branches:
-      - 'master'
+      - "master"
 
 jobs:
   prerelease:
-    name: 'Pre Release'
-    runs-on: 'ubuntu-latest'
+    name: "Pre Release"
+    runs-on: "ubuntu-latest"
 
     steps:
-      - uses: 'actions/checkout@v1'
+      - uses: "actions/checkout@v1"
 
-      - name: 'Update git remotes'
+      - name: "Update git remotes"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -23,4 +23,4 @@ jobs:
           git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 
       - name: 'Generate the "latest" release'
-        run: './scripts/release.sh latest'
+        run: "./scripts/release.sh latest"

@@ -4,11 +4,6 @@ module.exports = {
   ...jestconfig,
   name: 'keybase-notifications',
   displayName: 'keybase-notifications',
-  collectCoverageFrom: [
-    "src/**/*.ts",
-  ],
-  "coveragePathIgnorePatterns": [
-    "<rootDir>/src/keybase.ts",
-    "<rootDir>/src/index.ts",
-  ]
-}
+  collectCoverageFrom: ['src/**/*.ts'],
+  coveragePathIgnorePatterns: ['<rootDir>/src/keybase.ts', '<rootDir>/src/index.ts'],
+};

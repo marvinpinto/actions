@@ -1,25 +1,25 @@
 ---
-name: 'keybase'
+name: "keybase"
 
 on:
-  - 'push'
-  - 'pull_request'
-  - 'commit_comment'
-  - 'fork'
-  - 'issue_comment'
-  - 'issues'
-  - 'watch'
+  - "push"
+  - "pull_request"
+  - "commit_comment"
+  - "fork"
+  - "issue_comment"
+  - "issues"
+  - "watch"
 
 jobs:
   keybase:
-    runs-on: 'ubuntu-latest'
+    runs-on: "ubuntu-latest"
     steps:
-      - uses: 'actions/checkout@v1'
-      - run: './scripts/build_and_test.sh'
+      - uses: "actions/checkout@v1"
+      - run: "./scripts/build_and_test.sh"
 
       - uses: ./
         with:
-          keybase_username: '${{ secrets.KeybaseUsername }}'
-          keybase_paper_key: '${{ secrets.KeybasePaperKey }}'
-          keybase_team_name: '${{ secrets.KeybaseTeamName }}'
-          keybase_topic_name: '${{ secrets.KeybaseTopicName }}'
+          keybase_username: "${{ secrets.KeybaseUsername }}"
+          keybase_paper_key: "${{ secrets.KeybasePaperKey }}"
+          keybase_team_name: "${{ secrets.KeybaseTeamName }}"
+          keybase_topic_name: "${{ secrets.KeybaseTopicName }}"
