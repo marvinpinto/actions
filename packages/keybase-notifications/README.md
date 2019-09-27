@@ -1,117 +1,85 @@
-# Create a JavaScript Action using TypeScript
+# Keybase Chat Notifications
 
-Use this template to bootstrap the creation of a JavaScript action.:rocket:
+This action allows you to post messages to [Keybase Chat](https://keybase.io/blog/keybase-chat) channels, teams, and DMs. It sends messages using a Keybase paperkey and the corresponding Keybase username.
 
-This template includes compilication support, tests, a validation workflow, publishing, and versioning guidance.
+![Keybase default GitHub notification](images/keybase-gh-notification-example.png)
 
-If you are new, there's also a simpler introduction. See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
+## Using the Action
 
-## Create an action from this template
+You will need a Keybase paperkey and its corresponding username. It is probably a good idea to create a dedicated Keybase account for this purpose, or at the very least generate a dedicated paperkey on your existing account. This makes it easier to revoke if needed.
 
-Click the `Use this Template` and provide the new repo details for your action
-
-## Code in Master
-
-Install the dependencies
-
-```bash
-$ npm install
-```
-
-Build the typescript
-
-```bash
-$ npm run build
-```
-
-Run the tests :heavy_check_mark:
-
-```bash
-$ npm test
-
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-
-...
-```
-
-## Change action.yml
-
-The action.yml contains defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-import * as core from '@actions/core';
-...
-
-async function run() {
-  try {
-      ...
-  }
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Publish to a distribution branch
-
-Actions are run from GitHub repos. We will create a releases branch and only checkin production modules (core in this case).
-
-Comment out node_modules in .gitignore and create a releases/v1 branch
-
-```bash
-# comment out in distribution branches
-# node_modules/
-```
-
-```bash
-$ git checkout -b releases/v1
-$ git commit -a -m "prod dependencies"
-```
-
-```bash
-$ npm prune --production
-$ git add node_modules
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Your action is now published! :rocket:
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing the releases/v1 branch
+### Pull Request Notifications Example
 
 ```yaml
-uses: actions/typescript-action@releases/v1
-with:
-  milliseconds: 1000
+name: "keybase"
+
+on:
+  pull_request:
+    types:
+      - "opened"
+      - "closed"
+      - "reopened"
+      - "synchronize"
+
+jobs:
+  keybase:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "marvinpinto/actions/keybase-notifications@latest"
+        with:
+          keybase_username: "${{ secrets.KeybaseUsername }}"
+          keybase_paper_key: "${{ secrets.KeybasePaperKey }}" # "fancy regular ..."
+          keybase_team_name: "${{ secrets.KeybaseTeamName }}" # "keybasefriends"
+          keybase_topic_name: "${{ secrets.KeybaseTopicName }}" # "general"
 ```
 
-See the [actions tab](https://github.com/actions/javascript-action/actions) for runs of this action! :rocket:
-
-## Usage:
-
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and tested action
+### Private Messaging
 
 ```yaml
-uses: actions/typescript-action@v1
-with:
-  milliseconds: 1000
+jobs:
+  keybase:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "marvinpinto/actions/keybase-notifications@latest"
+        with:
+          keybase_username: "${{ secrets.KeybaseUsername }}"
+          keybase_paper_key: "${{ secrets.KeybasePaperKey }}" # "fancy regular ..."
+          keybase_channel: "${{ secrets.KeybaseChannel }}" # "you,robot,chris"
 ```
+
+## Supported GitHub Events
+
+The following events are supported in this action. Everything else gets silently ignored. Have a read through the [Events that trigger workflows](https://help.github.com/en/articles/events-that-trigger-workflows) document for more information on how this works.
+
+```yaml
+on:
+  - watch: # when someone stars a repository
+      types:
+        - "started"
+  - "push" # when someone pushes to a repository branch
+```
+
+## Filtering Notifications
+
+You can cut down on chat noise by applying filters to events that trigger this action. For example, you can send a Keybase chat notification only when someone pushes to the `master` branch.
+
+```yaml
+on:
+  push:
+    branches:
+      - master
+```
+
+Read through the [GitHub documentation](https://help.github.com/en/articles/workflow-syntax-for-github-actions) for advanced examples.
+
+## Versioning
+
+Every commit that lands on master for this project triggers an automatic build as well as a tagged release called `latest`. If you don't wish to live on the bleeding edge you may use a stable release instead. See [releases](https://github.com/marvinpinto/actions/releases) for the available versions.
+
+```yaml
+- uses: "marvinpinto/actions/keybase-notifications@<VERSION>"
+```
+
+## License
+
+The source code for this project is released under the [MIT License](/LICENSE). This is in no way associated with Keybase or GitHub.
