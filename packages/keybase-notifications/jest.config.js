@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const jestconfig = require('../../jest.config');
 module.exports = {
-  clearMocks: true,
-  moduleFileExtensions: ['js', 'ts'],
-  testEnvironment: 'node',
-  testMatch: ['**/*.test.ts'],
-  testRunner: 'jest-circus/runner',
-  transform: {
-    '^.+\\.ts$': 'ts-jest'
-  },
-  verbose: true
+  ...jestconfig,
+  name: 'keybase-notifications',
+  displayName: 'keybase-notifications',
+  collectCoverageFrom: [
+    "src/**/*.ts",
+  ],
+  "coveragePathIgnorePatterns": [
+    "<rootDir>/src/keybase.ts",
+    "<rootDir>/src/index.ts",
+  ]
 }

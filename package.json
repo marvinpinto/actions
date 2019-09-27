@@ -11,11 +11,21 @@
     "type": "git",
     "url": "git+https://github.com/marvinpinto/actions.git"
   },
+  "config": {
+    "eslintPaths": ".*.js *.js",
+    "prettierPaths": "*.{json,md,yaml,yml} !package.json"
+  },
   "scripts": {
-    "test": "lerna run test --stream",
+    "test": "lerna run test --stream --no-bail",
+    "build": "lerna run build --stream",
     "clean": "lerna run clean --stream && rm -rf node_modules yarn-error.log",
-    "lint": "lerna run lint --stream",
-    "lintfix": "lerna run lintfix --stream"
+    "reinstall": "yarn clean && yarn install",
+    "lint": "lerna run lint --stream && yarn run lint:eslint && yarn run lint:prettier",
+    "lint:eslint": "eslint  $npm_package_config_eslintPaths",
+    "lint:prettier": "prettier --list-different $npm_package_config_prettierPaths",
+    "lintfix": "lerna run lintfix --stream && yarn run lintfix:eslint && yarn run lintfix:prettier",
+    "lintfix:eslint": "eslint --fix  $npm_package_config_eslintPaths",
+    "lintfix:prettier": "prettier --write $npm_package_config_prettierPaths"
   },
   "devDependencies": {
     "@types/jest": "^24.0.18",
@@ -33,26 +43,5 @@
     "ts-jest": "^24.1.0",
     "typescript": "^3.6.3"
   },
-  "eslintConfig": {
-    "parser": "@typescript-eslint/parser",
-    "extends": [
-      "plugin:@typescript-eslint/recommended",
-      "prettier/@typescript-eslint",
-      "plugin:prettier/recommended"
-    ],
-    "parserOptions": {
-      "ecmaVersion": 2018,
-      "sourceType": "module"
-    },
-    "rules": {
-      "@typescript-eslint/explicit-function-return-type": 0
-    }
-  },
-  "prettier": {
-    "semi": true,
-    "trailingComma": "all",
-    "bracketSpacing": false,
-    "singleQuote": true,
-    "printWidth": 120
-  }
+  "eslintIgnore": ["!.*.js"]
 }
