@@ -2,8 +2,13 @@
 name: "ci"
 
 on:
-  - "push"
-  - "pull_request"
+  push:
+  pull_request:
+    types:
+      - "opened"
+      - "closed"
+      - "reopened"
+      - "synchronize"
 
 jobs:
   test:
