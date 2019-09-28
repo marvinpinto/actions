@@ -5,5 +5,5 @@ module.exports = {
   name: 'keybase-notifications',
   displayName: 'keybase-notifications',
   collectCoverageFrom: ['src/**/*.ts'],
-  coveragePathIgnorePatterns: ['<rootDir>/src/keybase.ts', '<rootDir>/src/index.ts'],
+  coveragePathIgnorePatterns: ['<rootDir>/src/keybase.ts', '<rootDir>/src/index.ts', '<rootDir>/src/utils.ts'],
 };

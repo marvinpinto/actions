@@ -22,7 +22,7 @@ export async function main() {
     const githubUsername = get(context, 'payload.sender.login', '');
     const associatedKeybaseUsername = await kb.getKeybaseUsername(githubUsername);
 
-    const chatMessage: string = generateChatMessage({context, keybaseUsername: associatedKeybaseUsername});
+    const chatMessage: string = await generateChatMessage({context, keybaseUsername: associatedKeybaseUsername});
     if (chatMessage) {
       await kb.sendChatMessage({
         teamInfo: {

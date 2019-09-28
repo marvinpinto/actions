@@ -6,6 +6,7 @@ import * as path from 'path';
 describe('main handler', () => {
   let mockKeybase;
   let mockKeybaseMethods;
+  let mockUtils;
 
   beforeEach(() => {
     jest.resetModules();
@@ -26,6 +27,13 @@ describe('main handler', () => {
     });
     jest.mock('../src/keybase', () => {
       return mockKeybase;
+    });
+
+    mockUtils = {
+      getShortenedUrl: jest.fn(() => Promise.resolve('https://example.com')),
+    };
+    jest.mock('../src/utils', () => {
+      return mockUtils;
     });
   });
 
@@ -79,7 +87,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'GitHub user `marvinpinto` *force-pushed* 1 commit(s) to `refs/heads/master` - https://github.com/marvinpinto/keybase-notifications-action/commit/8c1ccd210a0fb98e7f35213fc234f6def1eec9bc\n> - Run the generated action locally on spec ..',
+        'GitHub user `marvinpinto` *force-pushed* 1 commit(s) to `refs/heads/master` - https://example.com\n> - Run the generated action locally on spec ..',
     });
   });
 
@@ -108,7 +116,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'GitHub user `marvinpinto` *pushed* 2 commit(s) to `refs/heads/master` - https://github.com/marvinpinto/keybase-notifications-action/commit/811c5dd3500dabb4487444674669a1c885f38b61\n> - Add the functionality to deal with GitHu ..\n> - Make up a fake commit for testing',
+        'GitHub user `marvinpinto` *pushed* 2 commit(s) to `refs/heads/master` - https://example.com\n> - Add the functionality to deal with GitHu ..\n> - Make up a fake commit for testing',
     });
   });
 
@@ -124,7 +132,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'User @keybasebob *pushed* 2 commit(s) to `refs/heads/master` - https://github.com/marvinpinto/keybase-notifications-action/commit/811c5dd3500dabb4487444674669a1c885f38b61\n> - Add the functionality to deal with GitHu ..\n> - Make up a fake commit for testing',
+        'User @keybasebob *pushed* 2 commit(s) to `refs/heads/master` - https://example.com\n> - Add the functionality to deal with GitHu ..\n> - Make up a fake commit for testing',
     });
   });
 
@@ -154,7 +162,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'PR #2 *updated* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/pull/2\n> Title: *test: update for only pr events*\n> Need this for testing. Will probably remove later.',
+        'PR #2 *updated* by GitHub user `marvinpinto` - https://example.com\n> Title: *test: update for only pr events*\n> Need this for testing. Will probably remove later.',
     });
   });
 
@@ -168,8 +176,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
-      message:
-        'PR #3 *closed* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/pull/3\n> Title: *Pull request*\n> ',
+      message: 'PR #3 *closed* by GitHub user `marvinpinto` - https://example.com\n> Title: *Pull request*\n> ',
     });
   });
 
@@ -184,7 +191,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'PR #2 *reopened* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/pull/2\n> Title: *test: update for only pr events*\n> Need this for testing. Will probably remove later.',
+        'PR #2 *reopened* by GitHub user `marvinpinto` - https://example.com\n> Title: *test: update for only pr events*\n> Need this for testing. Will probably remove later.',
     });
   });
 
@@ -198,8 +205,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
-      message:
-        'PR #3 *merged* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/pull/3\n> Title: *Pull request*\n> ',
+      message: 'PR #3 *merged* by GitHub user `marvinpinto` - https://example.com\n> Title: *Pull request*\n> ',
     });
   });
 
@@ -214,8 +220,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
-      message:
-        'PR #4 *opened* by @keybasebob - https://github.com/marvinpinto/actions/pull/4\n> Title: *Pull request*\n> ',
+      message: 'PR #4 *opened* by @keybasebob - https://example.com\n> Title: *Pull request*\n> ',
     });
   });
 
@@ -231,7 +236,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'New comment on `marvinpinto/actions@dea24cc` by @keybasebob - https://github.com/marvinpinto/actions/commit/dea24ccf0943e99bc9c5084adddb08613245686e#commitcomment-35276166\n> This is a test commit comment!',
+        'New comment on `marvinpinto/actions@dea24cc` by @keybasebob - https://example.com\n> This is a test commit comment!',
     });
   });
 
@@ -246,7 +251,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'Issue #6 *opened* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/issues/6\n> Title: *This is a test issue*\n> ',
+        'Issue #6 *opened* by GitHub user `marvinpinto` - https://example.com\n> Title: *This is a test issue*\n> ',
     });
   });
 
@@ -261,7 +266,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'Issue #6 *updated* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/issues/6\n> Title: *This is a test issue with updates*\n> ',
+        'Issue #6 *updated* by GitHub user `marvinpinto` - https://example.com\n> Title: *This is a test issue with updates*\n> ',
     });
   });
 
@@ -276,7 +281,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'Issue #6 *closed* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/issues/6\n> Title: *This is a test issue with updates*\n> ',
+        'Issue #6 *closed* by GitHub user `marvinpinto` - https://example.com\n> Title: *This is a test issue with updates*\n> ',
     });
   });
 
@@ -292,7 +297,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'Issue #6 *reopened* by @keybasebob - https://github.com/marvinpinto/actions/issues/6\n> Title: *This is a test issue with updates*\n> ',
+        'Issue #6 *reopened* by @keybasebob - https://example.com\n> Title: *This is a test issue with updates*\n> ',
     });
   });
 
@@ -307,8 +312,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
-      message:
-        '*New* comment on Issue #6 from @keybasebob. https://github.com/marvinpinto/actions/issues/6\n> This is a test issue comment.',
+      message: '*New* comment on Issue #6 from @keybasebob. https://example.com\n> This is a test issue comment.',
     });
   });
 
@@ -323,7 +327,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        '*Updated* comment on Issue #6 from GitHub user `marvinpinto`. https://github.com/marvinpinto/actions/issues/6\n> This is an edited issue comment.',
+        '*Updated* comment on Issue #6 from GitHub user `marvinpinto`. https://example.com\n> This is an edited issue comment.',
     });
   });
 
@@ -338,7 +342,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        '*Deleted* comment on Issue #6 by GitHub user `marvinpinto`. https://github.com/marvinpinto/actions/issues/6\n> This is an edited issue comment.',
+        '*Deleted* comment on Issue #6 by GitHub user `marvinpinto`. https://example.com\n> This is an edited issue comment.',
     });
   });
 });

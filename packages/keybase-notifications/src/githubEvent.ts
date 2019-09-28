@@ -1,4 +1,5 @@
 import {get} from 'lodash';
+import {getShortenedUrl} from './utils';
 
 function getShortSHA(sha): string {
   const coreAbbrev = 7;
@@ -19,11 +20,11 @@ export function parseIntoQuotedString(body): string {
   return quotedStr;
 }
 
-function parsePushEvent({payload, keybaseUsername}): string {
+async function parsePushEvent({payload, keybaseUsername}): Promise<string> {
   const ghUser = get(payload, 'sender.login', 'UNKNOWN');
   const commits = get(payload, 'commits', []);
   const branchRef = get(payload, 'ref', 'N/A');
-  const url = get(payload, 'head_commit.url', 'N/A');
+  const url = await getShortenedUrl(get(payload, 'head_commit.url', 'N/A'));
   const forced = get(payload, 'forced', false);
   const forcedStr = forced ? '*force-pushed*' : '*pushed*';
   const userStr = keybaseUsername ? `User @${keybaseUsername}` : `GitHub user \`${ghUser}\``;
@@ -52,9 +53,9 @@ function parseRepoStarringEvent({payload, keybaseUsername}): string {
   return `Repository \`${repo}\` starred by ${userStr} :+1: :star:`;
 }
 
-function parsePullRequestEvent({payload, keybaseUsername}): string {
+async function parsePullRequestEvent({payload, keybaseUsername}): Promise<string> {
   const ghUser = get(payload, 'sender.login', 'UNKNOWN');
-  const url = get(payload, 'pull_request.html_url', 'N/A');
+  const url = await getShortenedUrl(get(payload, 'pull_request.html_url', 'N/A'));
   const num = get(payload, 'number', 'n/a');
   const title = get(payload, 'pull_request.title', 'N/A');
   const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${ghUser}\``;
@@ -72,20 +73,20 @@ function parsePullRequestEvent({payload, keybaseUsername}): string {
   return `PR #${num} ${actionStr} by ${userStr} - ${url}\n> Title: *${title}*\n${quotedBody}`;
 }
 
-function parseCommitCommentEvent({payload, keybaseUsername}): string {
+async function parseCommitCommentEvent({payload, keybaseUsername}): Promise<string> {
   const ghUser = get(payload, 'sender.login', 'UNKNOWN');
   const repo = get(payload, 'repository.full_name', 'UNKNOWN');
   const userStr = keybaseUsername ? `@${keybaseUsername}` : `\`${ghUser}\``;
   const sha = getShortSHA(get(payload, 'comment.commit_id', 'n/a'));
-  const url = get(payload, 'comment.html_url', 'N/A');
+  const url = await getShortenedUrl(get(payload, 'comment.html_url', 'N/A'));
   const body = get(payload, 'comment.body', '');
   const quotedBody = parseIntoQuotedString(body);
   return `New comment on \`${repo}@${sha}\` by ${userStr} - ${url}\n${quotedBody}`;
 }
 
-function parseIssuesEvent({payload, keybaseUsername}): string {
+async function parseIssuesEvent({payload, keybaseUsername}): Promise<string> {
   const ghUser = get(payload, 'sender.login', 'UNKNOWN');
-  const url = get(payload, 'issue.html_url', 'N/A');
+  const url = await getShortenedUrl(get(payload, 'issue.html_url', 'N/A'));
   const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${ghUser}\``;
   const action = get(payload, 'action', null);
   const issueNumber = get(payload, 'issue.number', 'n/a');
@@ -102,9 +103,9 @@ function parseIssuesEvent({payload, keybaseUsername}): string {
   return `Issue #${issueNumber} ${actionStr} by ${userStr} - ${url}\n> Title: *${issueTitle}*\n${quotedBody}`;
 }
 
-function parseIssueCommentEvent({payload, keybaseUsername}): string {
+async function parseIssueCommentEvent({payload, keybaseUsername}): Promise<string> {
   const ghUser = get(payload, 'sender.login', 'UNKNOWN');
-  const url = get(payload, 'issue.html_url', 'N/A');
+  const url = await getShortenedUrl(get(payload, 'issue.html_url', 'N/A'));
   const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${ghUser}\``;
   const action = get(payload, 'action', null);
   const issueNumber = get(payload, 'issue.number', 'n/a');
@@ -120,10 +121,10 @@ function parseIssueCommentEvent({payload, keybaseUsername}): string {
   return `${actionStr} comment on Issue #${issueNumber} ${preposition} ${userStr}. ${url}\n${quotedComment}`;
 }
 
-export function generateChatMessage({context, keybaseUsername}): string {
+export async function generateChatMessage({context, keybaseUsername}): Promise<string> {
   console.debug(`GitHub event: ${JSON.stringify(context)}`);
   if (get(context, 'eventName', null) === 'push') {
-    return parsePushEvent({payload: context.payload, keybaseUsername});
+    return await parsePushEvent({payload: context.payload, keybaseUsername});
   }
 
   if (get(context, 'eventName', null) === 'watch') {
@@ -131,19 +132,19 @@ export function generateChatMessage({context, keybaseUsername}): string {
   }
 
   if (get(context, 'eventName', null) === 'pull_request') {
-    return parsePullRequestEvent({payload: context.payload, keybaseUsername});
+    return await parsePullRequestEvent({payload: context.payload, keybaseUsername});
   }
 
   if (get(context, 'eventName', null) === 'commit_comment') {
-    return parseCommitCommentEvent({payload: context.payload, keybaseUsername});
+    return await parseCommitCommentEvent({payload: context.payload, keybaseUsername});
   }
 
   if (get(context, 'eventName', null) === 'issues') {
-    return parseIssuesEvent({payload: context.payload, keybaseUsername});
+    return await parseIssuesEvent({payload: context.payload, keybaseUsername});
   }
 
   if (get(context, 'eventName', null) === 'issue_comment') {
-    return parseIssueCommentEvent({payload: context.payload, keybaseUsername});
+    return await parseIssueCommentEvent({payload: context.payload, keybaseUsername});
   }
 
   console.error('Ignoring this event as it is unsupported by this application.');
