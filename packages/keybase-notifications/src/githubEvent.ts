@@ -50,6 +50,23 @@ function parseCommitCommentEvent({payload, keybaseUsername}): string {
   return `New comment on \`${repo}@${sha}\` by ${userStr}. See ${url} for details.`;
 }
 
+function parseIssuesEvent({payload, keybaseUsername}): string {
+  const ghUser = get(payload, 'sender.login', 'UNKNOWN');
+  const url = get(payload, 'issue.html_url', 'N/A');
+  const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${ghUser}\``;
+  const action = get(payload, 'action', null);
+  const issueNumber = get(payload, 'issue.number', 'n/a');
+  const issueTitle = get(payload, 'issue.title', 'n/a');
+  const actionMap = {
+    opened: '*opened*',
+    edited: '*updated*',
+    closed: '*closed*',
+    reopened: '*reopened*',
+  };
+  const actionStr = get(actionMap, action, 'n/a');
+  return `Issue #${issueNumber} - \`${issueTitle}\` ${actionStr} by ${userStr}. See ${url} for details.`;
+}
+
 export function generateChatMessage({context, keybaseUsername}): string {
   console.debug(`GitHub event: ${JSON.stringify(context)}`);
   if (get(context, 'eventName', null) === 'push') {
@@ -66,6 +83,10 @@ export function generateChatMessage({context, keybaseUsername}): string {
 
   if (get(context, 'eventName', null) === 'commit_comment') {
     return parseCommitCommentEvent({payload: context.payload, keybaseUsername});
+  }
+
+  if (get(context, 'eventName', null) === 'issues') {
+    return parseIssuesEvent({payload: context.payload, keybaseUsername});
   }
 
   console.error('Ignoring this event as it is unsupported by this application.');

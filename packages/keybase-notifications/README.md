@@ -64,6 +64,12 @@ on:
       - "reopened"
       - "synchronize"
   commit_comment:
+  issues:
+    types:
+      - "opened"
+      - "edited"
+      - "closed"
+      - "reopened"
 ```
 
 ## Filtering Notifications

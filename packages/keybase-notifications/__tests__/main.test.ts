@@ -229,4 +229,65 @@ describe('main handler', () => {
         'New comment on `marvinpinto/actions@dea24cc` by @keybasebob. See https://github.com/marvinpinto/actions/commit/dea24ccf0943e99bc9c5084adddb08613245686e#commitcomment-35276166 for details.',
     });
   });
+
+  it('is able to process a new issue event', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'issue-new.json');
+    process.env['GITHUB_EVENT_NAME'] = 'issues';
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message:
+        'Issue #6 - `This is a test issue` *opened* by GitHub user `marvinpinto`. See https://github.com/marvinpinto/actions/issues/6 for details.',
+    });
+  });
+
+  it('is able to process an updated issue event', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'issue-updated.json');
+    process.env['GITHUB_EVENT_NAME'] = 'issues';
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message:
+        'Issue #6 - `This is a test issue with updates` *updated* by GitHub user `marvinpinto`. See https://github.com/marvinpinto/actions/issues/6 for details.',
+    });
+  });
+
+  it('is able to process a closed issue event', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'issue-closed.json');
+    process.env['GITHUB_EVENT_NAME'] = 'issues';
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message:
+        'Issue #6 - `This is a test issue with updates` *closed* by GitHub user `marvinpinto`. See https://github.com/marvinpinto/actions/issues/6 for details.',
+    });
+  });
+
+  it('is able to process a reopened issue event', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'issue-reopened.json');
+    process.env['GITHUB_EVENT_NAME'] = 'issues';
+    mockKeybaseMethods.getKeybaseUsername = jest.fn(() => 'keybasebob');
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message:
+        'Issue #6 - `This is a test issue with updates` *reopened* by @keybasebob. See https://github.com/marvinpinto/actions/issues/6 for details.',
+    });
+  });
 });

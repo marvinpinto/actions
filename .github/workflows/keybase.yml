@@ -13,11 +13,16 @@ on:
       - "reopened"
       - "synchronize"
   commit_comment:
+  issues:
+    types:
+      - "opened"
+      - "edited"
+      - "closed"
+      - "reopened"
 
   # Not yet implemented
   fork:
   issue_comment:
-  issues:
 
 jobs:
   keybase:
