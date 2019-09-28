@@ -153,7 +153,8 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
-      message: 'PR https://github.com/marvinpinto/actions/pull/2 has been *updated* by GitHub user `marvinpinto`.',
+      message:
+        'PR #2 *updated* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/pull/2\n> Title: *test: update for only pr events*\n> Need this for testing. Will probably remove later.',
     });
   });
 
@@ -167,7 +168,8 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
-      message: 'PR https://github.com/marvinpinto/actions/pull/3 has been *closed* by GitHub user `marvinpinto`.',
+      message:
+        'PR #3 *closed* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/pull/3\n> Title: *Pull request*\n> ',
     });
   });
 
@@ -181,7 +183,8 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
-      message: 'PR https://github.com/marvinpinto/actions/pull/2 has been *reopened* by GitHub user `marvinpinto`.',
+      message:
+        'PR #2 *reopened* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/pull/2\n> Title: *test: update for only pr events*\n> Need this for testing. Will probably remove later.',
     });
   });
 
@@ -195,7 +198,8 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
-      message: 'PR https://github.com/marvinpinto/actions/pull/3 has been *merged* by GitHub user `marvinpinto`.',
+      message:
+        'PR #3 *merged* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/pull/3\n> Title: *Pull request*\n> ',
     });
   });
 
@@ -210,7 +214,8 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
-      message: 'New PR https://github.com/marvinpinto/actions/pull/4 *opened* by @keybasebob.',
+      message:
+        'PR #4 *opened* by @keybasebob - https://github.com/marvinpinto/actions/pull/4\n> Title: *Pull request*\n> ',
     });
   });
 

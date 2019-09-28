@@ -40,11 +40,13 @@ function parseRepoStarringEvent({payload, keybaseUsername}): string {
 function parsePullRequestEvent({payload, keybaseUsername}): string {
   const ghUser = get(payload, 'sender.login', 'UNKNOWN');
   const url = get(payload, 'pull_request.html_url', 'N/A');
+  const num = get(payload, 'number', 'n/a');
+  const title = get(payload, 'pull_request.title', 'N/A');
   const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${ghUser}\``;
   const action = get(payload, 'action', null);
   const merged = get(payload, 'pull_request.merged', false);
-  const strNewPrPrefix = action === 'opened' ? 'New PR' : 'PR';
-  const strPastTense = action === 'opened' ? '' : ' has been';
+  const body = get(payload, 'pull_request.body', '');
+  const quotedBody = parseIntoQuotedString(body);
   const actionMap = {
     synchronize: '*updated*',
     opened: '*opened*',
@@ -52,7 +54,7 @@ function parsePullRequestEvent({payload, keybaseUsername}): string {
     reopened: '*reopened*',
   };
   const actionStr = get(actionMap, action, 'n/a');
-  return `${strNewPrPrefix} ${url}${strPastTense} ${actionStr} by ${userStr}.`;
+  return `PR #${num} ${actionStr} by ${userStr} - ${url}\n> Title: *${title}*\n${quotedBody}`;
 }
 
 function parseCommitCommentEvent({payload, keybaseUsername}): string {
