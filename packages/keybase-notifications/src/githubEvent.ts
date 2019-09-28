@@ -28,6 +28,7 @@ async function parsePushEvent({payload, keybaseUsername}): Promise<string> {
   const forced = get(payload, 'forced', false);
   const forcedStr = forced ? '*force-pushed*' : '*pushed*';
   const userStr = keybaseUsername ? `User @${keybaseUsername}` : `GitHub user \`${ghUser}\``;
+  const repo = get(payload, 'repository.full_name', 'n/a');
 
   // We only care about the first 40 chars of the commit messages
   const commitMsgLen = 40;
@@ -43,7 +44,7 @@ async function parsePushEvent({payload, keybaseUsername}): Promise<string> {
     });
   const quotedCommitMessages = parseIntoQuotedString(commitMessagesStr);
 
-  return `${userStr} ${forcedStr} ${commits.length} commit(s) to \`${branchRef}\` - ${url}\n${quotedCommitMessages}`;
+  return `${userStr} ${forcedStr} ${commits.length} commit(s) to \`${branchRef}\` - ${url}\n> _repo: ${repo}_\n${quotedCommitMessages}`;
 }
 
 function parseRepoStarringEvent({payload, keybaseUsername}): string {
@@ -62,6 +63,7 @@ async function parsePullRequestEvent({payload, keybaseUsername}): Promise<string
   const action = get(payload, 'action', null);
   const merged = get(payload, 'pull_request.merged', false);
   const body = get(payload, 'pull_request.body', '');
+  const repo = get(payload, 'repository.full_name', 'n/a');
   const quotedBody = parseIntoQuotedString(body);
   const actionMap = {
     synchronize: '*updated*',
@@ -70,7 +72,7 @@ async function parsePullRequestEvent({payload, keybaseUsername}): Promise<string
     reopened: '*reopened*',
   };
   const actionStr = get(actionMap, action, 'n/a');
-  return `PR #${num} ${actionStr} by ${userStr} - ${url}\n> Title: *${title}*\n${quotedBody}`;
+  return `PR #${num} ${actionStr} by ${userStr} - ${url}\n> _repo: ${repo}_\n> Title: *${title}*\n${quotedBody}`;
 }
 
 async function parseCommitCommentEvent({payload, keybaseUsername}): Promise<string> {
@@ -88,6 +90,7 @@ async function parseIssuesEvent({payload, keybaseUsername}): Promise<string> {
   const ghUser = get(payload, 'sender.login', 'UNKNOWN');
   const url = await getShortenedUrl(get(payload, 'issue.html_url', 'N/A'));
   const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${ghUser}\``;
+  const repo = get(payload, 'repository.full_name', 'UNKNOWN');
   const action = get(payload, 'action', null);
   const issueNumber = get(payload, 'issue.number', 'n/a');
   const issueTitle = get(payload, 'issue.title', 'n/a');
@@ -100,7 +103,7 @@ async function parseIssuesEvent({payload, keybaseUsername}): Promise<string> {
     reopened: '*reopened*',
   };
   const actionStr = get(actionMap, action, 'n/a');
-  return `Issue #${issueNumber} ${actionStr} by ${userStr} - ${url}\n> Title: *${issueTitle}*\n${quotedBody}`;
+  return `Issue #${issueNumber} ${actionStr} by ${userStr} - ${url}\n> _repo: ${repo}_\n> Title: *${issueTitle}*\n${quotedBody}`;
 }
 
 async function parseIssueCommentEvent({payload, keybaseUsername}): Promise<string> {
@@ -108,6 +111,7 @@ async function parseIssueCommentEvent({payload, keybaseUsername}): Promise<strin
   const url = await getShortenedUrl(get(payload, 'comment.html_url', 'N/A'));
   const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${ghUser}\``;
   const action = get(payload, 'action', null);
+  const repo = get(payload, 'repository.full_name', 'n/a');
   const issueNumber = get(payload, 'issue.number', 'n/a');
   const commentBody = get(payload, 'comment.body', 'N/A');
   const actionMap = {
@@ -118,7 +122,7 @@ async function parseIssueCommentEvent({payload, keybaseUsername}): Promise<strin
   const actionStr = get(actionMap, action, 'N/A');
   const preposition = action === 'deleted' ? 'by' : 'from';
   const quotedComment = parseIntoQuotedString(commentBody);
-  return `${actionStr} comment on Issue #${issueNumber} ${preposition} ${userStr}. ${url}\n${quotedComment}`;
+  return `${actionStr} comment on Issue #${issueNumber} ${preposition} ${userStr}. ${url}\n> _repo: ${repo}_\n${quotedComment}`;
 }
 
 export async function generateChatMessage({context, keybaseUsername}): Promise<string> {
