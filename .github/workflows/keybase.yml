@@ -32,7 +32,15 @@ jobs:
   keybase:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "marvinpinto/actions/packages/keybase-notifications@latest"
+      - name: "Checkout source code"
+        uses: "actions/checkout@v1"
+
+      - name: "Install and build"
+        run: |
+          yarn run reinstall
+          yarn run build
+
+      - uses: "./packages/keybase-notifications/"
         with:
           keybase_username: "${{ secrets.KeybaseUsername }}"
           keybase_paper_key: "${{ secrets.KeybasePaperKey }}"
