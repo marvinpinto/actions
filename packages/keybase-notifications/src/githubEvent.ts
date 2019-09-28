@@ -21,13 +21,28 @@ export function parseIntoQuotedString(body): string {
 
 function parsePushEvent({payload, keybaseUsername}): string {
   const ghUser = get(payload, 'sender.login', 'UNKNOWN');
-  const numCommits = get(payload, 'commits', []).length;
+  const commits = get(payload, 'commits', []);
   const branchRef = get(payload, 'ref', 'N/A');
   const url = get(payload, 'head_commit.url', 'N/A');
   const forced = get(payload, 'forced', false);
-  const forcedStr = forced ? '*force-pushed*' : 'pushed';
+  const forcedStr = forced ? '*force-pushed*' : '*pushed*';
   const userStr = keybaseUsername ? `User @${keybaseUsername}` : `GitHub user \`${ghUser}\``;
-  return `${userStr} ${forcedStr} ${numCommits} commit(s) to \`${branchRef}\`. See ${url} for details.`;
+
+  // We only care about the first 40 chars of the commit messages
+  const commitMsgLen = 40;
+  const commitMessagesStr = commits
+    .map(commit => {
+      const msg = get(commit, 'message', '');
+      const shortenedMsg = msg.substring(0, commitMsgLen);
+      const msgStr = msg === shortenedMsg ? msg : `${shortenedMsg} ..`;
+      return `- ${msgStr}`;
+    })
+    .reduce((acc, commit) => {
+      return acc + `\n${commit}`;
+    });
+  const quotedCommitMessages = parseIntoQuotedString(commitMessagesStr);
+
+  return `${userStr} ${forcedStr} ${commits.length} commit(s) to \`${branchRef}\` - ${url}\n${quotedCommitMessages}`;
 }
 
 function parseRepoStarringEvent({payload, keybaseUsername}): string {

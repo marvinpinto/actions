@@ -27,6 +27,31 @@
       "timestamp": "2019-09-26T14:05:05-04:00",
       "tree_id": "3ee570e5a9281b079883058f7117ad9aabc0c623",
       "url": "https://github.com/marvinpinto/keybase-notifications-action/commit/811c5dd3500dabb4487444674669a1c885f38b61"
+    },
+    {
+      "added": ["__tests__/payloads/repo-starring.json"],
+      "author": {
+        "email": "git@pinto.im",
+        "name": "Marvin Pinto",
+        "username": "marvinpinto"
+      },
+      "committer": {
+        "email": "git@pinto.im",
+        "name": "Marvin Pinto",
+        "username": "marvinpinto"
+      },
+      "distinct": true,
+      "id": "811c5dd3500dabb4487444674669a1c885f38b62",
+      "message": "Make up a fake commit for testing",
+      "modified": [
+        "__tests__/main.test.ts",
+        "scripts/build_and_test.sh",
+        "src/githubEvent.ts"
+      ],
+      "removed": [],
+      "timestamp": "2019-09-26T14:06:05-04:00",
+      "tree_id": "3ee570e5a9281b079883058f7117ad9aabc0c623",
+      "url": "https://github.com/marvinpinto/keybase-notifications-action/commit/811c5dd3500dabb4487444674669a1c885f38b61"
     }
   ],
   "compare": "https://github.com/marvinpinto/keybase-notifications-action/compare/76f01f322718...811c5dd3500d",

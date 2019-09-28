@@ -79,7 +79,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'GitHub user `marvinpinto` *force-pushed* 1 commit(s) to `refs/heads/master`. See https://github.com/marvinpinto/keybase-notifications-action/commit/8c1ccd210a0fb98e7f35213fc234f6def1eec9bc for details.',
+        'GitHub user `marvinpinto` *force-pushed* 1 commit(s) to `refs/heads/master` - https://github.com/marvinpinto/keybase-notifications-action/commit/8c1ccd210a0fb98e7f35213fc234f6def1eec9bc\n> - Run the generated action locally on spec ..',
     });
   });
 
@@ -108,7 +108,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'GitHub user `marvinpinto` pushed 1 commit(s) to `refs/heads/master`. See https://github.com/marvinpinto/keybase-notifications-action/commit/811c5dd3500dabb4487444674669a1c885f38b61 for details.',
+        'GitHub user `marvinpinto` *pushed* 2 commit(s) to `refs/heads/master` - https://github.com/marvinpinto/keybase-notifications-action/commit/811c5dd3500dabb4487444674669a1c885f38b61\n> - Add the functionality to deal with GitHu ..\n> - Make up a fake commit for testing',
     });
   });
 
@@ -124,7 +124,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'User @keybasebob pushed 1 commit(s) to `refs/heads/master`. See https://github.com/marvinpinto/keybase-notifications-action/commit/811c5dd3500dabb4487444674669a1c885f38b61 for details.',
+        'User @keybasebob *pushed* 2 commit(s) to `refs/heads/master` - https://github.com/marvinpinto/keybase-notifications-action/commit/811c5dd3500dabb4487444674669a1c885f38b61\n> - Add the functionality to deal with GitHu ..\n> - Make up a fake commit for testing',
     });
   });
 
