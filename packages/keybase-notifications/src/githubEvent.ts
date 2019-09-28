@@ -71,6 +71,8 @@ function parseIssuesEvent({payload, keybaseUsername}): string {
   const action = get(payload, 'action', null);
   const issueNumber = get(payload, 'issue.number', 'n/a');
   const issueTitle = get(payload, 'issue.title', 'n/a');
+  const issueBody = get(payload, 'issue.body', '');
+  const quotedBody = parseIntoQuotedString(issueBody);
   const actionMap = {
     opened: '*opened*',
     edited: '*updated*',
@@ -78,7 +80,7 @@ function parseIssuesEvent({payload, keybaseUsername}): string {
     reopened: '*reopened*',
   };
   const actionStr = get(actionMap, action, 'n/a');
-  return `Issue #${issueNumber} - \`${issueTitle}\` ${actionStr} by ${userStr}. See ${url} for details.`;
+  return `Issue #${issueNumber} ${actionStr} by ${userStr} - ${url}\n> Title: *${issueTitle}*\n${quotedBody}`;
 }
 
 function parseIssueCommentEvent({payload, keybaseUsername}): string {

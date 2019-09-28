@@ -241,7 +241,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'Issue #6 - `This is a test issue` *opened* by GitHub user `marvinpinto`. See https://github.com/marvinpinto/actions/issues/6 for details.',
+        'Issue #6 *opened* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/issues/6\n> Title: *This is a test issue*\n> ',
     });
   });
 
@@ -256,7 +256,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'Issue #6 - `This is a test issue with updates` *updated* by GitHub user `marvinpinto`. See https://github.com/marvinpinto/actions/issues/6 for details.',
+        'Issue #6 *updated* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/issues/6\n> Title: *This is a test issue with updates*\n> ',
     });
   });
 
@@ -271,7 +271,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'Issue #6 - `This is a test issue with updates` *closed* by GitHub user `marvinpinto`. See https://github.com/marvinpinto/actions/issues/6 for details.',
+        'Issue #6 *closed* by GitHub user `marvinpinto` - https://github.com/marvinpinto/actions/issues/6\n> Title: *This is a test issue with updates*\n> ',
     });
   });
 
@@ -287,7 +287,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'Issue #6 - `This is a test issue with updates` *reopened* by @keybasebob. See https://github.com/marvinpinto/actions/issues/6 for details.',
+        'Issue #6 *reopened* by @keybasebob - https://github.com/marvinpinto/actions/issues/6\n> Title: *This is a test issue with updates*\n> ',
     });
   });
 
