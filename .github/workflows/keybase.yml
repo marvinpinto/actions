@@ -2,13 +2,22 @@
 name: "keybase"
 
 on:
-  - "push"
-  - "pull_request"
-  - "commit_comment"
-  - "fork"
-  - "issue_comment"
-  - "issues"
-  - "watch"
+  watch:
+    types:
+      - "started"
+  push:
+  pull_request:
+    types:
+      - "opened"
+      - "closed"
+      - "reopened"
+      - "synchronize"
+  commit_comment:
+
+  # Not yet implemented
+  fork:
+  issue_comment:
+  issues:
 
 jobs:
   keybase:

@@ -213,4 +213,20 @@ describe('main handler', () => {
       message: 'New PR https://github.com/marvinpinto/actions/pull/4 *opened* by @keybasebob.',
     });
   });
+
+  it('is able to process a commit_comment event', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'commit-comment.json');
+    process.env['GITHUB_EVENT_NAME'] = 'commit_comment';
+    mockKeybaseMethods.getKeybaseUsername = jest.fn(() => 'keybasebob');
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message:
+        'New comment on `marvinpinto/actions@dea24cc` by @keybasebob. See https://github.com/marvinpinto/actions/commit/dea24ccf0943e99bc9c5084adddb08613245686e#commitcomment-35276166 for details.',
+    });
+  });
 });

@@ -53,16 +53,17 @@ The following events are supported in this action. Everything else gets silently
 
 ```yaml
 on:
-  - watch: # when someone stars a repository
-      types:
-        - "started"
-  - "push" # when someone pushes to a repository branch
+  watch: # when someone stars a repository
+    types:
+      - "started"
+  push: # when someone pushes to a repository branch
   pull_request:
     types:
       - "opened"
       - "closed"
       - "reopened"
       - "synchronize"
+  commit_comment:
 ```
 
 ## Filtering Notifications
