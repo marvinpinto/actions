@@ -19,10 +19,14 @@ on:
       - "edited"
       - "closed"
       - "reopened"
+  issue_comment:
+    types:
+      - "created"
+      - "edited"
+      - "deleted"
 
   # Not yet implemented
   fork:
-  issue_comment:
 
 jobs:
   keybase:

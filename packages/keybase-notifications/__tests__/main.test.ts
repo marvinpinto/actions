@@ -290,4 +290,50 @@ describe('main handler', () => {
         'Issue #6 - `This is a test issue with updates` *reopened* by @keybasebob. See https://github.com/marvinpinto/actions/issues/6 for details.',
     });
   });
+
+  it('is able to process a new issue comment event', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'issue-comment-created.json');
+    process.env['GITHUB_EVENT_NAME'] = 'issue_comment';
+    mockKeybaseMethods.getKeybaseUsername = jest.fn(() => 'keybasebob');
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message:
+        '*New* comment on Issue #6 from @keybasebob. https://github.com/marvinpinto/actions/issues/6\n> This is a test issue comment.',
+    });
+  });
+
+  it('is able to process an updated issue comment event', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'issue-comment-edited.json');
+    process.env['GITHUB_EVENT_NAME'] = 'issue_comment';
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message:
+        '*Updated* comment on Issue #6 from GitHub user `marvinpinto`. https://github.com/marvinpinto/actions/issues/6\n> This is an edited issue comment.',
+    });
+  });
+
+  it('is able to process a deleted issue comment event', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'issue-comment-deleted.json');
+    process.env['GITHUB_EVENT_NAME'] = 'issue_comment';
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message:
+        '*Deleted* comment on Issue #6 by GitHub user `marvinpinto`. https://github.com/marvinpinto/actions/issues/6\n> This is an edited issue comment.',
+    });
+  });
 });

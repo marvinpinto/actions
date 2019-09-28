@@ -70,6 +70,11 @@ on:
       - "edited"
       - "closed"
       - "reopened"
+  issue_comment:
+    types:
+      - "created"
+      - "edited"
+      - "deleted"
 ```
 
 ## Filtering Notifications
