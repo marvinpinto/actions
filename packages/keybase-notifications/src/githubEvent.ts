@@ -105,7 +105,7 @@ async function parseIssuesEvent({payload, keybaseUsername}): Promise<string> {
 
 async function parseIssueCommentEvent({payload, keybaseUsername}): Promise<string> {
   const ghUser = get(payload, 'sender.login', 'UNKNOWN');
-  const url = await getShortenedUrl(get(payload, 'issue.html_url', 'N/A'));
+  const url = await getShortenedUrl(get(payload, 'comment.html_url', 'N/A'));
   const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${ghUser}\``;
   const action = get(payload, 'action', null);
   const issueNumber = get(payload, 'issue.number', 'n/a');
