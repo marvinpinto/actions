@@ -61,7 +61,9 @@ function parseCommitCommentEvent({payload, keybaseUsername}): string {
   const userStr = keybaseUsername ? `@${keybaseUsername}` : `\`${ghUser}\``;
   const sha = getShortSHA(get(payload, 'comment.commit_id', 'n/a'));
   const url = get(payload, 'comment.html_url', 'N/A');
-  return `New comment on \`${repo}@${sha}\` by ${userStr}. See ${url} for details.`;
+  const body = get(payload, 'comment.body', '');
+  const quotedBody = parseIntoQuotedString(body);
+  return `New comment on \`${repo}@${sha}\` by ${userStr} - ${url}\n${quotedBody}`;
 }
 
 function parseIssuesEvent({payload, keybaseUsername}): string {

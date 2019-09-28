@@ -226,7 +226,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'New comment on `marvinpinto/actions@dea24cc` by @keybasebob. See https://github.com/marvinpinto/actions/commit/dea24ccf0943e99bc9c5084adddb08613245686e#commitcomment-35276166 for details.',
+        'New comment on `marvinpinto/actions@dea24cc` by @keybasebob - https://github.com/marvinpinto/actions/commit/dea24ccf0943e99bc9c5084adddb08613245686e#commitcomment-35276166\n> This is a test commit comment!',
     });
   });
 
