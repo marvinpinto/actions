@@ -8,6 +8,7 @@ type Args = {
   releaseTag: string;
 };
 type Ref = Octokit.GitCreateRefParams;
+type ReleaseByTags = Octokit.ReposGetReleaseByTagParams;
 
 function getAndValidateArgs(): Args {
   const args = {
@@ -40,6 +41,24 @@ async function createReleaseTag(client: github.GitHub, refInfo: Ref) {
   core.endGroup();
 }
 
+async function deletePreviousGitHubRelease(client: github.GitHub, releaseInfo: ReleaseByTags) {
+  core.startGroup(`Deleting GitHub releases associated with the tag "${releaseInfo.tag}"`);
+  try {
+    console.log(`Searching for releases corresponding to the "${releaseInfo.tag}" tag`);
+    const resp = await client.repos.getReleaseByTag(releaseInfo);
+
+    console.log(`Deleting release: ${resp.data.id}`);
+    await client.repos.deleteRelease({
+      owner: releaseInfo.owner,
+      repo: releaseInfo.repo,
+      release_id: resp.data.id, // eslint-disable-line @typescript-eslint/camelcase
+    });
+  } catch (err) {
+    console.log(`Could not find release associated with tag "${releaseInfo.tag}"(${err.message})`);
+  }
+  core.endGroup();
+}
+
 export async function main() {
   try {
     const args = getAndValidateArgs();
@@ -54,6 +73,12 @@ export async function main() {
       ref: `refs/tags/${args.releaseTag}`,
       repo: github.context.repo.repo,
       sha: github.context.sha,
+    });
+
+    await deletePreviousGitHubRelease(client, {
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      tag: args.releaseTag,
     });
   } catch (error) {
     core.setFailed(error.message);

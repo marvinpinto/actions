@@ -51,13 +51,21 @@ describe('main handler', () => {
       })
       .reply(200);
 
+    const getReleaseByTag = nock('https://api.github.com')
+      .matchHeader('authorization', `token ${testGhToken}`)
+      .get(`/repos/marvinpinto/private-actions-tester/releases/tags/${testInputReleaseTag}`)
+      .reply(400);
+
     const inst = require('../src/main');
     await inst.main();
 
     expect(createRef.isDone()).toBe(true);
+    expect(getReleaseByTag.isDone()).toBe(true);
   });
 
   it('should update an existing release tag', async () => {
+    const foundReleaseId = 1235523222;
+
     const createRef = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
       .post('/repos/marvinpinto/private-actions-tester/git/refs', {
@@ -68,10 +76,22 @@ describe('main handler', () => {
 
     const updateRef = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
-      .patch('/repos/marvinpinto/private-actions-tester/git/refs/tags/testingtaglatest', {
+      .patch(`/repos/marvinpinto/private-actions-tester/git/refs/tags/${testInputReleaseTag}`, {
         sha: testGhSHA,
         force: true,
       })
+      .reply(200);
+
+    const getReleaseByTag = nock('https://api.github.com')
+      .matchHeader('authorization', `token ${testGhToken}`)
+      .get(`/repos/marvinpinto/private-actions-tester/releases/tags/${testInputReleaseTag}`)
+      .reply(200, {
+        id: foundReleaseId,
+      });
+
+    const deleteRelease = nock('https://api.github.com')
+      .matchHeader('authorization', `token ${testGhToken}`)
+      .delete(`/repos/marvinpinto/private-actions-tester/releases/${foundReleaseId}`)
       .reply(200);
 
     const inst = require('../src/main');
@@ -79,5 +99,7 @@ describe('main handler', () => {
 
     expect(createRef.isDone()).toBe(true);
     expect(updateRef.isDone()).toBe(true);
+    expect(getReleaseByTag.isDone()).toBe(true);
+    expect(deleteRelease.isDone()).toBe(true);
   });
 });
