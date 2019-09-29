@@ -7,8 +7,6 @@ type Args = {
   repoToken: string;
   releaseTag: string;
 };
-type Ref = Octokit.GitCreateRefParams;
-type ReleaseByTags = Octokit.ReposGetReleaseByTagParams;
 
 function getAndValidateArgs(): Args {
   const args = {
@@ -18,7 +16,7 @@ function getAndValidateArgs(): Args {
   return args;
 }
 
-async function createReleaseTag(client: github.GitHub, refInfo: Ref) {
+async function createReleaseTag(client: github.GitHub, refInfo: Octokit.GitCreateRefParams) {
   core.startGroup('Generating release tag');
   const friendlyTagName = refInfo.ref.substring(10); // 'refs/tags/latest' => 'latest'
   console.log(`Attempting to create or update release tag "${friendlyTagName}"`);
@@ -41,7 +39,7 @@ async function createReleaseTag(client: github.GitHub, refInfo: Ref) {
   core.endGroup();
 }
 
-async function deletePreviousGitHubRelease(client: github.GitHub, releaseInfo: ReleaseByTags) {
+async function deletePreviousGitHubRelease(client: github.GitHub, releaseInfo: Octokit.ReposGetReleaseByTagParams) {
   core.startGroup(`Deleting GitHub releases associated with the tag "${releaseInfo.tag}"`);
   try {
     console.log(`Searching for releases corresponding to the "${releaseInfo.tag}" tag`);
@@ -54,8 +52,16 @@ async function deletePreviousGitHubRelease(client: github.GitHub, releaseInfo: R
       release_id: resp.data.id, // eslint-disable-line @typescript-eslint/camelcase
     });
   } catch (err) {
-    console.log(`Could not find release associated with tag "${releaseInfo.tag}"(${err.message})`);
+    console.log(`Could not find release associated with tag "${releaseInfo.tag}" (${err.message})`);
   }
+  core.endGroup();
+}
+
+async function generateNewGitHubRelease(client: github.GitHub, releaseInfo: Octokit.ReposCreateReleaseParams) {
+  core.startGroup(`Generating new GitHub release for the "latest" tag`);
+
+  console.log('Creating new release');
+  await client.repos.createRelease(releaseInfo);
   core.endGroup();
 }
 
@@ -79,6 +85,16 @@ export async function main() {
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
       tag: args.releaseTag,
+    });
+
+    await generateNewGitHubRelease(client, {
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      tag_name: args.releaseTag, // eslint-disable-line @typescript-eslint/camelcase
+      name: 'Latest',
+      draft: false,
+      prerelease: true,
+      body: `Automatically generated from the current master branch (${github.context.sha})`,
     });
   } catch (error) {
     core.setFailed(error.message);

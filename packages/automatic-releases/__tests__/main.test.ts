@@ -56,11 +56,23 @@ describe('main handler', () => {
       .get(`/repos/marvinpinto/private-actions-tester/releases/tags/${testInputReleaseTag}`)
       .reply(400);
 
+    const createRelease = nock('https://api.github.com')
+      .matchHeader('authorization', `token ${testGhToken}`)
+      .post('/repos/marvinpinto/private-actions-tester/releases', {
+        tag_name: testInputReleaseTag, // eslint-disable-line @typescript-eslint/camelcase
+        name: 'Latest',
+        draft: false,
+        prerelease: true,
+        body: `Automatically generated from the current master branch (${testGhSHA})`,
+      })
+      .reply(200);
+
     const inst = require('../src/main');
     await inst.main();
 
     expect(createRef.isDone()).toBe(true);
     expect(getReleaseByTag.isDone()).toBe(true);
+    expect(createRelease.isDone()).toBe(true);
   });
 
   it('should update an existing release tag', async () => {
@@ -94,6 +106,17 @@ describe('main handler', () => {
       .delete(`/repos/marvinpinto/private-actions-tester/releases/${foundReleaseId}`)
       .reply(200);
 
+    const createRelease = nock('https://api.github.com')
+      .matchHeader('authorization', `token ${testGhToken}`)
+      .post('/repos/marvinpinto/private-actions-tester/releases', {
+        tag_name: testInputReleaseTag, // eslint-disable-line @typescript-eslint/camelcase
+        name: 'Latest',
+        draft: false,
+        prerelease: true,
+        body: `Automatically generated from the current master branch (${testGhSHA})`,
+      })
+      .reply(200);
+
     const inst = require('../src/main');
     await inst.main();
 
@@ -101,5 +124,6 @@ describe('main handler', () => {
     expect(updateRef.isDone()).toBe(true);
     expect(getReleaseByTag.isDone()).toBe(true);
     expect(deleteRelease.isDone()).toBe(true);
+    expect(createRelease.isDone()).toBe(true);
   });
 });
