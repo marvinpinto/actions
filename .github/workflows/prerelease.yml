@@ -4,7 +4,9 @@ name: "prerelease"
 on:
   push:
     branches:
-      - "master"
+      - "automatic-pre-releaser"
+    tags:
+      - "v*"
 
 jobs:
   prerelease:
@@ -14,14 +16,14 @@ jobs:
     steps:
       - name: "Checkout source code"
         uses: "actions/checkout@v1"
+        with:
+          lfs: true
 
-      - name: "Update git remotes"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Install and build"
         run: |
-          git config --global user.email "bot@github.com"
-          git config --global user.name "GitHub Actions"
-          git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          yarn run reinstall
+          yarn run build
 
-      - name: 'Generate the "latest" release'
-        run: "./scripts/release.sh latest"
+      - uses: "./packages/automatic-releases/"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"

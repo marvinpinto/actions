@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: "Checkout source code"
         uses: "actions/checkout@v1"
+        with:
+          lfs: true
 
       - name: "Build and run tests"
         run: |

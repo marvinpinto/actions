@@ -1,0 +1,17 @@
+name: "Automatic Releases"
+author: "marvinpinto"
+description: "Generate automatic releases whenever changes land on master"
+inputs:
+  repo_token:
+    description: "GitHub secret token"
+    required: true
+  release_tag:
+    description: "Git tag for your automatic releases"
+    required: false
+    default: "latest"
+runs:
+  using: "node12"
+  main: "dist/index.js"
+branding:
+  icon: "activity"
+  color: "red"
