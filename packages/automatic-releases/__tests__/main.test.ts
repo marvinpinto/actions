@@ -8,12 +8,19 @@ describe('main handler', () => {
   const testGhToken = 'fake-secret-token';
   const testGhSHA = 'f6f40d9fbd1130f7f2357bb54225567dbd7a3793';
   const testInputReleaseTag = 'testingtaglatest';
+  const testInputDraft = false;
+  const testInputPrerelease = true;
+  const testInputTitle = 'Development Build';
+  const testInputBody = `Automatically generated from the current master branch (${testGhSHA})`;
 
   beforeEach(() => {
     jest.resetModules();
     nock.disableNetConnect();
     process.env['INPUT_REPO_TOKEN'] = testGhToken;
     process.env['INPUT_RELEASE_TAG'] = testInputReleaseTag;
+    process.env['INPUT_DRAFT'] = testInputDraft.toString();
+    process.env['INPUT_PRERELEASE'] = testInputPrerelease.toString();
+    process.env['INPUT_TITLE'] = testInputTitle;
 
     process.env['GITHUB_EVENT_NAME'] = 'push';
     process.env['GITHUB_SHA'] = testGhSHA;
@@ -60,10 +67,10 @@ describe('main handler', () => {
       .matchHeader('authorization', `token ${testGhToken}`)
       .post('/repos/marvinpinto/private-actions-tester/releases', {
         tag_name: testInputReleaseTag, // eslint-disable-line @typescript-eslint/camelcase
-        name: 'Latest',
-        draft: false,
-        prerelease: true,
-        body: `Automatically generated from the current master branch (${testGhSHA})`,
+        name: testInputTitle,
+        draft: testInputDraft,
+        prerelease: testInputPrerelease,
+        body: testInputBody,
       })
       .reply(200);
 
@@ -110,10 +117,10 @@ describe('main handler', () => {
       .matchHeader('authorization', `token ${testGhToken}`)
       .post('/repos/marvinpinto/private-actions-tester/releases', {
         tag_name: testInputReleaseTag, // eslint-disable-line @typescript-eslint/camelcase
-        name: 'Latest',
-        draft: false,
-        prerelease: true,
-        body: `Automatically generated from the current master branch (${testGhSHA})`,
+        name: testInputTitle,
+        draft: testInputDraft,
+        prerelease: testInputPrerelease,
+        body: testInputBody,
       })
       .reply(200);
 

@@ -6,13 +6,26 @@ import {dumpGitHubEventPayload} from '../../keybase-notifications/src/utils';
 type Args = {
   repoToken: string;
   releaseTag: string;
+  draftRelease: boolean;
+  preRelease: boolean;
+  releaseTitle: string;
+  releaseBody: string;
 };
 
 function getAndValidateArgs(): Args {
   const args = {
     repoToken: core.getInput('repo_token', {required: true}),
     releaseTag: core.getInput('release_tag', {required: true}),
+    draftRelease: JSON.parse(core.getInput('draft', {required: true})),
+    preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
+    releaseTitle: core.getInput('title', {required: true}),
+    releaseBody: core.getInput('body', {required: false}),
   };
+
+  if (!args.releaseBody) {
+    args.releaseBody = `Automatically generated from the current master branch (${github.context.sha})`;
+  }
+
   return args;
 }
 
@@ -91,10 +104,10 @@ export async function main() {
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
       tag_name: args.releaseTag, // eslint-disable-line @typescript-eslint/camelcase
-      name: 'Latest',
-      draft: false,
-      prerelease: true,
-      body: `Automatically generated from the current master branch (${github.context.sha})`,
+      name: args.releaseTitle,
+      draft: args.draftRelease,
+      prerelease: args.preRelease,
+      body: args.releaseBody,
     });
   } catch (error) {
     core.setFailed(error.message);
