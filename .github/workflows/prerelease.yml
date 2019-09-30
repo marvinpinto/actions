@@ -27,3 +27,7 @@ jobs:
       - uses: "./packages/automatic-releases/"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          files: |
+            packages/automatic-releases/dist/index.js
+            packages/keybase-notifications/dist/index.js
+            packages/keybase-notifications/dist/keybase

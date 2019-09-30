@@ -24,6 +24,9 @@ inputs:
   body:
     description: "Text for the body of the release"
     required: false
+  files:
+    description: "Assets to upload to the release"
+    required: false
 runs:
   using: "node12"
   main: "dist/index.js"

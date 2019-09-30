@@ -12,6 +12,7 @@ describe('main handler', () => {
   const testInputPrerelease = true;
   const testInputTitle = 'Development Build';
   const testInputBody = `Automatically generated from the current master branch (${testGhSHA})`;
+  const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
 
   beforeEach(() => {
     jest.resetModules();
@@ -21,6 +22,7 @@ describe('main handler', () => {
     process.env['INPUT_DRAFT'] = testInputDraft.toString();
     process.env['INPUT_PRERELEASE'] = testInputPrerelease.toString();
     process.env['INPUT_TITLE'] = testInputTitle;
+    process.env['INPUT_FILES'] = testInputFiles;
 
     process.env['GITHUB_EVENT_NAME'] = 'push';
     process.env['GITHUB_SHA'] = testGhSHA;
@@ -50,6 +52,9 @@ describe('main handler', () => {
   });
 
   it('should create a new release tag', async () => {
+    delete process.env.INPUT_FILES;
+    const releaseUploadUrl = 'https://releaseupload.example.com';
+
     const createRef = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
       .post('/repos/marvinpinto/private-actions-tester/git/refs', {
@@ -63,6 +68,11 @@ describe('main handler', () => {
       .get(`/repos/marvinpinto/private-actions-tester/releases/tags/${testInputReleaseTag}`)
       .reply(400);
 
+    const deleteRelease = nock('https://api.github.com')
+      .matchHeader('authorization', `token ${testGhToken}`)
+      .delete(/.*/)
+      .reply(200);
+
     const createRelease = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
       .post('/repos/marvinpinto/private-actions-tester/releases', {
@@ -72,18 +82,28 @@ describe('main handler', () => {
         prerelease: testInputPrerelease,
         body: testInputBody,
       })
-      .reply(200);
+      .reply(200, {
+        upload_url: releaseUploadUrl, // eslint-disable-line @typescript-eslint/camelcase
+      });
 
     const inst = require('../src/main');
+    inst.uploadReleaseArtifacts = jest.fn(() => Promise.resolve());
     await inst.main();
 
     expect(createRef.isDone()).toBe(true);
     expect(getReleaseByTag.isDone()).toBe(true);
+    expect(deleteRelease.isDone()).toBe(false);
     expect(createRelease.isDone()).toBe(true);
+
+    expect(inst.uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
+    expect(inst.uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
+    // Should not attempt to upload any release artifacts, as there are none
+    expect(inst.uploadReleaseArtifacts.mock.calls[0][2]).toEqual([]);
   });
 
   it('should update an existing release tag', async () => {
     const foundReleaseId = 1235523222;
+    const releaseUploadUrl = 'https://releaseupload.example.com';
 
     const createRef = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
@@ -122,9 +142,12 @@ describe('main handler', () => {
         prerelease: testInputPrerelease,
         body: testInputBody,
       })
-      .reply(200);
+      .reply(200, {
+        upload_url: releaseUploadUrl, // eslint-disable-line @typescript-eslint/camelcase
+      });
 
     const inst = require('../src/main');
+    inst.uploadReleaseArtifacts = jest.fn(() => Promise.resolve());
     await inst.main();
 
     expect(createRef.isDone()).toBe(true);
@@ -132,5 +155,9 @@ describe('main handler', () => {
     expect(getReleaseByTag.isDone()).toBe(true);
     expect(deleteRelease.isDone()).toBe(true);
     expect(createRelease.isDone()).toBe(true);
+
+    expect(inst.uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
+    expect(inst.uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
+    expect(inst.uploadReleaseArtifacts.mock.calls[0][2]).toEqual(['file1.txt', 'file2.txt', '*.jar']);
   });
 });
