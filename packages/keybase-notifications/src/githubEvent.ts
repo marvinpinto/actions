@@ -1,7 +1,7 @@
 import {get} from 'lodash';
 import {getShortenedUrl} from './utils';
 
-function getShortSHA(sha): string {
+export function getShortSHA(sha): string {
   const coreAbbrev = 7;
   return sha.substring(0, coreAbbrev);
 }

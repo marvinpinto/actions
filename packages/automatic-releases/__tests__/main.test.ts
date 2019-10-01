@@ -3,6 +3,7 @@
 import * as process from 'process';
 import * as path from 'path';
 import nock from 'nock';
+import fs from 'fs';
 
 describe('main handler', () => {
   const testGhToken = 'fake-secret-token';
@@ -11,7 +12,7 @@ describe('main handler', () => {
   const testInputDraft = false;
   const testInputPrerelease = true;
   const testInputTitle = 'Development Build';
-  const testInputBody = `Automatically generated from the current master branch (${testGhSHA})`;
+  const testInputBody = `\n\n## Commits\n\n- [[f6f40d9](https://github.com/octocat/Hello-World/commit/${testGhSHA})]: Fix all the bugs (Monalisa Octocat)`;
   const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
 
   beforeEach(() => {
@@ -54,6 +55,19 @@ describe('main handler', () => {
   it('should create a new release tag', async () => {
     delete process.env.INPUT_FILES;
     const releaseUploadUrl = 'https://releaseupload.example.com';
+    const compareCommitsPayload = JSON.parse(
+      fs.readFileSync(path.join(__dirname, 'payloads', 'compare-commits.json'), 'utf8'),
+    );
+
+    const getCommitsSinceRelease = nock('https://api.github.com')
+      .matchHeader('authorization', `token ${testGhToken}`)
+      .get(`/repos/marvinpinto/private-actions-tester/compare/HEAD...${testGhSHA}`)
+      .reply(200, compareCommitsPayload);
+
+    const listAssociatedPRs = nock('https://api.github.com')
+      .matchHeader('authorization', `token ${testGhToken}`)
+      .get(`/repos/marvinpinto/private-actions-tester/commits/${testGhSHA}/pulls`)
+      .reply(200, []);
 
     const createRef = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
@@ -94,6 +108,8 @@ describe('main handler', () => {
     expect(getReleaseByTag.isDone()).toBe(true);
     expect(deleteRelease.isDone()).toBe(false);
     expect(createRelease.isDone()).toBe(true);
+    expect(getCommitsSinceRelease.isDone()).toBe(true);
+    expect(listAssociatedPRs.isDone()).toBe(true);
 
     expect(inst.uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
     expect(inst.uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
@@ -102,8 +118,32 @@ describe('main handler', () => {
   });
 
   it('should update an existing release tag', async () => {
+    const previousReleaseSHA = '4398ef4ea6f5a61880ca94ecfb8e60d1a38497dd';
     const foundReleaseId = 1235523222;
     const releaseUploadUrl = 'https://releaseupload.example.com';
+    const compareCommitsPayload = JSON.parse(
+      fs.readFileSync(path.join(__dirname, 'payloads', 'compare-commits.json'), 'utf8'),
+    );
+    const testInputBody = `\n\n## Commits\n\n- [[f6f40d9](https://github.com/octocat/Hello-World/commit/${testGhSHA})]: Fix all the bugs (Monalisa Octocat) [#22](https://example.com/PR22)`;
+
+    const getPreviousReleaseSHA = nock('https://api.github.com')
+      .matchHeader('authorization', `token ${testGhToken}`)
+      .get(`/repos/marvinpinto/private-actions-tester/git/refs/tags/${testInputReleaseTag}`)
+      .reply(200, {
+        object: {
+          sha: previousReleaseSHA,
+        },
+      });
+
+    const getCommitsSinceRelease = nock('https://api.github.com')
+      .matchHeader('authorization', `token ${testGhToken}`)
+      .get(`/repos/marvinpinto/private-actions-tester/compare/${previousReleaseSHA}...${testGhSHA}`)
+      .reply(200, compareCommitsPayload);
+
+    const listAssociatedPRs = nock('https://api.github.com')
+      .matchHeader('authorization', `token ${testGhToken}`)
+      .get(`/repos/marvinpinto/private-actions-tester/commits/${testGhSHA}/pulls`)
+      .reply(200, [{number: '22', html_url: 'https://example.com/PR22'}]); // eslint-disable-line @typescript-eslint/camelcase
 
     const createRef = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
@@ -155,6 +195,9 @@ describe('main handler', () => {
     expect(getReleaseByTag.isDone()).toBe(true);
     expect(deleteRelease.isDone()).toBe(true);
     expect(createRelease.isDone()).toBe(true);
+    expect(getPreviousReleaseSHA.isDone()).toBe(true);
+    expect(getCommitsSinceRelease.isDone()).toBe(true);
+    expect(listAssociatedPRs.isDone()).toBe(true);
 
     expect(inst.uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
     expect(inst.uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);

@@ -1,0 +1,103 @@
+[
+  {
+    "type": "revert",
+    "scope": null,
+    "subject": "revert a bunch of stuff",
+    "merge": null,
+    "header": "revert: revert a bunch of stuff",
+    "body": null,
+    "footer": null,
+    "notes": [],
+    "references": [],
+    "mentions": [],
+    "revert": null,
+    "extra": {
+      "commit": {
+        "sha": "4398ef4ea6f5a61880ca94ecfb8e60d1a38497dd",
+        "node_id": "MDY6Q29tbWl0MjExNTU5MTQxOjQzOThlZjRlYTZmNWE2MTg4MGNhOTRlY2ZiOGU2MGQxYTM4NDk3ZGQ=",
+        "commit": {
+          "author": {
+            "name": "Marvin Pinto",
+            "email": "git@pinto.im",
+            "date": "2019-09-29T15:52:09Z"
+          },
+          "committer": {
+            "name": "Marvin Pinto",
+            "email": "git@pinto.im",
+            "date": "2019-09-29T19:55:59Z"
+          },
+          "message": "revert: revert a bunch of stuff",
+          "tree": {
+            "sha": "8791b0f991294c63238ddf284b913be455131bd3",
+            "url": "https://api.github.com/repos/marvinpinto/private-actions-tester/git/trees/8791b0f991294c63238ddf284b913be455131bd3"
+          },
+          "url": "https://api.github.com/repos/marvinpinto/private-actions-tester/git/commits/4398ef4ea6f5a61880ca94ecfb8e60d1a38497dd",
+          "comment_count": 0,
+          "verification": {
+            "verified": false,
+            "reason": "unsigned",
+            "signature": null,
+            "payload": null
+          }
+        },
+        "url": "https://api.github.com/repos/marvinpinto/private-actions-tester/commits/4398ef4ea6f5a61880ca94ecfb8e60d1a38497dd",
+        "html_url": "https://github.com/marvinpinto/private-actions-tester/commit/4398ef4ea6f5a61880ca94ecfb8e60d1a38497dd",
+        "comments_url": "https://api.github.com/repos/marvinpinto/private-actions-tester/commits/4398ef4ea6f5a61880ca94ecfb8e60d1a38497dd/comments",
+        "author": {
+          "login": "marvinpinto",
+          "id": 1159942,
+          "node_id": "MDQ6VXNlcjExNTk5NDI=",
+          "avatar_url": "https://avatars0.githubusercontent.com/u/1159942?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/marvinpinto",
+          "html_url": "https://github.com/marvinpinto",
+          "followers_url": "https://api.github.com/users/marvinpinto/followers",
+          "following_url": "https://api.github.com/users/marvinpinto/following{/other_user}",
+          "gists_url": "https://api.github.com/users/marvinpinto/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/marvinpinto/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/marvinpinto/subscriptions",
+          "organizations_url": "https://api.github.com/users/marvinpinto/orgs",
+          "repos_url": "https://api.github.com/users/marvinpinto/repos",
+          "events_url": "https://api.github.com/users/marvinpinto/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/marvinpinto/received_events",
+          "type": "User",
+          "site_admin": false
+        },
+        "committer": {
+          "login": "marvinpinto",
+          "id": 1159942,
+          "node_id": "MDQ6VXNlcjExNTk5NDI=",
+          "avatar_url": "https://avatars0.githubusercontent.com/u/1159942?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/marvinpinto",
+          "html_url": "https://github.com/marvinpinto",
+          "followers_url": "https://api.github.com/users/marvinpinto/followers",
+          "following_url": "https://api.github.com/users/marvinpinto/following{/other_user}",
+          "gists_url": "https://api.github.com/users/marvinpinto/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/marvinpinto/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/marvinpinto/subscriptions",
+          "organizations_url": "https://api.github.com/users/marvinpinto/orgs",
+          "repos_url": "https://api.github.com/users/marvinpinto/repos",
+          "events_url": "https://api.github.com/users/marvinpinto/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/marvinpinto/received_events",
+          "type": "User",
+          "site_admin": false
+        },
+        "parents": [
+          {
+            "sha": "da6379ce1cfe8dd91b9681cf18c8b8c13d772d13",
+            "url": "https://api.github.com/repos/marvinpinto/private-actions-tester/commits/da6379ce1cfe8dd91b9681cf18c8b8c13d772d13",
+            "html_url": "https://github.com/marvinpinto/private-actions-tester/commit/da6379ce1cfe8dd91b9681cf18c8b8c13d772d13"
+          }
+        ]
+      },
+      "pullRequests": [
+        {
+          "number": 2,
+          "url": "https://github.com/marvinpinto/private-actions-tester/pull/2"
+        }
+      ],
+      "breakingChange": false
+    }
+  }
+]

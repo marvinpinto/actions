@@ -6,6 +6,9 @@ import globby from 'globby';
 import {lstatSync, readFileSync} from 'fs';
 import path from 'path';
 import md5File from 'md5-file/promise';
+import {sync as commitParser} from 'conventional-commits-parser';
+import defaultChangelogOpts from 'conventional-changelog-angular';
+import {isBreakingChange, generateChangelogFromParsedCommits} from './utils';
 
 type Args = {
   repoToken: string;
@@ -130,7 +133,92 @@ export const uploadReleaseArtifacts = async (client: github.GitHub, uploadUrl: s
   core.endGroup();
 };
 
-export async function main() {
+const getCommitsSinceRelease = async (
+  client: github.GitHub,
+  tagInfo: Octokit.GitGetRefParams,
+  currentSha: string,
+): Promise<Octokit.ReposCompareCommitsResponseCommitsItem[]> => {
+  core.startGroup('Retrieving commit history');
+
+  console.log('Determining state of the previous release');
+  let previousReleaseSha = '' as string;
+  console.log(`Searching for SHA corresponding to current "${tagInfo.ref}" tag`);
+  try {
+    const resp = await client.git.getRef(tagInfo);
+    previousReleaseSha = resp.data.object.sha;
+  } catch (err) {
+    console.log(
+      `Could not find SHA corresponding to tag "latest" (${err.message}). Assuming this is the first release.`,
+    );
+    previousReleaseSha = 'HEAD';
+  }
+
+  console.log(`Retrieving commits between ${previousReleaseSha} and ${currentSha}`);
+  const resp = await client.repos.compareCommits({
+    owner: tagInfo.owner,
+    repo: tagInfo.repo,
+    base: previousReleaseSha,
+    head: currentSha,
+  });
+
+  core.endGroup();
+  return resp.data.commits;
+};
+
+const getChangelog = async (
+  client: github.GitHub,
+  owner: string,
+  repo: string,
+  commits: Octokit.ReposCompareCommitsResponseCommitsItem[],
+): Promise<string> => {
+  const parsedCommits: object[] = [];
+  core.startGroup('Generating changelog');
+
+  for (const commit of commits) {
+    core.debug(`Processing commit: ${JSON.stringify(commit)}`);
+
+    core.debug(`Searching for pull requests associated with commit ${commit.sha}`);
+    const pulls = await client.repos.listPullRequestsAssociatedWithCommit({
+      owner: owner,
+      repo: repo,
+      commit_sha: commit.sha, // eslint-disable-line @typescript-eslint/camelcase
+    });
+    if (pulls.data.length) {
+      core.info(`Found ${pulls.data.length} pull request(s) associated with commit ${commit.sha}`);
+    }
+
+    const parsedCommitMsg = commitParser(commit.commit.message, defaultChangelogOpts);
+    parsedCommitMsg.extra = {
+      commit: commit,
+      pullRequests: [],
+      breakingChange: false,
+    };
+
+    parsedCommitMsg.extra.pullRequests = pulls.data.map(pr => {
+      return {
+        number: pr.number,
+        url: pr.html_url,
+      };
+    });
+
+    parsedCommitMsg.extra.breakingChange = isBreakingChange({
+      body: parsedCommitMsg.body,
+      footer: parsedCommitMsg.footer,
+    });
+    core.debug(`Parsed commit: ${JSON.stringify(parsedCommitMsg)}`);
+    parsedCommits.push(parsedCommitMsg);
+    core.info(`Adding commit "${parsedCommitMsg.header}" to the changelog`);
+  }
+
+  const changelog = generateChangelogFromParsedCommits(parsedCommits);
+  core.debug('Changelog:');
+  core.debug(changelog);
+
+  core.endGroup();
+  return changelog;
+};
+
+export const main = async () => {
   try {
     const args = getAndValidateArgs();
     const client = new github.GitHub(args.repoToken);
@@ -138,6 +226,23 @@ export async function main() {
     core.startGroup('Initializing the Automatic Releases action');
     dumpGitHubEventPayload();
     core.endGroup();
+
+    const commitsSinceRelease = await getCommitsSinceRelease(
+      client,
+      {
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        ref: `tags/${args.releaseTag}`,
+      },
+      github.context.sha,
+    );
+
+    const changelog = await getChangelog(
+      client,
+      github.context.repo.owner,
+      github.context.repo.repo,
+      commitsSinceRelease,
+    );
 
     await createReleaseTag(client, {
       owner: github.context.repo.owner,
@@ -159,7 +264,7 @@ export async function main() {
       name: args.releaseTitle,
       draft: args.draftRelease,
       prerelease: args.preRelease,
-      body: args.releaseBody,
+      body: changelog,
     });
 
     await uploadReleaseArtifacts(client, releaseUploadUrl, args.files);
@@ -167,4 +272,4 @@ export async function main() {
     core.setFailed(error.message);
     throw error;
   }
-}
+};
