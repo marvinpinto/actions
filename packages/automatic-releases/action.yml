@@ -21,9 +21,6 @@ inputs:
     description: "Release title"
     required: false
     default: "Development Build"
-  body:
-    description: "Text for the body of the release"
-    required: false
   files:
     description: "Assets to upload to the release"
     required: false

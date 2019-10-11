@@ -16,7 +16,6 @@ type Args = {
   draftRelease: boolean;
   preRelease: boolean;
   releaseTitle: string;
-  releaseBody: string;
   files: string[];
 };
 
@@ -27,17 +26,12 @@ const getAndValidateArgs = (): Args => {
     draftRelease: JSON.parse(core.getInput('draft', {required: true})),
     preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
     releaseTitle: core.getInput('title', {required: true}),
-    releaseBody: core.getInput('body', {required: false}),
     files: [] as string[],
   };
 
   const inputFilesStr = core.getInput('files', {required: false});
   if (inputFilesStr) {
     args.files = inputFilesStr.split(/\r?\n/);
-  }
-
-  if (!args.releaseBody) {
-    args.releaseBody = `Automatically generated from the current master branch (${github.context.sha})`;
   }
 
   return args;
