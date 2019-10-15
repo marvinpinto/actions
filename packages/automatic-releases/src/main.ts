@@ -193,6 +193,9 @@ const getCommitsSinceRelease = async (
     base: previousReleaseSha,
     head: currentSha,
   });
+  core.info(
+    `Successfully retrieved ${resp.data.commits.length} number of commits between ${previousReleaseSha} and ${currentSha}`,
+  );
 
   core.endGroup();
   return resp.data.commits;

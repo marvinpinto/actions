@@ -1,16 +1,14 @@
 ---
-name: "prerelease"
+name: "tagged-release"
 
 on:
   push:
-    branches:
-      - "automatic-pre-releaser"
     tags:
       - "v*"
 
 jobs:
-  prerelease:
-    name: "Pre Release"
+  tagged-release:
+    name: "Tagged Release"
     runs-on: "ubuntu-latest"
 
     steps:
@@ -27,6 +25,7 @@ jobs:
       - uses: "./packages/automatic-releases/"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
           files: |
             packages/automatic-releases/dist/index.js
             packages/keybase-notifications/dist/index.js
