@@ -32,6 +32,7 @@ describe('main handler processing automatic releases', () => {
     process.env['GITHUB_ACTION'] = 'self';
     process.env['GITHUB_ACTOR'] = 'marvinpinto';
     process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'git-push.json');
+    process.env['GITHUB_REPOSITORY'] = 'marvinpinto/private-actions-tester';
   });
 
   afterEach(() => {
