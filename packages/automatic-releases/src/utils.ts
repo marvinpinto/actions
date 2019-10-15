@@ -1,3 +1,4 @@
+import * as core from '@actions/core';
 import {getShortSHA} from '../../keybase-notifications/src/githubEvent';
 
 const getFormattedChangelogEntry = parsedCommit => {
@@ -84,4 +85,14 @@ export const generateChangelogFromParsedCommits = (parsedCommits): string => {
 export const isBreakingChange = ({body, footer}): boolean => {
   const re = /^BREAKING\s+CHANGES?:\s+/;
   return re.test(body || '') || re.test(footer || '');
+};
+
+export const parseGitTag = (inputRef): string => {
+  const re = /^refs\/tags\/(.*)$/;
+  const resMatch = inputRef.match(re);
+  if (!resMatch || !resMatch[1]) {
+    core.debug(`Input "${inputRef}" does not appear to be a tag`);
+    return '';
+  }
+  return resMatch[1];
 };

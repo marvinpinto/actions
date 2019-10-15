@@ -28,7 +28,8 @@
     "conventional-changelog-angular": "^5.0.5",
     "conventional-commits-parser": "^3.0.5",
     "globby": "^10.0.1",
-    "md5-file": "^4.0.0"
+    "md5-file": "^4.0.0",
+    "semver": "^6.3.0"
   },
   "devDependencies": {
     "nock": "^11.4.0"

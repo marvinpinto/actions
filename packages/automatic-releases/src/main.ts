@@ -8,11 +8,12 @@ import path from 'path';
 import md5File from 'md5-file/promise';
 import {sync as commitParser} from 'conventional-commits-parser';
 import defaultChangelogOpts from 'conventional-changelog-angular';
-import {isBreakingChange, generateChangelogFromParsedCommits} from './utils';
+import {isBreakingChange, generateChangelogFromParsedCommits, parseGitTag} from './utils';
+import semver from 'semver';
 
 type Args = {
   repoToken: string;
-  releaseTag: string;
+  automaticReleaseTag: string;
   draftRelease: boolean;
   preRelease: boolean;
   releaseTitle: string;
@@ -22,10 +23,10 @@ type Args = {
 const getAndValidateArgs = (): Args => {
   const args = {
     repoToken: core.getInput('repo_token', {required: true}),
-    releaseTag: core.getInput('release_tag', {required: true}),
+    automaticReleaseTag: core.getInput('automatic_release_tag', {required: false}),
     draftRelease: JSON.parse(core.getInput('draft', {required: true})),
     preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
-    releaseTitle: core.getInput('title', {required: true}),
+    releaseTitle: core.getInput('title', {required: false}),
     files: [] as string[],
   };
 
@@ -127,6 +128,44 @@ export const uploadReleaseArtifacts = async (client: github.GitHub, uploadUrl: s
   core.endGroup();
 };
 
+const searchForPreviousReleaseTag = async (
+  client: github.GitHub,
+  currentReleaseTag: string,
+  tagInfo: Octokit.ReposListTagsParams,
+): Promise<string> => {
+  const validSemver = semver.valid(currentReleaseTag);
+  if (!validSemver) {
+    throw new Error(
+      `The parameter "automatic_release_tag" was not set and the current tag "${currentReleaseTag}" does not appear to conform to semantic versioning.`,
+    );
+  }
+
+  const listTagsOptions = client.repos.listTags.endpoint.merge(tagInfo);
+  const tl = await client.paginate(listTagsOptions);
+
+  const tagList = tl
+    .map(tag => {
+      core.debug(`Currently processing tag ${tag.name}`);
+      const t = semver.valid(tag.name);
+      return {
+        ...tag,
+        semverTag: t,
+      };
+    })
+    .filter(tag => tag.semverTag !== null)
+    .sort((a, b) => semver.rcompare(a.semverTag, b.semverTag));
+
+  let previousReleaseTag = '';
+  for (const tag of tagList) {
+    if (semver.lt(tag.semverTag, currentReleaseTag)) {
+      previousReleaseTag = tag.name;
+      break;
+    }
+  }
+
+  return previousReleaseTag;
+};
+
 const getCommitsSinceRelease = async (
   client: github.GitHub,
   tagInfo: Octokit.GitGetRefParams,
@@ -142,7 +181,7 @@ const getCommitsSinceRelease = async (
     previousReleaseSha = resp.data.object.sha;
   } catch (err) {
     console.log(
-      `Could not find SHA corresponding to tag "latest" (${err.message}). Assuming this is the first release.`,
+      `Could not find SHA corresponding to tag "${tagInfo.ref}" (${err.message}). Assuming this is the first release.`,
     );
     previousReleaseSha = 'HEAD';
   }
@@ -219,6 +258,23 @@ export const main = async () => {
 
     core.startGroup('Initializing the Automatic Releases action');
     dumpGitHubEventPayload();
+    core.debug(`Github context: ${JSON.stringify(github.context)}`);
+    core.endGroup();
+
+    core.startGroup('Determining release tags');
+    const releaseTag = args.automaticReleaseTag ? args.automaticReleaseTag : parseGitTag(github.context.ref);
+    if (!releaseTag) {
+      throw new Error(
+        `The parameter "automatic_release_tag" was not set and this does not appear to be a GitHub tag event. (Event: ${github.context.ref})`,
+      );
+    }
+
+    const previousReleaseTag = args.automaticReleaseTag
+      ? args.automaticReleaseTag
+      : await searchForPreviousReleaseTag(client, releaseTag, {
+          owner: github.context.repo.owner,
+          repo: github.context.repo.repo,
+        });
     core.endGroup();
 
     const commitsSinceRelease = await getCommitsSinceRelease(
@@ -226,7 +282,7 @@ export const main = async () => {
       {
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
-        ref: `tags/${args.releaseTag}`,
+        ref: `tags/${previousReleaseTag}`,
       },
       github.context.sha,
     );
@@ -238,24 +294,26 @@ export const main = async () => {
       commitsSinceRelease,
     );
 
-    await createReleaseTag(client, {
-      owner: github.context.repo.owner,
-      ref: `refs/tags/${args.releaseTag}`,
-      repo: github.context.repo.repo,
-      sha: github.context.sha,
-    });
+    if (args.automaticReleaseTag) {
+      await createReleaseTag(client, {
+        owner: github.context.repo.owner,
+        ref: `refs/tags/${args.automaticReleaseTag}`,
+        repo: github.context.repo.repo,
+        sha: github.context.sha,
+      });
 
-    await deletePreviousGitHubRelease(client, {
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      tag: args.releaseTag,
-    });
+      await deletePreviousGitHubRelease(client, {
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        tag: args.automaticReleaseTag,
+      });
+    }
 
     const releaseUploadUrl = await generateNewGitHubRelease(client, {
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
-      tag_name: args.releaseTag, // eslint-disable-line @typescript-eslint/camelcase
-      name: args.releaseTitle,
+      tag_name: releaseTag, // eslint-disable-line @typescript-eslint/camelcase
+      name: args.automaticReleaseTag && args.releaseTitle ? args.releaseTitle : releaseTag,
       draft: args.draftRelease,
       prerelease: args.preRelease,
       body: changelog,
