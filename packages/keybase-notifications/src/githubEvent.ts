@@ -1,7 +1,8 @@
+import * as core from '@actions/core';
 import {get} from 'lodash';
 import {getShortenedUrl} from './utils';
 
-function getShortSHA(sha): string {
+export function getShortSHA(sha): string {
   const coreAbbrev = 7;
   return sha.substring(0, coreAbbrev);
 }
@@ -126,7 +127,7 @@ async function parseIssueCommentEvent({payload, keybaseUsername}): Promise<strin
 }
 
 export async function generateChatMessage({context, keybaseUsername}): Promise<string> {
-  console.debug(`GitHub event: ${JSON.stringify(context)}`);
+  core.debug(`GitHub event: ${JSON.stringify(context)}`);
   if (get(context, 'eventName', null) === 'push') {
     return await parsePushEvent({payload: context.payload, keybaseUsername});
   }
@@ -151,6 +152,6 @@ export async function generateChatMessage({context, keybaseUsername}): Promise<s
     return await parseIssueCommentEvent({payload: context.payload, keybaseUsername});
   }
 
-  console.error('Ignoring this event as it is unsupported by this application.');
+  core.error('Ignoring this event as it is unsupported by this application.');
   return '';
 }

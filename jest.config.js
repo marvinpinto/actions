@@ -1,3 +1,11 @@
+// Mock out `core.debug` calls
+const processStdoutWrite = process.stdout.write.bind(process.stdout);
+process.stdout.write = (str, encoding, cb) => {
+  if (!str.match(/^::/)) {
+    return processStdoutWrite(str, encoding, cb);
+  }
+};
+
 module.exports = {
   roots: ['<rootDir>/src', '<rootDir>/__tests__'],
   clearMocks: true,

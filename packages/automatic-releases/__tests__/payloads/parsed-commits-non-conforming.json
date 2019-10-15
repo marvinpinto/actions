@@ -1,0 +1,97 @@
+[
+  {
+    "type": null,
+    "scope": null,
+    "subject": null,
+    "merge": null,
+    "header": "Fix all the bugs",
+    "body": null,
+    "footer": null,
+    "notes": [],
+    "references": [],
+    "mentions": [],
+    "revert": null,
+    "extra": {
+      "commit": {
+        "sha": "f6f40d9fbd1130f7f2357bb54225567dbd7a3793",
+        "node_id": "MDY6Q29tbWl0MjExNTU5MTQxOjQzOThlZjRlYTZmNWE2MTg4MGNhOTRlY2ZiOGU2MGQxYTM4NDk3ZGQ=",
+        "commit": {
+          "author": {
+            "name": "Monalisa Octocat",
+            "email": "support@github.com",
+            "date": "2011-04-14T16:00:49Z"
+          },
+          "committer": {
+            "name": "Monalisa Octocat",
+            "email": "support@github.com",
+            "date": "2011-04-14T16:00:49Z"
+          },
+          "message": "Fix all the bugs",
+          "tree": {
+            "sha": "f6f40d9fbd1130f7f2357bb54225567dbd7a3793",
+            "url": "https://api.github.com/repos/octocat/Hello-World/tree/f6f40d9fbd1130f7f2357bb54225567dbd7a3793"
+          },
+          "url": "https://api.github.com/repos/octocat/Hello-World/tree/f6f40d9fbd1130f7f2357bb54225567dbd7a3793",
+          "comment_count": 0,
+          "verification": {
+            "verified": false,
+            "reason": "unsigned",
+            "signature": null,
+            "payload": null
+          }
+        },
+        "url": "https://api.github.com/repos/octocat/Hello-World/commits/f6f40d9fbd1130f7f2357bb54225567dbd7a3793",
+        "html_url": "https://github.com/octocat/Hello-World/commit/f6f40d9fbd1130f7f2357bb54225567dbd7a3793",
+        "comments_url": "https://api.github.com/repos/octocat/Hello-World/commits/f6f40d9fbd1130f7f2357bb54225567dbd7a3793/comments",
+        "author": {
+          "login": "octocat",
+          "id": 1,
+          "node_id": "MDQ6VXNlcjE=",
+          "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/octocat",
+          "html_url": "https://github.com/octocat",
+          "followers_url": "https://api.github.com/users/octocat/followers",
+          "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+          "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+          "organizations_url": "https://api.github.com/users/octocat/orgs",
+          "repos_url": "https://api.github.com/users/octocat/repos",
+          "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/octocat/received_events",
+          "type": "User",
+          "site_admin": false
+        },
+        "committer": {
+          "login": "octocat",
+          "id": 1,
+          "node_id": "MDQ6VXNlcjE=",
+          "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/octocat",
+          "html_url": "https://github.com/octocat",
+          "followers_url": "https://api.github.com/users/octocat/followers",
+          "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+          "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+          "organizations_url": "https://api.github.com/users/octocat/orgs",
+          "repos_url": "https://api.github.com/users/octocat/repos",
+          "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/octocat/received_events",
+          "type": "User",
+          "site_admin": false
+        },
+        "parents": [
+          {
+            "url": "https://api.github.com/repos/octocat/Hello-World/commits/f6f40d9fbd1130f7f2357bb54225567dbd7a3793",
+            "sha": "f6f40d9fbd1130f7f2357bb54225567dbd7a3793"
+          }
+        ]
+      },
+      "pullRequests": [],
+      "breakingChange": false
+    }
+  }
+]

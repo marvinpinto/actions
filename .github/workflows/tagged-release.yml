@@ -1,0 +1,32 @@
+---
+name: "tagged-release"
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  tagged-release:
+    name: "Tagged Release"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout source code"
+        uses: "actions/checkout@v1"
+        with:
+          lfs: true
+
+      - name: "Install and build"
+        run: |
+          yarn run reinstall
+          yarn run build
+
+      - uses: "./packages/automatic-releases/"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: |
+            packages/automatic-releases/dist/index.js
+            packages/keybase-notifications/dist/index.js
+            packages/keybase-notifications/dist/keybase

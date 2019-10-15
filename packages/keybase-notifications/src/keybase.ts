@@ -1,6 +1,7 @@
 import Bot from 'keybase-bot';
 import * as path from 'path';
 import {get} from 'lodash';
+import * as core from '@actions/core';
 
 export default class Keybase {
   bot: Bot;
@@ -11,7 +12,7 @@ export default class Keybase {
   constructor(username, paperKey) {
     this.bot = new Bot();
     this.keybaseBinary = path.join(__dirname, 'keybase');
-    console.debug(`Keybase binary location: ${this.keybaseBinary}`);
+    core.debug(`Keybase binary location: ${this.keybaseBinary}`);
     this.username = username;
     this.paperKey = paperKey;
   }
@@ -63,9 +64,9 @@ export default class Keybase {
         },
       });
       keybaseUsername = get(res, 'them[0].basics.username', '');
-      console.debug(`Username lookup successful, found ${keybaseUsername}`);
+      core.debug(`Username lookup successful, found ${keybaseUsername}`);
     } catch (error) {
-      console.log(`User ${githubUsername} not found: ${error.message}`);
+      core.info(`User ${githubUsername} not found: ${error.message}`);
     }
 
     return keybaseUsername;
