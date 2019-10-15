@@ -41,13 +41,13 @@ const getAndValidateArgs = (): Args => {
 const createReleaseTag = async (client: github.GitHub, refInfo: Octokit.GitCreateRefParams) => {
   core.startGroup('Generating release tag');
   const friendlyTagName = refInfo.ref.substring(10); // 'refs/tags/latest' => 'latest'
-  console.log(`Attempting to create or update release tag "${friendlyTagName}"`);
+  core.info(`Attempting to create or update release tag "${friendlyTagName}"`);
 
   try {
     await client.git.createRef(refInfo);
   } catch (err) {
     const existingTag = refInfo.ref.substring(5); // 'refs/tags/latest' => 'tags/latest'
-    console.log(
+    core.info(
       `Could not create new tag "${refInfo.ref}" (${err.message}) therefore updating existing tag "${existingTag}"`,
     );
     await client.git.updateRef({
@@ -57,24 +57,24 @@ const createReleaseTag = async (client: github.GitHub, refInfo: Octokit.GitCreat
     });
   }
 
-  console.log(`Successfully created or updated the release tag "${friendlyTagName}"`);
+  core.info(`Successfully created or updated the release tag "${friendlyTagName}"`);
   core.endGroup();
 };
 
 const deletePreviousGitHubRelease = async (client: github.GitHub, releaseInfo: Octokit.ReposGetReleaseByTagParams) => {
   core.startGroup(`Deleting GitHub releases associated with the tag "${releaseInfo.tag}"`);
   try {
-    console.log(`Searching for releases corresponding to the "${releaseInfo.tag}" tag`);
+    core.info(`Searching for releases corresponding to the "${releaseInfo.tag}" tag`);
     const resp = await client.repos.getReleaseByTag(releaseInfo);
 
-    console.log(`Deleting release: ${resp.data.id}`);
+    core.info(`Deleting release: ${resp.data.id}`);
     await client.repos.deleteRelease({
       owner: releaseInfo.owner,
       repo: releaseInfo.repo,
       release_id: resp.data.id, // eslint-disable-line @typescript-eslint/camelcase
     });
   } catch (err) {
-    console.log(`Could not find release associated with tag "${releaseInfo.tag}" (${err.message})`);
+    core.info(`Could not find release associated with tag "${releaseInfo.tag}" (${err.message})`);
   }
   core.endGroup();
 };
@@ -85,7 +85,7 @@ const generateNewGitHubRelease = async (
 ): Promise<string> => {
   core.startGroup(`Generating new GitHub release for the "${releaseInfo.tag_name}" tag`);
 
-  console.log('Creating new release');
+  core.info('Creating new release');
   const resp = await client.repos.createRelease(releaseInfo);
   core.endGroup();
   return resp.data.upload_url;
@@ -97,7 +97,7 @@ export const uploadReleaseArtifacts = async (client: github.GitHub, uploadUrl: s
   const paths = await globby(files);
 
   for (const filePath of paths) {
-    console.log(`Uploading: ${filePath}`);
+    core.info(`Uploading: ${filePath}`);
     const nameWithExt = path.basename(filePath);
     const uploadArgs = {
       url: uploadUrl,
@@ -112,7 +112,7 @@ export const uploadReleaseArtifacts = async (client: github.GitHub, uploadUrl: s
     try {
       await client.repos.uploadReleaseAsset(uploadArgs);
     } catch (err) {
-      console.log(
+      core.info(
         `Problem uploading ${filePath} as a release asset (${err.message}). Will retry with the md5 hash appended to the filename.`,
       );
       const hash = await md5File(filePath);
@@ -173,20 +173,20 @@ const getCommitsSinceRelease = async (
 ): Promise<Octokit.ReposCompareCommitsResponseCommitsItem[]> => {
   core.startGroup('Retrieving commit history');
 
-  console.log('Determining state of the previous release');
+  core.info('Determining state of the previous release');
   let previousReleaseSha = '' as string;
-  console.log(`Searching for SHA corresponding to current "${tagInfo.ref}" tag`);
+  core.info(`Searching for SHA corresponding to current "${tagInfo.ref}" tag`);
   try {
     const resp = await client.git.getRef(tagInfo);
     previousReleaseSha = resp.data.object.sha;
   } catch (err) {
-    console.log(
+    core.info(
       `Could not find SHA corresponding to tag "${tagInfo.ref}" (${err.message}). Assuming this is the first release.`,
     );
     previousReleaseSha = 'HEAD';
   }
 
-  console.log(`Retrieving commits between ${previousReleaseSha} and ${currentSha}`);
+  core.info(`Retrieving commits between ${previousReleaseSha} and ${currentSha}`);
   const resp = await client.repos.compareCommits({
     owner: tagInfo.owner,
     repo: tagInfo.repo,
