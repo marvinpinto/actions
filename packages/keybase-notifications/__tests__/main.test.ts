@@ -14,7 +14,15 @@ describe('main handler', () => {
     process.env['INPUT_KEYBASE_USERNAME'] = 'fakebob';
     process.env['INPUT_KEYBASE_PAPER_KEY'] = 'this is a fake paper key';
     process.env['INPUT_KEYBASE_CHANNEL'] = 'funtimes';
+
     process.env['GITHUB_EVENT_NAME'] = 'push';
+    process.env['GITHUB_SHA'] = 'f6f40d9fbd1130f7f2357bb54225567dbd7a3793';
+    process.env['GITHUB_REF'] = 'refs/heads/automatic-pre-releaser';
+    process.env['GITHUB_WORKFLOW'] = 'keybase';
+    process.env['GITHUB_ACTION'] = 'self';
+    process.env['GITHUB_ACTOR'] = 'marvinpinto';
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'force-push.json');
+    process.env['GITHUB_REPOSITORY'] = 'marvinpinto/private-actions-tester';
 
     mockKeybaseMethods = {
       init: jest.fn(() => Promise.resolve()),
@@ -31,6 +39,7 @@ describe('main handler', () => {
 
     mockUtils = {
       getShortenedUrl: jest.fn(() => Promise.resolve('https://example.com')),
+      dumpGitHubEventPayload: jest.fn(),
     };
     jest.mock('../src/utils', () => {
       return mockUtils;
