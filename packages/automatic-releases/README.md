@@ -8,6 +8,7 @@ This action simplifies the GitHub release process by automatically uploading ass
 1. [Supported Parameters](#supported-parameters)
 1. [Event Triggers](#event-triggers)
 1. [Versioning](#versioning)
+1. [How to get help](#how-to-get-help)
 1. [License](#license)
 
 ## Usage Examples
@@ -122,6 +123,10 @@ Every commit that lands on master for this project triggers an automatic build a
 ```yaml
 - uses: "marvinpinto/actions/packages/automatic-releases@<VERSION>"
 ```
+
+## How to get help
+
+The main [README](../../README.md) for this project has a bunch of information related to debugging & submitting issues. If you're still stuck, try and get a hold of me on [keybase](https://keybase.io/marvinpinto) and I'll do my best.
 
 ## License
 

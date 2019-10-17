@@ -11,6 +11,7 @@ This action allows you to post messages to [Keybase Chat](https://keybase.io/blo
 1. [Supported GitHub Events](#supported-github-events)
 1. [Filtering Notifications](#filtering-notifications)
 1. [Versioning](#versioning)
+1. [How to get help](#how-to-get-help)
 1. [License](#license)
 
 ## Using the Action
@@ -122,6 +123,10 @@ Every commit that lands on master for this project triggers an automatic build a
 ```yaml
 - uses: "marvinpinto/actions/packages/keybase-notifications@<VERSION>"
 ```
+
+## How to get help
+
+The main [README](../../README.md) for this project has a bunch of information related to debugging & submitting issues. If you're still stuck, try and get a hold of me on [keybase](https://keybase.io/marvinpinto) and I'll do my best.
 
 ## License
 
