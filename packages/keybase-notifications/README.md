@@ -4,6 +4,16 @@ This action allows you to post messages to [Keybase Chat](https://keybase.io/blo
 
 ![Keybase default GitHub notification](images/keybase-gh-notification-example.png)
 
+## Contents
+
+1. [Using the Action](#using-the-action)
+1. [Parameters](#parameters)
+1. [Supported GitHub Events](#supported-github-events)
+1. [Filtering Notifications](#filtering-notifications)
+1. [Versioning](#versioning)
+1. [How to get help](#how-to-get-help)
+1. [License](#license)
+
 ## Using the Action
 
 You will need a Keybase paperkey and its corresponding username. It is probably a good idea to create a dedicated Keybase account for this purpose, or at the very least generate a dedicated paperkey on your existing account. This makes it easier to revoke if needed.
@@ -46,6 +56,22 @@ jobs:
           keybase_paper_key: "${{ secrets.KeybasePaperKey }}" # "fancy regular ..."
           keybase_channel: "${{ secrets.KeybaseChannel }}" # "you,robot,chris"
 ```
+
+## Parameters
+
+| Parameter               | Description                                 | Default |
+| ----------------------- | ------------------------------------------- | ------- |
+| `keybase_username`\*\*  | Keybase username, e.g. `spacedrop`          | `null`  |
+| `keybase_paper_key`\*\* | Keybase Paper Key, e.g. `fancy regular ...` | `null`  |
+| `keybase_channel`       | Peer channels, e.g. `you,robot,chris`       | `null`  |
+| `keybase_team_name`     | Keybase Team Name, e.g. `keybasefriends`    | `null`  |
+| `keybase_topic_name`    | Team channel, e.g. `general`                | `null`  |
+
+### Notes:
+
+- Parameters denoted with `**` are required.
+- `keybase_team_name` and `keybase_topic_name` are required for messaging within team chat rooms.
+- `keybase_channel` is required for peer-to-peer messages.
 
 ## Supported GitHub Events
 
@@ -98,6 +124,10 @@ Every commit that lands on master for this project triggers an automatic build a
 - uses: "marvinpinto/actions/packages/keybase-notifications@<VERSION>"
 ```
 
+## How to get help
+
+The main [README](../../README.md) for this project has a bunch of information related to debugging & submitting issues. If you're still stuck, try and get a hold of me on [keybase](https://keybase.io/marvinpinto) and I'll do my best.
+
 ## License
 
-The source code for this project is released under the [MIT License](/LICENSE). This is in no way associated with Keybase or GitHub.
+The source code for this project is released under the [MIT License](/LICENSE). This project is not associated with Keybase or GitHub.
