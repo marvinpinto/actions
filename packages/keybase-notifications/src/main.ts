@@ -10,6 +10,7 @@ type Args = {
   keybaseChannel: string;
   keybaseTeamName: string;
   keybaseTopicName: string;
+  customChatMessage: string;
 };
 
 const getAndValidateArgs = (): Args => {
@@ -19,6 +20,7 @@ const getAndValidateArgs = (): Args => {
     keybaseChannel: core.getInput('keybase_channel'),
     keybaseTeamName: core.getInput('keybase_team_name'),
     keybaseTopicName: core.getInput('keybase_topic_name'),
+    customChatMessage: core.getInput('message'),
   };
 
   return args;
@@ -39,10 +41,12 @@ export const main = async () => {
     const associatedKeybaseUsername = await kb.getKeybaseUsername(github.context.actor);
     core.endGroup();
 
-    const chatMessage: string = await generateChatMessage({
-      context: github.context,
-      keybaseUsername: associatedKeybaseUsername,
-    });
+    const chatMessage = args.customChatMessage
+      ? args.customChatMessage
+      : await generateChatMessage({
+          context: github.context,
+          keybaseUsername: associatedKeybaseUsername,
+        });
     if (chatMessage) {
       await kb.sendChatMessage({
         teamInfo: {

@@ -358,4 +358,16 @@ describe('main handler', () => {
         '*Deleted* comment on Issue #6 by GitHub user `marvinpinto`. https://example.com\n> _repo: marvinpinto/actions_\n> This is an edited issue comment.',
     });
   });
+
+  it('is able to send out custom keybase notification messages', async () => {
+    process.env['INPUT_MESSAGE'] = 'Hey there, world!';
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message: 'Hey there, world!',
+    });
+  });
 });
