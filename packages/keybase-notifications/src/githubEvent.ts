@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as OctokitWebhooks from '@octokit/webhooks';
 import {getShortenedUrl} from './utils';
 import {sync as commitParser} from 'conventional-commits-parser';
-import defaultChangelogOpts from 'conventional-changelog-angular';
+import {getChangelogOptions} from '../../automatic-releases/src/utils';
 import {isBreakingChange, ParsedCommits, ParsedCommitsExtraCommit} from '../../automatic-releases/src/utils';
 
 type Override<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
@@ -33,12 +33,19 @@ export const parseIntoQuotedString = (body: string): string => {
   return quotedStr;
 };
 
-const generateParsedCommits = (commits: ParsedCommitsExtraCommit[]): ParsedCommits[] => {
+const generateParsedCommits = async (commits: ParsedCommitsExtraCommit[]): Promise<ParsedCommits[]> => {
   const parsedCommits: ParsedCommits[] = [];
+  const clOptions = await getChangelogOptions();
 
   for (const commit of commits) {
     core.debug(`Processing commit: ${JSON.stringify(commit)}`);
-    const parsedCommitMsg = commitParser(commit.message, defaultChangelogOpts);
+    const parsedCommitMsg = commitParser(commit.message, clOptions);
+
+    if (parsedCommitMsg.merge) {
+      core.debug(`Ignoring merge commit: ${parsedCommitMsg.merge}`);
+      continue;
+    }
+
     parsedCommitMsg.extra = {
       commit: commit,
       pullRequests: [],
@@ -61,7 +68,7 @@ const parsePushEvent = async (payload: WebhookPayloadPush, keybaseUsername: stri
   const forcedStr = payload.forced ? '*force-pushed*' : '*pushed*';
   const userStr = keybaseUsername ? `User @${keybaseUsername}` : `GitHub user \`${payload.sender.login}\``;
 
-  const parsedCommits = generateParsedCommits(payload.commits);
+  const parsedCommits = await generateParsedCommits(payload.commits);
   const commitMessagesStr = parsedCommits
     .map(commit => `- ${commit.header}`)
     .reduce((acc, commit) => {

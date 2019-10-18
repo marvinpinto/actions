@@ -14,6 +14,7 @@ describe('main handler', () => {
     process.env['INPUT_KEYBASE_USERNAME'] = 'fakebob';
     process.env['INPUT_KEYBASE_PAPER_KEY'] = 'this is a fake paper key';
     process.env['INPUT_KEYBASE_CHANNEL'] = 'funtimes';
+    delete process.env['INPUT_MESSAGE'];
 
     process.env['GITHUB_EVENT_NAME'] = 'push';
     process.env['GITHUB_SHA'] = 'f6f40d9fbd1130f7f2357bb54225567dbd7a3793';
@@ -368,6 +369,23 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message: 'Hey there, world!',
+    });
+  });
+
+  it('is able to ignore merge commits', async () => {
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'push-with-merge-commits.json');
+    process.env['GITHUB_EVENT_NAME'] = 'push';
+
+    const inst = require('../src/main');
+    await inst.main();
+
+    expect(mockKeybase).toHaveBeenCalledTimes(1);
+    expect(mockKeybase).toHaveBeenCalledWith('fakebob', 'this is a fake paper key');
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledTimes(1);
+    expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
+      teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
+      message:
+        'GitHub user `marvinpinto` *pushed* 2 commit(s) to `refs/heads/master` - https://example.com\n> _repo: marvinpinto/private-actions-tester_\n> - feat: add the ability to send custom keybase notification messages',
     });
   });
 });

@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import {getShortSHA} from '../../keybase-notifications/src/githubEvent';
 import * as Octokit from '@octokit/rest';
+import defaultChangelogOpts from 'conventional-changelog-angular';
 
 export type ParsedCommitsExtraCommit = Octokit.ReposCompareCommitsResponseCommitsItem & {
   author: {
@@ -149,4 +150,12 @@ export const parseGitTag = (inputRef): string => {
     return '';
   }
   return resMatch[1];
+};
+
+export const getChangelogOptions = async () => {
+  const defaultOpts = await defaultChangelogOpts;
+  defaultOpts['mergePattern'] = '^Merge pull request #(.*) from (.*)$';
+  defaultOpts['mergeCorrespondence'] = ['issueId', 'source'];
+  core.debug(`Changelog options: ${JSON.stringify(defaultOpts)}`);
+  return defaultOpts;
 };
