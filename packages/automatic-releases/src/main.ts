@@ -7,7 +7,7 @@ import {lstatSync, readFileSync} from 'fs';
 import path from 'path';
 import md5File from 'md5-file/promise';
 import {sync as commitParser} from 'conventional-commits-parser';
-import defaultChangelogOpts from 'conventional-changelog-angular';
+import {getChangelogOptions} from './utils';
 import {isBreakingChange, generateChangelogFromParsedCommits, parseGitTag, ParsedCommits} from './utils';
 import semver from 'semver';
 
@@ -222,7 +222,15 @@ export const getChangelog = async (
       core.info(`Found ${pulls.data.length} pull request(s) associated with commit ${commit.sha}`);
     }
 
-    const parsedCommitMsg = commitParser(commit.commit.message, defaultChangelogOpts);
+    const clOptions = await getChangelogOptions();
+    const parsedCommitMsg = commitParser(commit.commit.message, clOptions);
+
+    // istanbul ignore next
+    if (parsedCommitMsg.merge) {
+      core.debug(`Ignoring merge commit: ${parsedCommitMsg.merge}`);
+      continue;
+    }
+
     parsedCommitMsg.extra = {
       commit: commit,
       pullRequests: [],
