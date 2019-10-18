@@ -13,7 +13,7 @@
   },
   "config": {
     "eslintPaths": ".*.js *.js",
-    "prettierPaths": "*.{json,md,yaml,yml} .github/**/*.{json,md,yaml,yml} !package.json"
+    "prettierPaths": "*.{json,md,yaml,yml} .github/**/*.{json,md,yaml,yml} !package.json !lerna.json"
   },
   "scripts": {
     "test": "lerna run test --stream --no-bail",
@@ -26,7 +26,8 @@
     "lint:commits": "commitlint --to .",
     "lintfix": "lerna run lintfix --stream && yarn run lintfix:eslint && yarn run lintfix:prettier",
     "lintfix:eslint": "eslint --fix  $npm_package_config_eslintPaths",
-    "lintfix:prettier": "prettier --write $npm_package_config_prettierPaths"
+    "lintfix:prettier": "prettier --write $npm_package_config_prettierPaths",
+    "release": "lerna version"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.2.0",

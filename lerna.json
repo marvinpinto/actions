@@ -2,5 +2,15 @@
   "version": "0.0.0",
   "npmClient": "yarn",
   "useWorkspaces": true,
-  "packages": ["packages/*"]
+  "packages": ["packages/*"],
+  "command": {
+    "version": {
+      "allowBranch": "master",
+      "conventionalCommits": true,
+      "changelog": false,
+      "gitRemote": "public",
+      "message": "chore: publish %s",
+      "tagVersionPrefix": "v"
+    }
+  }
 }
