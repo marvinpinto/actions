@@ -57,6 +57,22 @@ jobs:
           keybase_channel: "${{ secrets.KeybaseChannel }}" # "you,robot,chris"
 ```
 
+### Custom Notification Message
+
+```yaml
+jobs:
+  keybase:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "marvinpinto/actions/packages/keybase-notifications@latest"
+        with:
+          message: "Hey there, world!"
+          keybase_username: "${{ secrets.KeybaseUsername }}"
+          keybase_paper_key: "${{ secrets.KeybasePaperKey }}" # "fancy regular ..."
+          keybase_team_name: "${{ secrets.KeybaseTeamName }}" # "keybasefriends"
+          keybase_topic_name: "${{ secrets.KeybaseTopicName }}" # "general"
+```
+
 ## Parameters
 
 | Parameter               | Description                                 | Default |

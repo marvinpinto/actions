@@ -17,6 +17,9 @@ inputs:
   keybase_topic_name:
     description: 'Required for team channels, e.g. "general"'
     required: false
+  message:
+    description: 'A customized notification messsage, e.g. "Hey there, world!"'
+    required: false
 runs:
   using: "node12"
   main: "dist/index.js"
