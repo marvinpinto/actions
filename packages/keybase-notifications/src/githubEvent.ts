@@ -1,10 +1,13 @@
 import * as core from '@actions/core';
 import * as OctokitWebhooks from '@octokit/webhooks';
-import {get} from 'lodash';
 import {getShortenedUrl} from './utils';
 import {sync as commitParser} from 'conventional-commits-parser';
 import defaultChangelogOpts from 'conventional-changelog-angular';
 import {isBreakingChange, ParsedCommits, ParsedCommitsExtraCommit} from '../../automatic-releases/src/utils';
+
+type Override<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
+
+type WebhookPayloadPush = Override<OctokitWebhooks.WebhookPayloadPush, {head_commit: ParsedCommitsExtraCommit}>;
 
 export const getShortSHA = (sha: string): string => {
   const coreAbbrev = 7;
@@ -48,11 +51,8 @@ const generateParsedCommits = (commits: ParsedCommitsExtraCommit[]): ParsedCommi
   return parsedCommits;
 };
 
-const parsePushEvent = async (
-  payload: OctokitWebhooks.WebhookPayloadPush,
-  keybaseUsername: string,
-): Promise<string> => {
-  const url = await getShortenedUrl(get(payload, 'head_commit.url', ''));
+const parsePushEvent = async (payload: WebhookPayloadPush, keybaseUsername: string): Promise<string> => {
+  const url = await getShortenedUrl(payload.head_commit.url);
   const forcedStr = payload.forced ? '*force-pushed*' : '*pushed*';
   const userStr = keybaseUsername ? `User @${keybaseUsername}` : `GitHub user \`${payload.sender.login}\``;
 
@@ -67,110 +67,90 @@ const parsePushEvent = async (
   return `${userStr} ${forcedStr} ${payload.commits.length} commit(s) to \`${payload.ref}\` - ${url}\n> _repo: ${payload.repository.full_name}_\n${quotedCommitMessages}`;
 };
 
-const parseRepoStarringEvent = ({payload, keybaseUsername}): string => {
-  const ghUser = get(payload, 'sender.login', 'UNKNOWN');
-  const repo = get(payload, 'repository.full_name', 'UNKNOWN');
-  const userStr = keybaseUsername ? `@${keybaseUsername}` : `\`${ghUser}\``;
-  return `Repository \`${repo}\` starred by ${userStr} :+1: :star:`;
+const parseRepoStarringEvent = (payload: OctokitWebhooks.WebhookPayloadStar, keybaseUsername: string): string => {
+  const userStr = keybaseUsername ? `@${keybaseUsername}` : `\`${payload.sender.login}\``;
+  return `Repository \`${payload.repository.full_name}\` starred by ${userStr} :+1: :star:`;
 };
 
-const parsePullRequestEvent = async ({payload, keybaseUsername}): Promise<string> => {
-  const ghUser = get(payload, 'sender.login', 'UNKNOWN');
-  const url = await getShortenedUrl(get(payload, 'pull_request.html_url', 'N/A'));
-  const num = get(payload, 'number', 'n/a');
-  const title = get(payload, 'pull_request.title', 'N/A');
-  const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${ghUser}\``;
-  const action = get(payload, 'action', null);
-  const merged = get(payload, 'pull_request.merged', false);
-  const body = get(payload, 'pull_request.body', '');
-  const repo = get(payload, 'repository.full_name', 'n/a');
-  const quotedBody = parseIntoQuotedString(body);
+const parsePullRequestEvent = async (
+  payload: OctokitWebhooks.WebhookPayloadPullRequest,
+  keybaseUsername: string,
+): Promise<string> => {
+  const url = await getShortenedUrl(payload.pull_request.html_url);
+  const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${payload.sender.login}\``;
+  const quotedBody = parseIntoQuotedString(payload.pull_request.body);
   const actionMap = {
     synchronize: '*updated*',
     opened: '*opened*',
-    closed: merged ? '*merged*' : '*closed*',
+    closed: payload.pull_request.merged ? '*merged*' : '*closed*',
     reopened: '*reopened*',
   };
-  const actionStr = get(actionMap, action, 'n/a');
-  return `PR #${num} ${actionStr} by ${userStr} - ${url}\n> _repo: ${repo}_\n> Title: *${title}*\n${quotedBody}`;
+  const actionStr = actionMap[payload.action];
+  return `PR #${payload.number} ${actionStr} by ${userStr} - ${url}\n> _repo: ${payload.repository.full_name}_\n> Title: *${payload.pull_request.title}*\n${quotedBody}`;
 };
 
-const parseCommitCommentEvent = async ({payload, keybaseUsername}): Promise<string> => {
-  const ghUser = get(payload, 'sender.login', 'UNKNOWN');
-  const repo = get(payload, 'repository.full_name', 'UNKNOWN');
-  const userStr = keybaseUsername ? `@${keybaseUsername}` : `\`${ghUser}\``;
-  const sha = getShortSHA(get(payload, 'comment.commit_id', 'n/a'));
-  const url = await getShortenedUrl(get(payload, 'comment.html_url', 'N/A'));
-  const body = get(payload, 'comment.body', '');
-  const quotedBody = parseIntoQuotedString(body);
-  return `New comment on \`${repo}@${sha}\` by ${userStr} - ${url}\n${quotedBody}`;
+const parseCommitCommentEvent = async (
+  payload: OctokitWebhooks.WebhookPayloadCommitComment,
+  keybaseUsername: string,
+): Promise<string> => {
+  const userStr = keybaseUsername ? `@${keybaseUsername}` : `\`${payload.sender.login}\``;
+  const sha = getShortSHA(payload.comment.commit_id);
+  const url = await getShortenedUrl(payload.comment.html_url);
+  const quotedBody = parseIntoQuotedString(payload.comment.body);
+  return `New comment on \`${payload.repository.full_name}@${sha}\` by ${userStr} - ${url}\n${quotedBody}`;
 };
 
-const parseIssuesEvent = async ({payload, keybaseUsername}): Promise<string> => {
-  const ghUser = get(payload, 'sender.login', 'UNKNOWN');
-  const url = await getShortenedUrl(get(payload, 'issue.html_url', 'N/A'));
-  const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${ghUser}\``;
-  const repo = get(payload, 'repository.full_name', 'UNKNOWN');
-  const action = get(payload, 'action', null);
-  const issueNumber = get(payload, 'issue.number', 'n/a');
-  const issueTitle = get(payload, 'issue.title', 'n/a');
-  const issueBody = get(payload, 'issue.body', '');
-  const quotedBody = parseIntoQuotedString(issueBody);
+const parseIssuesEvent = async (
+  payload: OctokitWebhooks.WebhookPayloadIssues,
+  keybaseUsername: string,
+): Promise<string> => {
+  const url = await getShortenedUrl(payload.issue.html_url);
+  const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${payload.sender.login}\``;
+  const quotedBody = parseIntoQuotedString(payload.issue.body);
   const actionMap = {
     opened: '*opened*',
     edited: '*updated*',
     closed: '*closed*',
     reopened: '*reopened*',
   };
-  const actionStr = get(actionMap, action, 'n/a');
-  return `Issue #${issueNumber} ${actionStr} by ${userStr} - ${url}\n> _repo: ${repo}_\n> Title: *${issueTitle}*\n${quotedBody}`;
+  const actionStr = actionMap[payload.action];
+  return `Issue #${payload.issue.number} ${actionStr} by ${userStr} - ${url}\n> _repo: ${payload.repository.full_name}_\n> Title: *${payload.issue.title}*\n${quotedBody}`;
 };
 
-const parseIssueCommentEvent = async ({payload, keybaseUsername}): Promise<string> => {
-  const ghUser = get(payload, 'sender.login', 'UNKNOWN');
-  const url = await getShortenedUrl(get(payload, 'comment.html_url', 'N/A'));
-  const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${ghUser}\``;
-  const action = get(payload, 'action', null);
-  const repo = get(payload, 'repository.full_name', 'n/a');
-  const issueNumber = get(payload, 'issue.number', 'n/a');
-  const commentBody = get(payload, 'comment.body', 'N/A');
+const parseIssueCommentEvent = async (
+  payload: OctokitWebhooks.WebhookPayloadIssueComment,
+  keybaseUsername: string,
+): Promise<string> => {
+  const url = await getShortenedUrl(payload.comment.html_url);
+  const userStr = keybaseUsername ? `@${keybaseUsername}` : `GitHub user \`${payload.sender.login}\``;
   const actionMap = {
     created: '*New*',
     edited: '*Updated*',
     deleted: '*Deleted*',
   };
-  const actionStr = get(actionMap, action, 'N/A');
-  const preposition = action === 'deleted' ? 'by' : 'from';
-  const quotedComment = parseIntoQuotedString(commentBody);
-  return `${actionStr} comment on Issue #${issueNumber} ${preposition} ${userStr}. ${url}\n> _repo: ${repo}_\n${quotedComment}`;
+  const actionStr = actionMap[payload.action];
+  const preposition = payload.action === 'deleted' ? 'by' : 'from';
+  const quotedComment = parseIntoQuotedString(payload.comment.body);
+  return `${actionStr} comment on Issue #${payload.issue.number} ${preposition} ${userStr}. ${url}\n> _repo: ${payload.repository.full_name}_\n${quotedComment}`;
 };
 
 export const generateChatMessage = async ({context, keybaseUsername}): Promise<string> => {
   core.debug(`GitHub event: ${JSON.stringify(context)}`);
-  if (get(context, 'eventName', null) === 'push') {
-    return await parsePushEvent(context.payload, keybaseUsername);
+  switch (context.eventName) {
+    case 'push':
+      return await parsePushEvent(context.payload, keybaseUsername);
+    case 'watch':
+      return parseRepoStarringEvent(context.payload, keybaseUsername);
+    case 'pull_request':
+      return await parsePullRequestEvent(context.payload, keybaseUsername);
+    case 'commit_comment':
+      return await parseCommitCommentEvent(context.payload, keybaseUsername);
+    case 'issues':
+      return await parseIssuesEvent(context.payload, keybaseUsername);
+    case 'issue_comment':
+      return await parseIssueCommentEvent(context.payload, keybaseUsername);
+    default:
+      core.error('Ignoring this event as it is unsupported by this application.');
   }
-
-  if (get(context, 'eventName', null) === 'watch') {
-    return parseRepoStarringEvent({payload: context.payload, keybaseUsername});
-  }
-
-  if (get(context, 'eventName', null) === 'pull_request') {
-    return await parsePullRequestEvent({payload: context.payload, keybaseUsername});
-  }
-
-  if (get(context, 'eventName', null) === 'commit_comment') {
-    return await parseCommitCommentEvent({payload: context.payload, keybaseUsername});
-  }
-
-  if (get(context, 'eventName', null) === 'issues') {
-    return await parseIssuesEvent({payload: context.payload, keybaseUsername});
-  }
-
-  if (get(context, 'eventName', null) === 'issue_comment') {
-    return await parseIssueCommentEvent({payload: context.payload, keybaseUsername});
-  }
-
-  core.error('Ignoring this event as it is unsupported by this application.');
   return '';
 };
