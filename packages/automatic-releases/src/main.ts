@@ -8,7 +8,7 @@ import path from 'path';
 import md5File from 'md5-file/promise';
 import {sync as commitParser} from 'conventional-commits-parser';
 import defaultChangelogOpts from 'conventional-changelog-angular';
-import {isBreakingChange, generateChangelogFromParsedCommits, parseGitTag} from './utils';
+import {isBreakingChange, generateChangelogFromParsedCommits, parseGitTag, ParsedCommits} from './utils';
 import semver from 'semver';
 
 type Args = {
@@ -201,18 +201,17 @@ const getCommitsSinceRelease = async (
   return resp.data.commits;
 };
 
-const getChangelog = async (
+export const getChangelog = async (
   client: github.GitHub,
   owner: string,
   repo: string,
   commits: Octokit.ReposCompareCommitsResponseCommitsItem[],
 ): Promise<string> => {
-  const parsedCommits: object[] = [];
+  const parsedCommits: ParsedCommits[] = [];
   core.startGroup('Generating changelog');
 
   for (const commit of commits) {
     core.debug(`Processing commit: ${JSON.stringify(commit)}`);
-
     core.debug(`Searching for pull requests associated with commit ${commit.sha}`);
     const pulls = await client.repos.listPullRequestsAssociatedWithCommit({
       owner: owner,
