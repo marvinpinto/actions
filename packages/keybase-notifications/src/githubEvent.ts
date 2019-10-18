@@ -1,8 +1,12 @@
 import * as core from '@actions/core';
+import * as OctokitWebhooks from '@octokit/webhooks';
 import {get} from 'lodash';
 import {getShortenedUrl} from './utils';
+import {sync as commitParser} from 'conventional-commits-parser';
+import defaultChangelogOpts from 'conventional-changelog-angular';
+import {isBreakingChange, ParsedCommits, ParsedCommitsExtraCommit} from '../../automatic-releases/src/utils';
 
-export const getShortSHA = (sha): string => {
+export const getShortSHA = (sha: string): string => {
   const coreAbbrev = 7;
   return sha.substring(0, coreAbbrev);
 };
@@ -21,31 +25,46 @@ export const parseIntoQuotedString = (body): string => {
   return quotedStr;
 };
 
-const parsePushEvent = async ({payload, keybaseUsername}): Promise<string> => {
-  const ghUser = get(payload, 'sender.login', 'UNKNOWN');
-  const commits = get(payload, 'commits', []);
-  const branchRef = get(payload, 'ref', 'N/A');
-  const url = await getShortenedUrl(get(payload, 'head_commit.url', 'N/A'));
-  const forced = get(payload, 'forced', false);
-  const forcedStr = forced ? '*force-pushed*' : '*pushed*';
-  const userStr = keybaseUsername ? `User @${keybaseUsername}` : `GitHub user \`${ghUser}\``;
-  const repo = get(payload, 'repository.full_name', 'n/a');
+const generateParsedCommits = (commits: ParsedCommitsExtraCommit[]): ParsedCommits[] => {
+  const parsedCommits: ParsedCommits[] = [];
 
-  // We only care about the first 40 chars of the commit messages
-  const commitMsgLen = 40;
-  const commitMessagesStr = commits
-    .map(commit => {
-      const msg = get(commit, 'message', '');
-      const shortenedMsg = msg.substring(0, commitMsgLen);
-      const msgStr = msg === shortenedMsg ? msg : `${shortenedMsg} ..`;
-      return `- ${msgStr}`;
-    })
+  for (const commit of commits) {
+    core.debug(`Processing commit: ${JSON.stringify(commit)}`);
+    const parsedCommitMsg = commitParser(commit.message, defaultChangelogOpts);
+    parsedCommitMsg.extra = {
+      commit: commit,
+      pullRequests: [],
+      breakingChange: false,
+    };
+
+    parsedCommitMsg.extra.breakingChange = isBreakingChange({
+      body: parsedCommitMsg.body,
+      footer: parsedCommitMsg.footer,
+    });
+    core.debug(`Parsed commit: ${JSON.stringify(parsedCommitMsg)}`);
+    parsedCommits.push(parsedCommitMsg);
+  }
+
+  return parsedCommits;
+};
+
+const parsePushEvent = async (
+  payload: OctokitWebhooks.WebhookPayloadPush,
+  keybaseUsername: string,
+): Promise<string> => {
+  const url = await getShortenedUrl(get(payload, 'head_commit.url', ''));
+  const forcedStr = payload.forced ? '*force-pushed*' : '*pushed*';
+  const userStr = keybaseUsername ? `User @${keybaseUsername}` : `GitHub user \`${payload.sender.login}\``;
+
+  const parsedCommits = generateParsedCommits(payload.commits);
+  const commitMessagesStr = parsedCommits
+    .map(commit => `- ${commit.header}`)
     .reduce((acc, commit) => {
       return acc + `\n${commit}`;
-    });
+    }, '');
   const quotedCommitMessages = parseIntoQuotedString(commitMessagesStr);
 
-  return `${userStr} ${forcedStr} ${commits.length} commit(s) to \`${branchRef}\` - ${url}\n> _repo: ${repo}_\n${quotedCommitMessages}`;
+  return `${userStr} ${forcedStr} ${payload.commits.length} commit(s) to \`${payload.ref}\` - ${url}\n> _repo: ${payload.repository.full_name}_\n${quotedCommitMessages}`;
 };
 
 const parseRepoStarringEvent = ({payload, keybaseUsername}): string => {
@@ -129,7 +148,7 @@ const parseIssueCommentEvent = async ({payload, keybaseUsername}): Promise<strin
 export const generateChatMessage = async ({context, keybaseUsername}): Promise<string> => {
   core.debug(`GitHub event: ${JSON.stringify(context)}`);
   if (get(context, 'eventName', null) === 'push') {
-    return await parsePushEvent({payload: context.payload, keybaseUsername});
+    return await parsePushEvent(context.payload, keybaseUsername);
   }
 
   if (get(context, 'eventName', null) === 'watch') {

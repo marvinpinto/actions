@@ -96,7 +96,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'GitHub user `marvinpinto` *force-pushed* 1 commit(s) to `refs/heads/master` - https://example.com\n> _repo: marvinpinto/keybase-notifications-action_\n> - Run the generated action locally on spec ..',
+        'GitHub user `marvinpinto` *force-pushed* 1 commit(s) to `refs/heads/master` - https://example.com\n> _repo: marvinpinto/keybase-notifications-action_\n> - Run the generated action locally on specific events',
     });
   });
 
@@ -125,7 +125,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'GitHub user `marvinpinto` *pushed* 2 commit(s) to `refs/heads/master` - https://example.com\n> _repo: marvinpinto/keybase-notifications-action_\n> - Add the functionality to deal with GitHu ..\n> - Make up a fake commit for testing',
+        'GitHub user `marvinpinto` *pushed* 2 commit(s) to `refs/heads/master` - https://example.com\n> _repo: marvinpinto/keybase-notifications-action_\n> - Add the functionality to deal with GitHub repo-starring events\n> - Make up a fake commit for testing',
     });
   });
 
@@ -141,7 +141,7 @@ describe('main handler', () => {
     expect(mockKeybaseMethods.sendChatMessage).toHaveBeenCalledWith({
       teamInfo: {channel: 'funtimes', teamName: '', topicName: ''},
       message:
-        'User @keybasebob *pushed* 2 commit(s) to `refs/heads/master` - https://example.com\n> _repo: marvinpinto/keybase-notifications-action_\n> - Add the functionality to deal with GitHu ..\n> - Make up a fake commit for testing',
+        'User @keybasebob *pushed* 2 commit(s) to `refs/heads/master` - https://example.com\n> _repo: marvinpinto/keybase-notifications-action_\n> - Add the functionality to deal with GitHub repo-starring events\n> - Make up a fake commit for testing',
     });
   });
 

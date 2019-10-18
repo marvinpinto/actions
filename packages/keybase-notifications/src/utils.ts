@@ -4,7 +4,7 @@ import querystring from 'querystring';
 import * as fs from 'fs';
 import * as core from '@actions/core';
 
-export const getShortenedUrl = async (url): Promise<string> => {
+export const getShortenedUrl = async (url: string): Promise<string> => {
   try {
     const result = await axios.post('https://git.io', querystring.stringify({url: url}));
     const shortUrl = get(result, 'headers.location', null);
