@@ -14,13 +14,18 @@ export const getShortSHA = (sha: string): string => {
   return sha.substring(0, coreAbbrev);
 };
 
-export const parseIntoQuotedString = (body): string => {
+export const parseIntoQuotedString = (body: string): string => {
   let quotedStr = body
     .trim()
     .split('\n')
     .reduce((acc, line) => {
       return acc + `\n> ${line}`;
     });
+
+  // Return an empty body instead of an errant "empty quoted line"
+  if (!quotedStr) {
+    return '';
+  }
 
   // Prepend '>' to account for the first line
   quotedStr = `> ${quotedStr}`;
@@ -86,7 +91,8 @@ const parsePullRequestEvent = async (
     reopened: '*reopened*',
   };
   const actionStr = actionMap[payload.action];
-  return `PR #${payload.number} ${actionStr} by ${userStr} - ${url}\n> _repo: ${payload.repository.full_name}_\n> Title: *${payload.pull_request.title}*\n${quotedBody}`;
+  const quotedBodyStr = quotedBody ? `\n${quotedBody}` : '';
+  return `PR #${payload.number} ${actionStr} by ${userStr} - ${url}\n> _repo: ${payload.repository.full_name}_\n> Title: *${payload.pull_request.title}*${quotedBodyStr}`;
 };
 
 const parseCommitCommentEvent = async (
@@ -114,7 +120,8 @@ const parseIssuesEvent = async (
     reopened: '*reopened*',
   };
   const actionStr = actionMap[payload.action];
-  return `Issue #${payload.issue.number} ${actionStr} by ${userStr} - ${url}\n> _repo: ${payload.repository.full_name}_\n> Title: *${payload.issue.title}*\n${quotedBody}`;
+  const quotedBodyStr = quotedBody ? `\n${quotedBody}` : '';
+  return `Issue #${payload.issue.number} ${actionStr} by ${userStr} - ${url}\n> _repo: ${payload.repository.full_name}_\n> Title: *${payload.issue.title}*${quotedBodyStr}`;
 };
 
 const parseIssueCommentEvent = async (
