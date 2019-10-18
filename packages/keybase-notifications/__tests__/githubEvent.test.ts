@@ -7,10 +7,10 @@ describe('githubEvent parseIntoQuotedString function', () => {
     expect(output).toBe('> Hello, this is a comment.');
   });
 
-  it('returns an empty quoted string when supplied with empty input', () => {
+  it('returns nothing when supplied with empty input', () => {
     const input = '';
     const output = parseIntoQuotedString(input);
-    expect(output).toBe('> ');
+    expect(output).toBe('');
   });
 
   it('is able to maintain the line spacing supplied originally, with quotes', () => {

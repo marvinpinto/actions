@@ -1,7 +1,75 @@
 import * as core from '@actions/core';
 import {getShortSHA} from '../../keybase-notifications/src/githubEvent';
+import * as Octokit from '@octokit/rest';
 
-const getFormattedChangelogEntry = parsedCommit => {
+export type ParsedCommitsExtraCommit = Octokit.ReposCompareCommitsResponseCommitsItem & {
+  author: {
+    email: string;
+    name: string;
+    username: string;
+  };
+  committer: {
+    email: string;
+    name: string;
+    username: string;
+  };
+  distinct: boolean;
+  id: string;
+  message: string;
+  timestamp: string;
+  tree_id: string;
+  url: string;
+};
+
+type ParsedCommitsExtra = {
+  commit: ParsedCommitsExtraCommit;
+  pullRequests: {
+    number: number;
+    url: string;
+  }[];
+  breakingChange: boolean;
+};
+
+enum ConventionalCommitTypes {
+  feat = 'Features',
+  fix = 'Bug Fixes',
+  docs = 'Documentation',
+  style = 'Styles',
+  refactor = 'Code Refactoring',
+  perf = 'Performance Improvements',
+  test = 'Tests',
+  build = 'Builds',
+  ci = 'Continuous Integration',
+  chore = 'Chores',
+  revert = 'Reverts',
+}
+
+export type ParsedCommits = {
+  type: ConventionalCommitTypes;
+  scope: string;
+  subject: string;
+  merge: string;
+  header: string;
+  body: string;
+  footer: string;
+  notes: {
+    title: string;
+    text: string;
+  }[];
+  extra: ParsedCommitsExtra;
+  references: {
+    action: string;
+    owner: string;
+    repository: string;
+    issue: string;
+    raw: string;
+    prefix: string;
+  }[];
+  mentions: string[];
+  revert: boolean;
+};
+
+const getFormattedChangelogEntry = (parsedCommit: ParsedCommits): string => {
   let entry = '';
 
   const url = parsedCommit.extra.commit.html_url;
@@ -31,22 +99,8 @@ const getFormattedChangelogEntry = parsedCommit => {
   return entry;
 };
 
-export const generateChangelogFromParsedCommits = (parsedCommits): string => {
+export const generateChangelogFromParsedCommits = (parsedCommits: ParsedCommits[]): string => {
   let changelog = '';
-
-  const conventionalCommitTypeHeader = {
-    feat: 'Features',
-    fix: 'Bug Fixes',
-    docs: 'Documentation',
-    style: 'Styles',
-    refactor: 'Code Refactoring',
-    perf: 'Performance Improvements',
-    test: 'Tests',
-    build: 'Builds',
-    ci: 'Continuous Integration',
-    chore: 'Chores',
-    revert: 'Reverts',
-  };
 
   // Breaking Changes
   const breaking = parsedCommits
@@ -58,13 +112,13 @@ export const generateChangelogFromParsedCommits = (parsedCommits): string => {
     changelog += breaking;
   }
 
-  for (const key of Object.keys(conventionalCommitTypeHeader)) {
+  for (const key of Object.keys(ConventionalCommitTypes)) {
     const clBlock = parsedCommits
       .filter(val => val.type === key)
       .map(val => getFormattedChangelogEntry(val))
       .reduce((acc, line) => `${acc}\n${line}`, '');
     if (clBlock) {
-      changelog += `\n\n## ${conventionalCommitTypeHeader[key]}\n`;
+      changelog += `\n\n## ${ConventionalCommitTypes[key]}\n`;
       changelog += clBlock;
     }
   }
