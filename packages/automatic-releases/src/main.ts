@@ -8,7 +8,7 @@ import path from 'path';
 import md5File from 'md5-file/promise';
 import {sync as commitParser} from 'conventional-commits-parser';
 import {getChangelogOptions} from './utils';
-import {isBreakingChange, generateChangelogFromParsedCommits, parseGitTag, ParsedCommits} from './utils';
+import {isBreakingChange, generateChangelogFromParsedCommits, parseGitTag, ParsedCommits, octokitLogger} from './utils';
 import semver from 'semver';
 
 type Args = {
@@ -264,7 +264,16 @@ export const getChangelog = async (
 export const main = async () => {
   try {
     const args = getAndValidateArgs();
-    const client = new github.GitHub(args.repoToken);
+
+    // istanbul ignore next
+    const client = new github.GitHub(args.repoToken, {
+      log: {
+        debug: (...args) => core.debug(octokitLogger(...args)),
+        info: (...args) => core.debug(octokitLogger(...args)),
+        warn: (...args) => core.warning(octokitLogger(...args)),
+        error: (...args) => core.error(octokitLogger(...args)),
+      },
+    });
 
     core.startGroup('Initializing the Automatic Releases action');
     dumpGitHubEventPayload();

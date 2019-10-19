@@ -159,3 +159,24 @@ export const getChangelogOptions = async () => {
   core.debug(`Changelog options: ${JSON.stringify(defaultOpts)}`);
   return defaultOpts;
 };
+
+// istanbul ignore next
+export const octokitLogger = (...args): string => {
+  return args
+    .map(arg => {
+      if (typeof arg === 'string') {
+        return arg;
+      }
+
+      // Do not log file buffers
+      if (arg.file) {
+        arg.file = '== raw file buffer info removed ==';
+      }
+      if (arg.data) {
+        arg.data = '== raw file buffer info removed ==';
+      }
+
+      return JSON.stringify(arg);
+    })
+    .reduce((acc, val) => `${acc} ${val}`, '');
+};
