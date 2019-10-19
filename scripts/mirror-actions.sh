@@ -16,7 +16,7 @@ ACTION_KEYBASE_NOTIFICATIONS_REPO="action-keybase-notifications"
 ACTION_AUTOMATIC_RELEASES_REPO="action-automatic-releases"
 TAG=$1
 GITHUB_LOGIN="marvinpinto"
-RELEASE_BODY="This is an mirrored release. Detailed release notes available at https://github.com/marvinpinto/actions/releases/tag/${TAG}."
+RELEASE_BODY="Details available at [marvinpinto/actions@${TAG}](https://github.com/marvinpinto/actions/releases/tag/${TAG})."
 
 PRERELEASE="false"
 if [[ "$TAG" == "latest" ]]; then
@@ -35,6 +35,19 @@ create_tagged_release() {
   # Set the local git identity
   git config user.email "${GITHUB_LOGIN}@users.noreply.github.com"
   git config user.name "$GITHUB_LOGIN"
+
+  # Obtain the release ID for the previous release of $TAG (if present)
+  local previous_release_id=$(curl --user ${GITHUB_LOGIN}:${GITHUB_SUPER_TOKEN} --request GET --silent https://api.github.com/repos/${GITHUB_LOGIN}/${REPO}/releases/tags/${TAG} | jq '.id')
+
+  # Delete the previous release (if present)
+  if [[ -n "$previous_release_id" ]]; then
+    echo "Deleting previous release: ${previous_release_id}"
+    curl \
+      --user ${GITHUB_LOGIN}:${GITHUB_SUPER_TOKEN} \
+      --request DELETE \
+      --silent \
+      https://api.github.com/repos/${GITHUB_LOGIN}/${REPO}/releases/${previous_release_id}
+  fi
 
   # Delete previous identical tags, if present
   git tag -d $TAG || true
