@@ -30,6 +30,7 @@ jobs:
             packages/automatic-releases/dist/index.js
             packages/keybase-notifications/dist/index.js
             packages/keybase-notifications/dist/keybase
+        id: "automatic_releases"
 
       # marvinpinto/action-keybase-notifications
       # marvinpinto/action-automatic-releases
@@ -41,7 +42,7 @@ jobs:
 
       - uses: "marvinpinto/action-keybase-notifications@latest"
         with:
-          message: "Version `$AUTOMATIC_RELEASES_TAG` of `marvinpinto/actions` successfully released."
+          message: "Version `${{ steps.automatic_releases.outputs.automatic_releases_tag }}` of `{{ github.repository }}` successfully released."
           keybase_username: "${{ secrets.KeybaseUsername }}"
           keybase_paper_key: "${{ secrets.KeybasePaperKey }}"
           keybase_team_name: "${{ secrets.KeybaseTeamName }}"
