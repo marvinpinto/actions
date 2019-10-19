@@ -143,13 +143,13 @@ export const isBreakingChange = ({body, footer}): boolean => {
 };
 
 export const parseGitTag = (inputRef): string => {
-  const re = /^refs\/tags\/(.*)$/;
+  const re = /^(refs\/)?tags\/(.*)$/;
   const resMatch = inputRef.match(re);
-  if (!resMatch || !resMatch[1]) {
+  if (!resMatch || !resMatch[2]) {
     core.debug(`Input "${inputRef}" does not appear to be a tag`);
     return '';
   }
-  return resMatch[1];
+  return resMatch[2];
 };
 
 export const getChangelogOptions = async () => {

@@ -134,7 +134,7 @@ describe('main handler processing automatic releases', () => {
 
     const getCommitsSinceRelease = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
-      .get(`/repos/marvinpinto/private-actions-tester/compare/${previousReleaseSHA}...${testGhSHA}`)
+      .get(`/repos/marvinpinto/private-actions-tester/compare/${testInputAutomaticReleaseTag}...${testGhSHA}`)
       .reply(200, compareCommitsPayload);
 
     const listAssociatedPRs = nock('https://api.github.com')

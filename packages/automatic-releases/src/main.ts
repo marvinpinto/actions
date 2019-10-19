@@ -172,33 +172,45 @@ const getCommitsSinceRelease = async (
   currentSha: string,
 ): Promise<Octokit.ReposCompareCommitsResponseCommitsItem[]> => {
   core.startGroup('Retrieving commit history');
+  let resp;
 
   core.info('Determining state of the previous release');
-  let previousReleaseSha = '' as string;
-  core.info(`Searching for SHA corresponding to current "${tagInfo.ref}" tag`);
+  let previousReleaseRef = '' as string;
+  core.info(`Searching for SHA corresponding to previous "${tagInfo.ref}" release tag`);
   try {
-    const resp = await client.git.getRef(tagInfo);
-    previousReleaseSha = resp.data.object.sha;
+    resp = await client.git.getRef(tagInfo);
+    previousReleaseRef = parseGitTag(tagInfo.ref);
   } catch (err) {
     core.info(
       `Could not find SHA corresponding to tag "${tagInfo.ref}" (${err.message}). Assuming this is the first release.`,
     );
-    previousReleaseSha = 'HEAD';
+    previousReleaseRef = 'HEAD';
   }
 
-  core.info(`Retrieving commits between ${previousReleaseSha} and ${currentSha}`);
-  const resp = await client.repos.compareCommits({
-    owner: tagInfo.owner,
-    repo: tagInfo.repo,
-    base: previousReleaseSha,
-    head: currentSha,
-  });
-  core.info(
-    `Successfully retrieved ${resp.data.commits.length} number of commits between ${previousReleaseSha} and ${currentSha}`,
-  );
+  core.info(`Retrieving commits between ${previousReleaseRef} and ${currentSha}`);
+  try {
+    resp = await client.repos.compareCommits({
+      owner: tagInfo.owner,
+      repo: tagInfo.repo,
+      base: previousReleaseRef,
+      head: currentSha,
+    });
+    core.info(
+      `Successfully retrieved ${resp.data.commits.length} commits between ${previousReleaseRef} and ${currentSha}`,
+    );
+  } catch (err) {
+    // istanbul ignore next
+    core.warning(`Could not find any commits between ${previousReleaseRef} and ${currentSha}`);
+  }
+
+  let commits = [];
+  if (resp.data.commits) {
+    commits = resp.data.commits;
+  }
+  core.debug(`Currently ${commits.length} number of commits between ${previousReleaseRef} and ${currentSha}`);
 
   core.endGroup();
-  return resp.data.commits;
+  return commits;
 };
 
 export const getChangelog = async (
