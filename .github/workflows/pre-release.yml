@@ -40,3 +40,11 @@ jobs:
           GITHUB_SUPER_TOKEN: ${{ secrets.GITHUB_SUPER_TOKEN }}
         run: |
           ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
+
+      - uses: "./packages/keybase-notifications/"
+        with:
+          message: "Version `$AUTOMATIC_RELEASES_TAG` of `marvinpinto/actions` successfully released."
+          keybase_username: "${{ secrets.KeybaseUsername }}"
+          keybase_paper_key: "${{ secrets.KeybasePaperKey }}"
+          keybase_team_name: "${{ secrets.KeybaseTeamName }}"
+          keybase_topic_name: "${{ secrets.KeybaseTopicName }}"
