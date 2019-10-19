@@ -354,6 +354,7 @@ export const main = async () => {
 
     core.debug(`Exporting environment variable AUTOMATIC_RELEASES_TAG with value ${releaseTag}`);
     core.exportVariable('AUTOMATIC_RELEASES_TAG', releaseTag);
+    core.setOutput('automatic_releases_tag', releaseTag);
   } catch (error) {
     core.setFailed(error.message);
     throw error;
