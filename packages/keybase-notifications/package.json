@@ -10,7 +10,7 @@
   "scripts": {
     "preinstall": "./scripts/install_keybase_binary.sh",
     "build": "ncc build src/index.ts",
-    "test": "jest --silent",
+    "test": "jest",
     "clean": "rm -rf node_modules yarn-error.log dist",
     "lint": "yarn run lint:eslint && yarn run lint:prettier",
     "lint:eslint": "eslint --max-warnings=0 $npm_package_config_eslintPaths",

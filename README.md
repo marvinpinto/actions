@@ -29,6 +29,7 @@ yarn build
 yarn lint
 yarn test
 yarn lintfix  # automatic lint-fixing, during development
+JEST_VERBOSE=yes yarn test  # useful for test output debugging
 ```
 
 ## Debugging

@@ -143,13 +143,13 @@ export const isBreakingChange = ({body, footer}): boolean => {
 };
 
 export const parseGitTag = (inputRef): string => {
-  const re = /^refs\/tags\/(.*)$/;
+  const re = /^(refs\/)?tags\/(.*)$/;
   const resMatch = inputRef.match(re);
-  if (!resMatch || !resMatch[1]) {
+  if (!resMatch || !resMatch[2]) {
     core.debug(`Input "${inputRef}" does not appear to be a tag`);
     return '';
   }
-  return resMatch[1];
+  return resMatch[2];
 };
 
 export const getChangelogOptions = async () => {
@@ -158,4 +158,25 @@ export const getChangelogOptions = async () => {
   defaultOpts['mergeCorrespondence'] = ['issueId', 'source'];
   core.debug(`Changelog options: ${JSON.stringify(defaultOpts)}`);
   return defaultOpts;
+};
+
+// istanbul ignore next
+export const octokitLogger = (...args): string => {
+  return args
+    .map(arg => {
+      if (typeof arg === 'string') {
+        return arg;
+      }
+
+      // Do not log file buffers
+      if (arg.file) {
+        arg.file = '== raw file buffer info removed ==';
+      }
+      if (arg.data) {
+        arg.data = '== raw file buffer info removed ==';
+      }
+
+      return JSON.stringify(arg);
+    })
+    .reduce((acc, val) => `${acc} ${val}`, '');
 };
