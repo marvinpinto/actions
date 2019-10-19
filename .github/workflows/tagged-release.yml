@@ -22,7 +22,7 @@ jobs:
           yarn run reinstall
           yarn run build
 
-      - uses: "marvinpinto/actions-automatic-releases@latest"
+      - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
@@ -39,7 +39,7 @@ jobs:
         run: |
           ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
 
-      - uses: "marvinpinto/actions-keybase-notifications@latest"
+      - uses: "marvinpinto/action-keybase-notifications@latest"
         with:
           message: "Version `$AUTOMATIC_RELEASES_TAG` of `marvinpinto/actions` successfully released."
           keybase_username: "${{ secrets.KeybaseUsername }}"

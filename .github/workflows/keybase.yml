@@ -31,7 +31,7 @@ jobs:
   keybase:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "marvinpinto/actions-keybase-notifications@latest"
+      - uses: "marvinpinto/action-keybase-notifications@latest"
         with:
           keybase_username: "${{ secrets.KeybaseUsername }}"
           keybase_paper_key: "${{ secrets.KeybasePaperKey }}"
