@@ -16,8 +16,8 @@ This repository is a collection of said actions which you are free to re-use and
 
 ## Actions in this Repository
 
-- [Keybase Notifications](packages/keybase-notifications) - send GitHub notifications to Keybase Chat channels, teams, and DMs.
-- [GitHub Automatic Releases](packages/automatic-releases) - automatically upload assets, generate changelogs, pre-releases, and so on.
+- [Keybase Notifications](https://github.com/marketplace/actions/keybase-notifications) - send GitHub notifications to Keybase Chat channels, teams, and DMs.
+- [GitHub Automatic Releases](https://github.com/marketplace/actions/automatic-releases) - automatically upload assets, generate changelogs, pre-releases, and so on.
 
 ## Development
 
