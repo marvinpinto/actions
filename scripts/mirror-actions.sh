@@ -81,9 +81,7 @@ END
 # Mirroring Keybase Notifications
 rm -rf "/tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}"
 git clone "https://marvinpinto:${GITHUB_SUPER_TOKEN}@github.com/marvinpinto/${ACTION_KEYBASE_NOTIFICATIONS_REPO}.git" /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}
-mkdir -p /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}/dist
-cp packages/keybase-notifications/dist/index.js /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}/dist/
-cp packages/keybase-notifications/dist/keybase /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}/dist/
+cp -R packages/keybase-notifications/dist /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}/
 cp -R packages/keybase-notifications/images /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}/
 cp packages/keybase-notifications/README.md /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}/
 cp packages/keybase-notifications/action.yml /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}/
@@ -93,8 +91,7 @@ create_tagged_release "$ACTION_KEYBASE_NOTIFICATIONS_REPO"
 # Mirroring Automatic Releases
 rm -rf "/tmp/${ACTION_AUTOMATIC_RELEASES_REPO}"
 git clone "https://marvinpinto:${GITHUB_SUPER_TOKEN}@github.com/marvinpinto/${ACTION_AUTOMATIC_RELEASES_REPO}.git" /tmp/${ACTION_AUTOMATIC_RELEASES_REPO}
-mkdir -p /tmp/${ACTION_AUTOMATIC_RELEASES_REPO}/dist
-cp packages/automatic-releases/dist/index.js /tmp/${ACTION_AUTOMATIC_RELEASES_REPO}/dist/
+cp -R packages/automatic-releases/dist /tmp/${ACTION_AUTOMATIC_RELEASES_REPO}/
 cp packages/automatic-releases/README.md /tmp/${ACTION_AUTOMATIC_RELEASES_REPO}/
 cp packages/automatic-releases/action.yml /tmp/${ACTION_AUTOMATIC_RELEASES_REPO}/
 cp LICENSE /tmp/${ACTION_AUTOMATIC_RELEASES_REPO}/
