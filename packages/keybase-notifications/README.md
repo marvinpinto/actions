@@ -37,7 +37,7 @@ jobs:
   keybase:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "marvinpinto/actions-keybase-notifications@latest"
+      - uses: "marvinpinto/action-keybase-notifications@latest"
         with:
           keybase_username: "${{ secrets.KeybaseUsername }}"
           keybase_paper_key: "${{ secrets.KeybasePaperKey }}" # "fancy regular ..."
@@ -52,7 +52,7 @@ jobs:
   keybase:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "marvinpinto/actions-keybase-notifications@latest"
+      - uses: "marvinpinto/action-keybase-notifications@latest"
         with:
           keybase_username: "${{ secrets.KeybaseUsername }}"
           keybase_paper_key: "${{ secrets.KeybasePaperKey }}" # "fancy regular ..."
@@ -66,7 +66,7 @@ jobs:
   keybase:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "marvinpinto/actions-keybase-notifications@latest"
+      - uses: "marvinpinto/action-keybase-notifications@latest"
         with:
           message: "Hey there, world!"
           keybase_username: "${{ secrets.KeybaseUsername }}"
@@ -139,7 +139,7 @@ Read through the [GitHub documentation](https://help.github.com/en/articles/work
 Every commit that lands on master for this project triggers an automatic build as well as a tagged release called `latest`. If you don't wish to live on the bleeding edge you may use a stable release instead. See [releases](../../releases/latest) for the available versions.
 
 ```yaml
-- uses: "marvinpinto/actions-keybase-notifications@<VERSION>"
+- uses: "marvinpinto/action-keybase-notifications@<VERSION>"
 ```
 
 ## How to get help
