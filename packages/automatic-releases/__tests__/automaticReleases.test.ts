@@ -39,6 +39,7 @@ describe('main handler processing automatic releases', () => {
     jest.clearAllMocks();
     nock.cleanAll();
     nock.enableNetConnect();
+    delete process.env['AUTOMATIC_RELEASES_TAG'];
   });
 
   it('throws an error when "automatic_release_tag" is not supplied', async () => {
@@ -97,6 +98,9 @@ describe('main handler processing automatic releases', () => {
         upload_url: releaseUploadUrl, // eslint-disable-line @typescript-eslint/camelcase
       });
 
+    // Output env variable should be empty
+    expect(process.env['AUTOMATIC_RELEASES_TAG']).toBeUndefined();
+
     const inst = require('../src/main');
     inst.uploadReleaseArtifacts = jest.fn(() => Promise.resolve());
     await inst.main();
@@ -112,6 +116,9 @@ describe('main handler processing automatic releases', () => {
     expect(inst.uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
     // Should not attempt to upload any release artifacts, as there are none
     expect(inst.uploadReleaseArtifacts.mock.calls[0][2]).toEqual([]);
+
+    // Should populate the output env variable
+    expect(process.env['AUTOMATIC_RELEASES_TAG']).toBe(testInputAutomaticReleaseTag);
   });
 
   it('should update an existing release tag', async () => {
@@ -183,6 +190,9 @@ describe('main handler processing automatic releases', () => {
         upload_url: releaseUploadUrl, // eslint-disable-line @typescript-eslint/camelcase
       });
 
+    // Output env variable should be empty
+    expect(process.env['AUTOMATIC_RELEASES_TAG']).toBeUndefined();
+
     const inst = require('../src/main');
     inst.uploadReleaseArtifacts = jest.fn(() => Promise.resolve());
     await inst.main();
@@ -199,5 +209,8 @@ describe('main handler processing automatic releases', () => {
     expect(inst.uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
     expect(inst.uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
     expect(inst.uploadReleaseArtifacts.mock.calls[0][2]).toEqual(['file1.txt', 'file2.txt', '*.jar']);
+
+    // Should populate the output env variable
+    expect(process.env['AUTOMATIC_RELEASES_TAG']).toBe(testInputAutomaticReleaseTag);
   });
 });

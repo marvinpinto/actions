@@ -32,3 +32,11 @@ jobs:
             packages/automatic-releases/dist/index.js
             packages/keybase-notifications/dist/index.js
             packages/keybase-notifications/dist/keybase
+
+      # marvinpinto/action-keybase-notifications
+      # marvinpinto/action-automatic-releases
+      - name: "Automatically mirror release artifacts"
+        env:
+          GITHUB_SUPER_TOKEN: ${{ secrets.GITHUB_SUPER_TOKEN }}
+        run: |
+          ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
