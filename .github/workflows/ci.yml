@@ -20,6 +20,8 @@ jobs:
           lfs: true
 
       - name: "Build and run tests"
+        env:
+          JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
         run: |
           yarn run reinstall
           yarn run lint
