@@ -14,6 +14,8 @@ This action allows you to post messages to [Keybase Chat](https://keybase.io/blo
 1. [How to get help](#how-to-get-help)
 1. [License](#license)
 
+> **NOTE**: The `marvinpinto/action-keybase-notifications` repository is an automatically generated mirror of the [marvinpinto/actions](https://github.com/marvinpinto/actions) monorepo containing this and other actions. Please file issues and pull requests over there.
+
 ## Using the Action
 
 You will need a Keybase paperkey and its corresponding username. It is probably a good idea to create a dedicated Keybase account for this purpose, or at the very least generate a dedicated paperkey on your existing account. This makes it easier to revoke if needed.
@@ -35,7 +37,7 @@ jobs:
   keybase:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "marvinpinto/actions/packages/keybase-notifications@latest"
+      - uses: "marvinpinto/actions-keybase-notifications@latest"
         with:
           keybase_username: "${{ secrets.KeybaseUsername }}"
           keybase_paper_key: "${{ secrets.KeybasePaperKey }}" # "fancy regular ..."
@@ -50,7 +52,7 @@ jobs:
   keybase:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "marvinpinto/actions/packages/keybase-notifications@latest"
+      - uses: "marvinpinto/actions-keybase-notifications@latest"
         with:
           keybase_username: "${{ secrets.KeybaseUsername }}"
           keybase_paper_key: "${{ secrets.KeybasePaperKey }}" # "fancy regular ..."
@@ -64,7 +66,7 @@ jobs:
   keybase:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "marvinpinto/actions/packages/keybase-notifications@latest"
+      - uses: "marvinpinto/actions-keybase-notifications@latest"
         with:
           message: "Hey there, world!"
           keybase_username: "${{ secrets.KeybaseUsername }}"
@@ -134,15 +136,15 @@ Read through the [GitHub documentation](https://help.github.com/en/articles/work
 
 ## Versioning
 
-Every commit that lands on master for this project triggers an automatic build as well as a tagged release called `latest`. If you don't wish to live on the bleeding edge you may use a stable release instead. See [releases](https://github.com/marvinpinto/actions/releases) for the available versions.
+Every commit that lands on master for this project triggers an automatic build as well as a tagged release called `latest`. If you don't wish to live on the bleeding edge you may use a stable release instead. See [releases](../../releases/latest) for the available versions.
 
 ```yaml
-- uses: "marvinpinto/actions/packages/keybase-notifications@<VERSION>"
+- uses: "marvinpinto/actions-keybase-notifications@<VERSION>"
 ```
 
 ## How to get help
 
-The main [README](../../README.md) for this project has a bunch of information related to debugging & submitting issues. If you're still stuck, try and get a hold of me on [keybase](https://keybase.io/marvinpinto) and I'll do my best.
+The main [README](https://github.com/marvinpinto/actions/blob/master/README.md) for this project has a bunch of information related to debugging & submitting issues. If you're still stuck, try and get a hold of me on [keybase](https://keybase.io/marvinpinto) and I will do my best to help you out.
 
 ## License
 
