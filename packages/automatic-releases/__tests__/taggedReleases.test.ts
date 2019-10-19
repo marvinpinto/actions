@@ -35,6 +35,7 @@ describe('main handler processing tagged releases', () => {
     jest.clearAllMocks();
     nock.cleanAll();
     nock.enableNetConnect();
+    delete process.env['AUTOMATIC_RELEASES_TAG'];
   });
 
   it('throws an error if the github event tag does not conform to semantic versioning', async () => {
@@ -107,6 +108,9 @@ describe('main handler processing tagged releases', () => {
         upload_url: releaseUploadUrl,
       });
 
+    // Output env variable should be empty
+    expect(process.env['AUTOMATIC_RELEASES_TAG']).toBeUndefined();
+
     const inst = require('../src/main');
     inst.uploadReleaseArtifacts = jest.fn(() => Promise.resolve());
     await inst.main();
@@ -119,5 +123,8 @@ describe('main handler processing tagged releases', () => {
     expect(inst.uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
     expect(inst.uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
     expect(inst.uploadReleaseArtifacts.mock.calls[0][2]).toEqual(['file1.txt', 'file2.txt', '*.jar']);
+
+    // Should populate the output env variable
+    expect(process.env['AUTOMATIC_RELEASES_TAG']).toBe('v0.0.1');
   });
 });

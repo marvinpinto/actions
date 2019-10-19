@@ -351,6 +351,9 @@ export const main = async () => {
     });
 
     await uploadReleaseArtifacts(client, releaseUploadUrl, args.files);
+
+    core.debug(`Exporting environment variable AUTOMATIC_RELEASES_TAG with value ${releaseTag}`);
+    core.exportVariable('AUTOMATIC_RELEASES_TAG', releaseTag);
   } catch (error) {
     core.setFailed(error.message);
     throw error;
