@@ -1,6 +1,6 @@
 {
   "name": "keybase-notifications",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "private": true,
   "description": "Trigger Keybase chat notifications from GitHub actions",
   "config": {
