@@ -168,15 +168,17 @@ export const octokitLogger = (...args): string => {
         return arg;
       }
 
+      const argCopy = {...arg};
+
       // Do not log file buffers
-      if (arg.file) {
-        arg.file = '== raw file buffer info removed ==';
+      if (argCopy.file) {
+        argCopy.file = '== raw file buffer info removed ==';
       }
-      if (arg.data) {
-        arg.data = '== raw file buffer info removed ==';
+      if (argCopy.data) {
+        argCopy.data = '== raw file buffer info removed ==';
       }
 
-      return JSON.stringify(arg);
+      return JSON.stringify(argCopy);
     })
     .reduce((acc, val) => `${acc} ${val}`, '');
 };
