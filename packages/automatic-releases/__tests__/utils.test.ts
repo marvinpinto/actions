@@ -1,6 +1,6 @@
 import * as path from 'path';
 import fs from 'fs';
-import {generateChangelogFromParsedCommits} from '../src/utils';
+import {generateChangelogFromParsedCommits, octokitLogger} from '../src/utils';
 
 describe('changelog generator', () => {
   beforeEach(() => {
@@ -74,5 +74,34 @@ describe('changelog generator', () => {
 
     const result = generateChangelogFromParsedCommits(payload);
     expect(result.trim()).toEqual(expected.trim());
+  });
+
+  it('log of input arguments should not overwrite the original args', () => {
+    const licenseFile = fs.readFileSync(path.join(__dirname, 'assets', 'LICENSE'), 'utf8');
+    const jarFile = fs.readFileSync(path.join(__dirname, 'assets', 'test.jar'), 'utf8');
+
+    const args = [
+      {
+        repoToken: 'repoToken',
+        automaticReleaseTag: 'automaticReleaseTag',
+        draftRelease: false,
+        preRelease: false,
+        releaseTitle: 'releaseTitle',
+        file: licenseFile,
+      },
+      {
+        repoToken: 'repoToken',
+        automaticReleaseTag: 'automaticReleaseTag',
+        draftRelease: false,
+        preRelease: false,
+        releaseTitle: 'releaseTitle',
+        file: jarFile,
+      },
+    ];
+
+    octokitLogger(...args);
+
+    expect(args[0].file).toEqual('this should not be overridden');
+    expect(args[1].file).toEqual('');
   });
 });
