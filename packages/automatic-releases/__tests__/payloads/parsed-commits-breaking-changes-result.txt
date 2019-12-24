@@ -1,7 +1,5 @@
 ## Breaking Changes
-
 - revert a bunch of stuff [#2](https://github.com/marvinpinto/private-actions-tester/pull/2) ([Marvin Pinto](https://github.com/marvinpinto/private-actions-tester/commit/4398ef4ea6f5a61880ca94ecfb8e60d1a38497dd))
 
 ## Reverts
-
 - revert a bunch of stuff [#2](https://github.com/marvinpinto/private-actions-tester/pull/2) ([Marvin Pinto](https://github.com/marvinpinto/private-actions-tester/commit/4398ef4ea6f5a61880ca94ecfb8e60d1a38497dd))
