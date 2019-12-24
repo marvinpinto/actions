@@ -1,66 +1,151 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import {generateChatMessage} from './githubEvent';
-import Keybase from './keybase';
-import {dumpGitHubEventPayload} from './utils';
+import {getShortenedUrl} from './utils';
+import axios from 'axios';
+import qs from 'querystring';
+import {parseGitTag} from '../../automatic-releases/src/utils';
+
+enum JobStatus {
+  SUCCESS = 'success',
+  FAILED = 'failure',
+  CANCELLED = 'cancelled',
+  UNKNOWN = 'unknown',
+}
+
+enum BuildNotification {
+  ALWAYS = 'always',
+  NEVER = 'never',
+}
 
 type Args = {
-  keybaseUsername: string;
-  keybasePaperKey: string;
-  keybaseChannel: string;
-  keybaseTeamName: string;
-  keybaseTopicName: string;
-  customChatMessage: string;
+  opensentinelOwner: string;
+  opensentinelToken: string;
+  jobStatus: JobStatus;
+  jobName: string;
+  onSuccessNotification: BuildNotification;
+  onFailureNotification: BuildNotification;
 };
 
 const getAndValidateArgs = (): Args => {
   const args = {
-    keybaseUsername: core.getInput('keybase_username', {required: true}),
-    keybasePaperKey: core.getInput('keybase_paper_key', {required: true}),
-    keybaseChannel: core.getInput('keybase_channel'),
-    keybaseTeamName: core.getInput('keybase_team_name'),
-    keybaseTopicName: core.getInput('keybase_topic_name'),
-    customChatMessage: core.getInput('message'),
+    opensentinelOwner: core.getInput('opensentinel_owner', {required: true}),
+    opensentinelToken: core.getInput('opensentinel_token', {required: true}),
+    jobStatus: JobStatus.UNKNOWN,
+    jobName: '',
+    onSuccessNotification: BuildNotification.ALWAYS,
+    onFailureNotification: BuildNotification.ALWAYS,
   };
 
+  const status = core.getInput('job_status', {required: true});
+  core.debug(`Input job status: ${status}`);
+  switch (status.toLowerCase()) {
+    case JobStatus.SUCCESS:
+      args.jobStatus = JobStatus.SUCCESS;
+      break;
+    case JobStatus.FAILED:
+      args.jobStatus = JobStatus.FAILED;
+      break;
+    case JobStatus.CANCELLED:
+      args.jobStatus = JobStatus.CANCELLED;
+      break;
+    default:
+      // istanbul ignore next
+      throw new Error(`Unexpected job status ${status}`);
+  }
+
+  const onSuccess = core.getInput('on_success');
+  switch (onSuccess.toLowerCase()) {
+    case BuildNotification.ALWAYS:
+      args.onSuccessNotification = BuildNotification.ALWAYS;
+      break;
+    case BuildNotification.NEVER:
+      args.onSuccessNotification = BuildNotification.NEVER;
+      break;
+  }
+
+  const onFailure = core.getInput('on_failure');
+  switch (onFailure.toLowerCase()) {
+    case BuildNotification.ALWAYS:
+      args.onFailureNotification = BuildNotification.ALWAYS;
+      break;
+    case BuildNotification.NEVER:
+      args.onFailureNotification = BuildNotification.NEVER;
+      break;
+  }
+
+  let name = core.getInput('job_name');
+  if (!name) {
+    name = process.env['GITHUB_WORKFLOW'] || '<unnamed>';
+  }
+  args.jobName = name;
   return args;
 };
 
 export const main = async () => {
   try {
+    const defaultUrl = `https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/commit/${github.context.sha}/checks`;
     const args = getAndValidateArgs();
 
-    core.startGroup('Initializing the Keybase Notifications action');
-    dumpGitHubEventPayload();
-    core.debug(`Github context: ${JSON.stringify(github.context)}`);
-    const kb = new Keybase(args.keybaseUsername, args.keybasePaperKey);
-    await kb.init();
-    core.endGroup();
-
-    core.startGroup('Determining keybase ID for the user who triggered this event');
-    const associatedKeybaseUsername = await kb.getKeybaseUsername(github.context.actor);
-    core.endGroup();
-
-    const chatMessage = args.customChatMessage
-      ? args.customChatMessage
-      : await generateChatMessage({
-          context: github.context,
-          keybaseUsername: associatedKeybaseUsername,
-        });
-    if (chatMessage) {
-      await kb.sendChatMessage({
-        teamInfo: {
-          channel: args.keybaseChannel,
-          teamName: args.keybaseTeamName,
-          topicName: args.keybaseTopicName,
-        },
-        message: chatMessage,
-      });
+    // Short-circuit if the build passes & we don't need to notify
+    if (args.jobStatus === JobStatus.SUCCESS && args.onSuccessNotification === BuildNotification.NEVER) {
+      core.debug('Build passed & the user chose not to be notified');
+      return;
     }
 
-    await kb.deinit();
+    // Short-circuit if the build fails & we don't need to notify
+    if (args.jobStatus === JobStatus.FAILED && args.onFailureNotification === BuildNotification.NEVER) {
+      core.debug('Build failed & the user chose not to be notified');
+      return;
+    }
+
+    const shortUrl = await getShortenedUrl(defaultUrl);
+    core.startGroup('Sending out Keybase build notification via opensentinal');
+
+    let tagStr = parseGitTag(github.context.ref);
+    if (tagStr) {
+      tagStr = `(tag ${tagStr}) `;
+    }
+
+    let sender = github.context.payload?.sender?.login;
+    if (sender) {
+      sender = `by \`${sender}\` `;
+    }
+
+    let msg = '';
+    switch (args.jobStatus) {
+      case JobStatus.SUCCESS:
+        msg = `GitHub build **${args.jobName}** ${tagStr}completed successfully :tada: - ${shortUrl}`;
+        break;
+      case JobStatus.FAILED:
+        msg = `GitHub build **${args.jobName}** ${tagStr}failed :rotating_light: - ${shortUrl}`;
+        break;
+      case JobStatus.CANCELLED:
+        msg = `GitHub build **${args.jobName}** ${tagStr}was cancelled ${sender}:warning: - ${shortUrl}`;
+        break;
+    }
+
+    // istanbul ignore next
+    if (!msg) {
+      core.info('Empty notification message, nothing to do here');
+      core.endGroup();
+      return;
+    }
+
+    core.debug(`Outbound message: ${msg}`);
+    const params = qs.stringify({
+      owner: args.opensentinelOwner,
+      token: args.opensentinelToken,
+    });
+    const url = `https://api.opensentinel.com/kb/webhooks?${params}`;
+    await axios.post(url, msg, {
+      headers: {
+        'Content-Type': 'text/plain',
+      },
+    });
+    core.endGroup();
   } catch (error) {
-    core.setFailed(error.message);
-    throw error;
+    // Never fail the build as a result of a notification error
+    core.error(`Unable to send out build status notification - ${error}`);
+    core.endGroup();
   }
 };

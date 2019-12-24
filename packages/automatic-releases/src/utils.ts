@@ -1,7 +1,11 @@
 import * as core from '@actions/core';
-import {getShortSHA} from '../../keybase-notifications/src/githubEvent';
 import * as Octokit from '@octokit/rest';
 import defaultChangelogOpts from 'conventional-changelog-angular';
+
+export const getShortSHA = (sha: string): string => {
+  const coreAbbrev = 7;
+  return sha.substring(0, coreAbbrev);
+};
 
 export type ParsedCommitsExtraCommit = Octokit.ReposCompareCommitsResponseCommitsItem & {
   author: {

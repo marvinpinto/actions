@@ -27,3 +27,9 @@ jobs:
           yarn run lint
           yarn run test
           yarn run build
+      - uses: "./packages/keybase-notifications"
+        if: always()
+        with:
+          job_status: ${{ job.status }}
+          opensentinel_owner: ${{ secrets.OSL_OWNER }}
+          opensentinel_token: ${{ secrets.OSL_TOKEN }}

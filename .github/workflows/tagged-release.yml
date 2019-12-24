@@ -29,7 +29,6 @@ jobs:
           files: |
             packages/automatic-releases/dist/index.js
             packages/keybase-notifications/dist/index.js
-            packages/keybase-notifications/dist/keybase
         id: "automatic_releases"
 
       # marvinpinto/action-keybase-notifications
@@ -41,9 +40,8 @@ jobs:
           ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
 
       - uses: "marvinpinto/action-keybase-notifications@latest"
+        if: always()
         with:
-          message: "Version `${{ steps.automatic_releases.outputs.automatic_releases_tag }}` of `${{ github.repository }}` successfully released."
-          keybase_username: "${{ secrets.KeybaseUsername }}"
-          keybase_paper_key: "${{ secrets.KeybasePaperKey }}"
-          keybase_team_name: "${{ secrets.KeybaseTeamName }}"
-          keybase_topic_name: "${{ secrets.KeybaseTopicName }}"
+          job_status: ${{ job.status }}
+          opensentinel_owner: ${{ secrets.OSL_OWNER }}
+          opensentinel_token: ${{ secrets.OSL_TOKEN }}
