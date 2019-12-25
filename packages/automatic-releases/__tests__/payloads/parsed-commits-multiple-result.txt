@@ -1,5 +1,4 @@
 ## Features
-
 - add the initial prototype of the automatic-releases GitHub action [#2](https://github.com/marvinpinto/private-actions-tester/pull/2) ([Marvin Pinto](https://github.com/marvinpinto/private-actions-tester/commit/4398ef4ea6f5a61880ca94ecfb8e60d1a38497dd))
 - delete previous releases associated with the specified tag [#2](https://github.com/marvinpinto/private-actions-tester/pull/2) ([Marvin Pinto](https://github.com/marvinpinto/private-actions-tester/commit/c01c5105f679a2e692e40877def62ec69a3f9f2b))
 - create new GitHub releases [#2](https://github.com/marvinpinto/private-actions-tester/pull/2) ([Marvin Pinto](https://github.com/marvinpinto/private-actions-tester/commit/50c9b2d9400621ffbc0af334d0911c25354ee383))
@@ -8,5 +7,4 @@
 - use the commit list to generate a changelog [#2](https://github.com/marvinpinto/private-actions-tester/pull/2) ([Marvin Pinto](https://github.com/marvinpinto/private-actions-tester/commit/1be97dbfbc3d399b38dfaa0b23a31816fcc000d5))
 
 ## Tests
-
 - pr strings [#2](https://github.com/marvinpinto/private-actions-tester/pull/2) ([Marvin Pinto](https://github.com/marvinpinto/private-actions-tester/commit/377432c80b3955c3b2e4b0a045b0a90f8abe3480))

@@ -1,7 +1,11 @@
 import * as core from '@actions/core';
-import {getShortSHA} from '../../keybase-notifications/src/githubEvent';
 import * as Octokit from '@octokit/rest';
 import defaultChangelogOpts from 'conventional-changelog-angular';
+
+export const getShortSHA = (sha: string): string => {
+  const coreAbbrev = 7;
+  return sha.substring(0, coreAbbrev);
+};
 
 export type ParsedCommitsExtraCommit = Octokit.ReposCompareCommitsResponseCommitsItem & {
   author: {
@@ -109,8 +113,8 @@ export const generateChangelogFromParsedCommits = (parsedCommits: ParsedCommits[
     .map(val => getFormattedChangelogEntry(val))
     .reduce((acc, line) => `${acc}\n${line}`, '');
   if (breaking) {
-    changelog += '\n\n## Breaking Changes\n';
-    changelog += breaking;
+    changelog += '## Breaking Changes\n';
+    changelog += breaking.trim();
   }
 
   for (const key of Object.keys(ConventionalCommitTypes)) {
@@ -120,7 +124,7 @@ export const generateChangelogFromParsedCommits = (parsedCommits: ParsedCommits[
       .reduce((acc, line) => `${acc}\n${line}`, '');
     if (clBlock) {
       changelog += `\n\n## ${ConventionalCommitTypes[key]}\n`;
-      changelog += clBlock;
+      changelog += clBlock.trim();
     }
   }
 
@@ -131,10 +135,10 @@ export const generateChangelogFromParsedCommits = (parsedCommits: ParsedCommits[
     .reduce((acc, line) => `${acc}\n${line}`, '');
   if (commits) {
     changelog += '\n\n## Commits\n';
-    changelog += commits;
+    changelog += commits.trim();
   }
 
-  return changelog;
+  return changelog.trim();
 };
 
 export const isBreakingChange = ({body, footer}): boolean => {

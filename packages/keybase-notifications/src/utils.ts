@@ -1,4 +1,3 @@
-import {get} from 'lodash';
 import axios from 'axios';
 import querystring from 'querystring';
 import * as fs from 'fs';
@@ -7,7 +6,7 @@ import * as core from '@actions/core';
 export const getShortenedUrl = async (url: string): Promise<string> => {
   try {
     const result = await axios.post('https://git.io', querystring.stringify({url: url}));
-    const shortUrl = get(result, 'headers.location', null);
+    const shortUrl = result.headers?.location;
     if (!shortUrl) {
       core.error(`Unable to retrieve a shortened git url`);
       return url;
