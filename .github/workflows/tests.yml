@@ -1,15 +1,17 @@
 ---
-name: "pre-release"
+name: "tests"
 
 on:
   push:
-    branches:
-      - "master"
-    tags-ignore:
-      - "*"
+  pull_request:
+    types:
+      - "opened"
+      - "closed"
+      - "reopened"
+      - "synchronize"
 
 jobs:
-  gh_pre_release:
+  gh_tests:
     runs-on: "ubuntu-latest"
     env:
       JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
@@ -36,25 +38,6 @@ jobs:
       - run: "yarn lint"
       - run: "yarn test"
       - run: "yarn build"
-
-      - uses: "./packages/automatic-releases/"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Development Build"
-          files: |
-            packages/automatic-releases/dist/index.js
-            packages/keybase-notifications/dist/index.js
-        id: "automatic_releases"
-
-      # marvinpinto/action-keybase-notifications
-      # marvinpinto/action-automatic-releases
-      - name: "Automatically mirror release artifacts"
-        env:
-          GITHUB_SUPER_TOKEN: ${{ secrets.GITHUB_SUPER_TOKEN }}
-        run: |
-          ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
 
       - uses: "./packages/keybase-notifications"
         if: always()
