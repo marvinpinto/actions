@@ -21,17 +21,17 @@
     "lintfix:prettier": "prettier --color --write $npm_package_config_prettierPaths"
   },
   "dependencies": {
-    "@actions/core": "^1.1.3",
-    "@actions/github": "^1.1.0",
-    "@octokit/rest": "^16.33.0",
-    "conventional-changelog-angular": "^5.0.5",
-    "conventional-commits-parser": "^3.0.5",
+    "@actions/core": "^1.2.0",
+    "@actions/github": "^2.0.0",
+    "@octokit/rest": "^16.36.0",
+    "conventional-changelog-angular": "^5.0.6",
+    "conventional-commits-parser": "^3.0.8",
     "globby": "^10.0.1",
     "md5-file": "^4.0.0",
-    "semver": "^6.3.0"
+    "semver": "^7.1.1"
   },
   "devDependencies": {
-    "nock": "^11.4.0"
+    "nock": "^11.7.0"
   },
   "eslintIgnore": [
     "!.*.js"
