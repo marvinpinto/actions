@@ -106,21 +106,26 @@ export const main = async () => {
       tagStr = `(tag ${tagStr}) `;
     }
 
-    let sender = github.context.payload?.sender?.login;
+    let sender = github.context.payload.sender?.login;
     if (sender) {
       sender = `by \`${sender}\` `;
+    }
+
+    let repoStr = process.env['GITHUB_REPOSITORY'] || '';
+    if (repoStr) {
+      repoStr = `for repository \`${repoStr}\` `;
     }
 
     let msg = '';
     switch (args.jobStatus) {
       case JobStatus.SUCCESS:
-        msg = `GitHub build **${args.jobName}** ${tagStr}completed successfully :tada: - ${shortUrl}`;
+        msg = `GitHub build **${args.jobName}** ${tagStr}${repoStr}completed successfully :tada: - ${shortUrl}`;
         break;
       case JobStatus.FAILED:
-        msg = `GitHub build **${args.jobName}** ${tagStr}failed :rotating_light: - ${shortUrl}`;
+        msg = `GitHub build **${args.jobName}** ${tagStr}${repoStr}failed :rotating_light: - ${shortUrl}`;
         break;
       case JobStatus.CANCELLED:
-        msg = `GitHub build **${args.jobName}** ${tagStr}was cancelled ${sender}:warning: - ${shortUrl}`;
+        msg = `GitHub build **${args.jobName}** ${tagStr}${repoStr}was cancelled ${sender}:warning: - ${shortUrl}`;
         break;
     }
 

@@ -45,7 +45,7 @@ describe('main handler', () => {
     const opensentinelAPIcall = nock('https://api.opensentinel.com')
       .post(
         '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
-        'GitHub build **Testing Production Deployment** (tag v0.0.1) completed successfully :tada: - https://example.com',
+        'GitHub build **Testing Production Deployment** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` completed successfully :tada: - https://example.com',
       )
       .reply(202, {
         message: 'Thanks!',
@@ -61,7 +61,7 @@ describe('main handler', () => {
     const opensentinelAPIcall = nock('https://api.opensentinel.com')
       .post(
         '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
-        'GitHub build **Testing Production Deployment** (tag v0.0.1) failed :rotating_light: - https://example.com',
+        'GitHub build **Testing Production Deployment** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` failed :rotating_light: - https://example.com',
       )
       .reply(202, {
         message: 'Thanks!',
@@ -77,7 +77,7 @@ describe('main handler', () => {
     const opensentinelAPIcall = nock('https://api.opensentinel.com')
       .post(
         '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
-        'GitHub build **Testing Production Deployment** (tag v0.0.1) was cancelled by `marvinpinto` :warning: - https://example.com',
+        'GitHub build **Testing Production Deployment** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` was cancelled by `marvinpinto` :warning: - https://example.com',
       )
       .reply(202, {
         message: 'Thanks!',
@@ -93,7 +93,7 @@ describe('main handler', () => {
     const opensentinelAPIcall = nock('https://api.opensentinel.com')
       .post(
         '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
-        'GitHub build **keybase** (tag v0.0.1) completed successfully :tada: - https://example.com',
+        'GitHub build **keybase** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` completed successfully :tada: - https://example.com',
       )
       .reply(202, {
         message: 'Thanks!',
@@ -109,7 +109,23 @@ describe('main handler', () => {
     const opensentinelAPIcall = nock('https://api.opensentinel.com')
       .post(
         '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
-        'GitHub build **Testing Production Deployment** completed successfully :tada: - https://example.com',
+        'GitHub build **Testing Production Deployment** for repository `marvinpinto/private-actions-tester` completed successfully :tada: - https://example.com',
+      )
+      .reply(202, {
+        message: 'Thanks!',
+      });
+
+    const inst = require('../src/main');
+    await inst.main();
+    expect(opensentinelAPIcall.isDone()).toBe(true);
+  });
+
+  it('falls back gracefully if there is no repository set (for whatever reason)', async () => {
+    delete process.env['GITHUB_REPOSITORY'];
+    const opensentinelAPIcall = nock('https://api.opensentinel.com')
+      .post(
+        '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
+        'GitHub build **Testing Production Deployment** (tag v0.0.1) completed successfully :tada: - https://example.com',
       )
       .reply(202, {
         message: 'Thanks!',
@@ -125,7 +141,7 @@ describe('main handler', () => {
     const opensentinelAPIcall = nock('https://api.opensentinel.com')
       .post(
         '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
-        'GitHub build **Testing Production Deployment** (tag v0.0.1) completed successfully :tada: - https://example.com',
+        'GitHub build **Testing Production Deployment** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` completed successfully :tada: - https://example.com',
       )
       .reply(202, {
         message: 'Thanks!',
@@ -142,7 +158,7 @@ describe('main handler', () => {
     const opensentinelAPIcall = nock('https://api.opensentinel.com')
       .post(
         '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
-        'GitHub build **Testing Production Deployment** (tag v0.0.1) failed :rotating_light: - https://example.com',
+        'GitHub build **Testing Production Deployment** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` failed :rotating_light: - https://example.com',
       )
       .reply(202, {
         message: 'Thanks!',
@@ -157,7 +173,7 @@ describe('main handler', () => {
     const opensentinelAPIcall = nock('https://api.opensentinel.com')
       .post(
         '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
-        'GitHub build **Testing Production Deployment** (tag v0.0.1) completed successfully :tada: - https://example.com',
+        'GitHub build **Testing Production Deployment** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` completed successfully :tada: - https://example.com',
       )
       .reply(403, {
         message: 'Something terribly bad happened here',
