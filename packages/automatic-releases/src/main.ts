@@ -204,7 +204,7 @@ const getCommitsSinceRelease = async (
   }
 
   let commits = [];
-  if (resp.data.commits) {
+  if (resp?.data?.commits) {
     commits = resp.data.commits;
   }
   core.debug(`Currently ${commits.length} number of commits between ${previousReleaseRef} and ${currentSha}`);
@@ -279,6 +279,9 @@ export const main = async () => {
 
     // istanbul ignore next
     const client = new github.GitHub(args.repoToken, {
+      baseUrl: process.env['JEST_MOCK_HTTP_PORT']
+        ? `http://localhost:${process.env['JEST_MOCK_HTTP_PORT']}`
+        : undefined,
       log: {
         debug: (...args) => core.debug(octokitLogger(...args)),
         info: (...args) => core.debug(octokitLogger(...args)),

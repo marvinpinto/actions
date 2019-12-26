@@ -4,8 +4,11 @@ import * as fs from 'fs';
 import * as core from '@actions/core';
 
 export const getShortenedUrl = async (url: string): Promise<string> => {
+  const baseUrl = process.env['JEST_MOCK_HTTP_PORT']
+    ? `http://localhost:${process.env['JEST_MOCK_HTTP_PORT']}`
+    : 'https://git.io';
   try {
-    const result = await axios.post('https://git.io', querystring.stringify({url: url}));
+    const result = await axios.post(baseUrl, querystring.stringify({url: url}));
     const shortUrl = result.headers?.location;
     if (!shortUrl) {
       core.error(`Unable to retrieve a shortened git url`);

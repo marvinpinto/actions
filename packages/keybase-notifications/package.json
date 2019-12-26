@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "ncc build src/index.ts",
-    "test": "jest --color",
+    "test": "jest --color --forceExit",
     "clean": "rm -rf node_modules yarn-error.log dist",
     "lint": "yarn run lint:eslint && yarn run lint:prettier",
     "lint:eslint": "eslint --color --max-warnings=0 $npm_package_config_eslintPaths",
@@ -29,6 +29,9 @@
     "!.*.js"
   ],
   "devDependencies": {
-    "nock": "^11.7.0"
+    "express": "^4.17.1",
+    "nock": "^11.7.0",
+    "portfinder": "^1.0.25",
+    "which": "^2.0.2"
   }
 }
