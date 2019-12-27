@@ -11,7 +11,6 @@
   },
   "scripts": {
     "build": "webpack --config webpack.config.js --colors",
-    "test": "jest --color --forceExit",
     "clean": "rm -rf node_modules yarn-error.log dist",
     "lint": "yarn run lint:eslint && yarn run lint:prettier",
     "lint:eslint": "eslint --color --max-warnings=0 $npm_package_config_eslintPaths",

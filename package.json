@@ -16,7 +16,7 @@
     "prettierPaths": "*.{json,md,yaml,yml} .github/**/*.{json,md,yaml,yml} !package.json !lerna.json"
   },
   "scripts": {
-    "test": "lerna run test --stream --no-bail",
+    "test": "yarn jest --colors",
     "build": "lerna run build --stream",
     "clean": "lerna run clean --stream && rm -rf node_modules yarn-error.log",
     "reinstall": "yarn clean; yarn install",
@@ -30,6 +30,11 @@
     "release": "lerna version"
   },
   "devDependencies": {
+    "@babel/core": "^7.7.7",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/plugin-proposal-optional-chaining": "^7.7.5",
+    "@babel/preset-env": "^7.7.7",
+    "@babel/preset-typescript": "^7.7.7",
     "@commitlint/cli": "^8.2.0",
     "@commitlint/config-conventional": "^8.2.0",
     "@commitlint/config-lerna-scopes": "^8.2.0",
@@ -37,6 +42,7 @@
     "@types/node": "^13.1.0",
     "@typescript-eslint/eslint-plugin": "^2.13.0",
     "@typescript-eslint/parser": "^2.13.0",
+    "babel-jest": "^24.9.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.8.0",
     "eslint-plugin-jest": "^23.1.1",
@@ -45,7 +51,6 @@
     "jest-circus": "^24.9.0",
     "lerna": "^3.19.0",
     "prettier": "^1.19.1",
-    "ts-jest": "^24.2.0",
     "typescript": "^3.7.4"
   },
   "eslintIgnore": [

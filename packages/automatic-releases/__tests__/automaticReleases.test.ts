@@ -1,9 +1,11 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 import * as process from 'process';
 import * as path from 'path';
 import nock from 'nock';
 import fs from 'fs';
+import {uploadReleaseArtifacts} from '../src/uploadReleaseArtifacts';
+import {main} from '../src/main';
+
+jest.mock('../src/uploadReleaseArtifacts');
 
 describe('main handler processing automatic releases', () => {
   const testGhToken = 'fake-secret-token';
@@ -33,6 +35,8 @@ describe('main handler processing automatic releases', () => {
     process.env['GITHUB_ACTOR'] = 'marvinpinto';
     process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'git-push.json');
     process.env['GITHUB_REPOSITORY'] = 'marvinpinto/private-actions-tester';
+
+    uploadReleaseArtifacts.mockImplementation().mockResolvedValue({});
   });
 
   afterEach(() => {
@@ -44,8 +48,7 @@ describe('main handler processing automatic releases', () => {
 
   it('throws an error when "automatic_release_tag" is not supplied', async () => {
     delete process.env.INPUT_AUTOMATIC_RELEASE_TAG;
-    const inst = require('../src/main');
-    await expect(inst.main()).rejects.toThrow(
+    await expect(main()).rejects.toThrow(
       'The parameter "automatic_release_tag" was not set and this does not appear to be a GitHub tag event. (Event: refs/heads/automatic-pre-releaser)',
     );
   });
@@ -61,6 +64,11 @@ describe('main handler processing automatic releases', () => {
       .matchHeader('authorization', `token ${testGhToken}`)
       .get(`/repos/marvinpinto/private-actions-tester/compare/HEAD...${testGhSHA}`)
       .reply(200, compareCommitsPayload);
+
+    const getRef = nock('https://api.github.com')
+      .matchHeader('authorization', `token ${testGhToken}`)
+      .get(`/repos/marvinpinto/private-actions-tester/git/refs/tags/${testInputAutomaticReleaseTag}`)
+      .reply(404);
 
     const listAssociatedPRs = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
@@ -101,21 +109,20 @@ describe('main handler processing automatic releases', () => {
     // Output env variable should be empty
     expect(process.env['AUTOMATIC_RELEASES_TAG']).toBeUndefined();
 
-    const inst = require('../src/main');
-    inst.uploadReleaseArtifacts = jest.fn(() => Promise.resolve());
-    await inst.main();
+    await main();
 
     expect(createRef.isDone()).toBe(true);
     expect(getReleaseByTag.isDone()).toBe(true);
     expect(deleteRelease.isDone()).toBe(false);
     expect(createRelease.isDone()).toBe(true);
+    expect(getRef.isDone()).toBe(true);
     expect(getCommitsSinceRelease.isDone()).toBe(true);
     expect(listAssociatedPRs.isDone()).toBe(true);
 
-    expect(inst.uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
-    expect(inst.uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
+    expect(uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
+    expect(uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
     // Should not attempt to upload any release artifacts, as there are none
-    expect(inst.uploadReleaseArtifacts.mock.calls[0][2]).toEqual([]);
+    expect(uploadReleaseArtifacts.mock.calls[0][2]).toEqual([]);
 
     // Should populate the output env variable
     expect(process.env['AUTOMATIC_RELEASES_TAG']).toBe(testInputAutomaticReleaseTag);
@@ -193,9 +200,7 @@ describe('main handler processing automatic releases', () => {
     // Output env variable should be empty
     expect(process.env['AUTOMATIC_RELEASES_TAG']).toBeUndefined();
 
-    const inst = require('../src/main');
-    inst.uploadReleaseArtifacts = jest.fn(() => Promise.resolve());
-    await inst.main();
+    await main();
 
     expect(createRef.isDone()).toBe(true);
     expect(updateRef.isDone()).toBe(true);
@@ -206,9 +211,9 @@ describe('main handler processing automatic releases', () => {
     expect(getCommitsSinceRelease.isDone()).toBe(true);
     expect(listAssociatedPRs.isDone()).toBe(true);
 
-    expect(inst.uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
-    expect(inst.uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
-    expect(inst.uploadReleaseArtifacts.mock.calls[0][2]).toEqual(['file1.txt', 'file2.txt', '*.jar']);
+    expect(uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
+    expect(uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
+    expect(uploadReleaseArtifacts.mock.calls[0][2]).toEqual(['file1.txt', 'file2.txt', '*.jar']);
 
     // Should populate the output env variable
     expect(process.env['AUTOMATIC_RELEASES_TAG']).toBe(testInputAutomaticReleaseTag);

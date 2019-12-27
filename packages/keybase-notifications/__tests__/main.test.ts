@@ -175,7 +175,7 @@ describe('main handler', () => {
         '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
         'GitHub build **Testing Production Deployment** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` completed successfully :tada: - https://example.com',
       )
-      .reply(403, {
+      .reply(408, {
         message: 'Something terribly bad happened here',
       });
 

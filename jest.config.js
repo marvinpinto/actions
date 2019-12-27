@@ -1,20 +1,43 @@
 module.exports = {
-  roots: ['<rootDir>/src', '<rootDir>/__tests__'],
   clearMocks: true,
-  moduleFileExtensions: ['js', 'ts'],
+  moduleFileExtensions: ['js', 'ts', 'tsx'],
   testEnvironment: 'node',
-  testMatch: ['**/*.test.ts'],
   testRunner: 'jest-circus/runner',
   transform: {
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.ts$': 'babel-jest',
+    '^.+\\.tsx$': 'babel-jest',
   },
   collectCoverage: true,
-  projects: ['<rootDir>/packages/*/jest.config.js'],
+  projects: [
+    {
+      name: 'keybase-notifications',
+      displayName: 'keybase-notifications',
+      testRegex: 'packages/keybase-notifications/__tests__',
+      testPathIgnorePatterns: ['/__tests__/payloads', '/__tests__/utils'],
+      setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+    },
+    {
+      name: 'automatic-releases',
+      displayName: 'automatic-releases',
+      testRegex: 'packages/automatic-releases/__tests__',
+      testPathIgnorePatterns: ['/__tests__/payloads', '/__tests__/utils/', '/__tests__/assets'],
+      setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+    },
+  ],
   coverageReporters: ['text'],
   coverageThreshold: {
     global: {
       lines: 100,
     },
   },
-  setupFilesAfterEnv: ['<rootDir>/../../jest.setup.js'],
+  collectCoverageFrom: [
+    '**/packages/keybase-notifications/**/*.ts',
+    '**/packages/automatic-releases/**/*.ts',
+    '!**/__tests__/**',
+    '!**/dist/**',
+    '!**/packages/keybase-notifications/src/index.ts',
+    '!**/packages/keybase-notifications/src/utils.ts',
+    '!**/packages/automatic-releases/src/index.ts',
+    '!**/packages/automatic-releases/src/uploadReleaseArtifacts.ts',
+  ],
 };
