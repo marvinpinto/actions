@@ -141,7 +141,10 @@ export const main = async () => {
       owner: args.opensentinelOwner,
       token: args.opensentinelToken,
     });
-    const url = `https://api.opensentinel.com/kb/webhooks?${params}`;
+    const baseUrl = process.env['JEST_MOCK_HTTP_PORT']
+      ? `http://localhost:${process.env['JEST_MOCK_HTTP_PORT']}`
+      : 'https://api.opensentinel.com';
+    const url = `${baseUrl}/kb/webhooks?${params}`;
     await axios.post(url, msg, {
       headers: {
         'Content-Type': 'text/plain',

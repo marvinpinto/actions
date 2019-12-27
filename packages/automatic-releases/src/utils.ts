@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 import * as Octokit from '@octokit/rest';
-import defaultChangelogOpts from 'conventional-changelog-angular';
+import defaultChangelogOpts from 'conventional-changelog-angular/conventional-recommended-bump';
 
 export const getShortSHA = (sha: string): string => {
   const coreAbbrev = 7;
@@ -157,7 +157,7 @@ export const parseGitTag = (inputRef): string => {
 };
 
 export const getChangelogOptions = async () => {
-  const defaultOpts = await defaultChangelogOpts;
+  const defaultOpts = defaultChangelogOpts;
   defaultOpts['mergePattern'] = '^Merge pull request #(.*) from (.*)$';
   defaultOpts['mergeCorrespondence'] = ['issueId', 'source'];
   core.debug(`Changelog options: ${JSON.stringify(defaultOpts)}`);

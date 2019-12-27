@@ -1,15 +1,15 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import {Context} from '@actions/github/lib/context';
 import * as Octokit from '@octokit/rest';
 import {dumpGitHubEventPayload} from '../../keybase-notifications/src/utils';
-import globby from 'globby';
-import {lstatSync, readFileSync} from 'fs';
-import path from 'path';
-import md5File from 'md5-file/promise';
 import {sync as commitParser} from 'conventional-commits-parser';
 import {getChangelogOptions} from './utils';
 import {isBreakingChange, generateChangelogFromParsedCommits, parseGitTag, ParsedCommits, octokitLogger} from './utils';
-import semver from 'semver';
+import semverValid from 'semver/functions/valid';
+import semverRcompare from 'semver/functions/rcompare';
+import semverLt from 'semver/functions/lt';
+import {uploadReleaseArtifacts} from './uploadReleaseArtifacts';
 
 type Args = {
   repoToken: string;
@@ -91,49 +91,12 @@ const generateNewGitHubRelease = async (
   return resp.data.upload_url;
 };
 
-// istanbul ignore next
-export const uploadReleaseArtifacts = async (client: github.GitHub, uploadUrl: string, files: string[]) => {
-  core.startGroup('Uploading release artifacts');
-  const paths = await globby(files);
-
-  for (const filePath of paths) {
-    core.info(`Uploading: ${filePath}`);
-    const nameWithExt = path.basename(filePath);
-    const uploadArgs = {
-      url: uploadUrl,
-      headers: {
-        'content-length': lstatSync(filePath).size,
-        'content-type': 'application/octet-stream',
-      },
-      name: nameWithExt,
-      file: readFileSync(filePath),
-    };
-
-    try {
-      await client.repos.uploadReleaseAsset(uploadArgs);
-    } catch (err) {
-      core.info(
-        `Problem uploading ${filePath} as a release asset (${err.message}). Will retry with the md5 hash appended to the filename.`,
-      );
-      const hash = await md5File(filePath);
-      const basename = path.basename(filePath, path.extname(filePath));
-      const ext = path.extname(filePath);
-      const newName = ext ? `${basename}-${hash}.${ext}` : `${basename}-${hash}`;
-      await client.repos.uploadReleaseAsset({
-        ...uploadArgs,
-        name: newName,
-      });
-    }
-  }
-  core.endGroup();
-};
-
 const searchForPreviousReleaseTag = async (
   client: github.GitHub,
   currentReleaseTag: string,
   tagInfo: Octokit.ReposListTagsParams,
 ): Promise<string> => {
-  const validSemver = semver.valid(currentReleaseTag);
+  const validSemver = semverValid(currentReleaseTag);
   if (!validSemver) {
     throw new Error(
       `The parameter "automatic_release_tag" was not set and the current tag "${currentReleaseTag}" does not appear to conform to semantic versioning.`,
@@ -146,18 +109,18 @@ const searchForPreviousReleaseTag = async (
   const tagList = tl
     .map(tag => {
       core.debug(`Currently processing tag ${tag.name}`);
-      const t = semver.valid(tag.name);
+      const t = semverValid(tag.name);
       return {
         ...tag,
         semverTag: t,
       };
     })
     .filter(tag => tag.semverTag !== null)
-    .sort((a, b) => semver.rcompare(a.semverTag, b.semverTag));
+    .sort((a, b) => semverRcompare(a.semverTag, b.semverTag));
 
   let previousReleaseTag = '';
   for (const tag of tagList) {
-    if (semver.lt(tag.semverTag, currentReleaseTag)) {
+    if (semverLt(tag.semverTag, currentReleaseTag)) {
       previousReleaseTag = tag.name;
       break;
     }
@@ -204,7 +167,7 @@ const getCommitsSinceRelease = async (
   }
 
   let commits = [];
-  if (resp.data.commits) {
+  if (resp?.data?.commits) {
     commits = resp.data.commits;
   }
   core.debug(`Currently ${commits.length} number of commits between ${previousReleaseRef} and ${currentSha}`);
@@ -276,73 +239,72 @@ export const getChangelog = async (
 export const main = async () => {
   try {
     const args = getAndValidateArgs();
+    const context = new Context();
 
     // istanbul ignore next
     const client = new github.GitHub(args.repoToken, {
+      baseUrl: process.env['JEST_MOCK_HTTP_PORT']
+        ? `http://localhost:${process.env['JEST_MOCK_HTTP_PORT']}`
+        : undefined,
       log: {
-        debug: (...args) => core.debug(octokitLogger(...args)),
-        info: (...args) => core.debug(octokitLogger(...args)),
-        warn: (...args) => core.warning(octokitLogger(...args)),
-        error: (...args) => core.error(octokitLogger(...args)),
+        debug: (...logArgs) => core.debug(octokitLogger(...logArgs)),
+        info: (...logArgs) => core.debug(octokitLogger(...logArgs)),
+        warn: (...logArgs) => core.warning(octokitLogger(...logArgs)),
+        error: (...logArgs) => core.error(octokitLogger(...logArgs)),
       },
     });
 
     core.startGroup('Initializing the Automatic Releases action');
     dumpGitHubEventPayload();
-    core.debug(`Github context: ${JSON.stringify(github.context)}`);
+    core.debug(`Github context: ${JSON.stringify(context)}`);
     core.endGroup();
 
     core.startGroup('Determining release tags');
-    const releaseTag = args.automaticReleaseTag ? args.automaticReleaseTag : parseGitTag(github.context.ref);
+    const releaseTag = args.automaticReleaseTag ? args.automaticReleaseTag : parseGitTag(context.ref);
     if (!releaseTag) {
       throw new Error(
-        `The parameter "automatic_release_tag" was not set and this does not appear to be a GitHub tag event. (Event: ${github.context.ref})`,
+        `The parameter "automatic_release_tag" was not set and this does not appear to be a GitHub tag event. (Event: ${context.ref})`,
       );
     }
 
     const previousReleaseTag = args.automaticReleaseTag
       ? args.automaticReleaseTag
       : await searchForPreviousReleaseTag(client, releaseTag, {
-          owner: github.context.repo.owner,
-          repo: github.context.repo.repo,
+          owner: context.repo.owner,
+          repo: context.repo.repo,
         });
     core.endGroup();
 
     const commitsSinceRelease = await getCommitsSinceRelease(
       client,
       {
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
+        owner: context.repo.owner,
+        repo: context.repo.repo,
         ref: `tags/${previousReleaseTag}`,
       },
-      github.context.sha,
+      context.sha,
     );
 
-    const changelog = await getChangelog(
-      client,
-      github.context.repo.owner,
-      github.context.repo.repo,
-      commitsSinceRelease,
-    );
+    const changelog = await getChangelog(client, context.repo.owner, context.repo.repo, commitsSinceRelease);
 
     if (args.automaticReleaseTag) {
       await createReleaseTag(client, {
-        owner: github.context.repo.owner,
+        owner: context.repo.owner,
         ref: `refs/tags/${args.automaticReleaseTag}`,
-        repo: github.context.repo.repo,
-        sha: github.context.sha,
+        repo: context.repo.repo,
+        sha: context.sha,
       });
 
       await deletePreviousGitHubRelease(client, {
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
+        owner: context.repo.owner,
+        repo: context.repo.repo,
         tag: args.automaticReleaseTag,
       });
     }
 
     const releaseUploadUrl = await generateNewGitHubRelease(client, {
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
+      owner: context.repo.owner,
+      repo: context.repo.repo,
       tag_name: releaseTag, // eslint-disable-line @typescript-eslint/camelcase
       name: args.automaticReleaseTag && args.releaseTitle ? args.releaseTitle : releaseTag,
       draft: args.draftRelease,
