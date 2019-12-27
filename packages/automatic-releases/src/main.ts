@@ -9,7 +9,9 @@ import md5File from 'md5-file/promise';
 import {sync as commitParser} from 'conventional-commits-parser';
 import {getChangelogOptions} from './utils';
 import {isBreakingChange, generateChangelogFromParsedCommits, parseGitTag, ParsedCommits, octokitLogger} from './utils';
-import semver from 'semver';
+import semverValid from 'semver/functions/valid';
+import semverRcompare from 'semver/functions/rcompare';
+import semverLt from 'semver/functions/lt';
 
 type Args = {
   repoToken: string;
@@ -133,7 +135,7 @@ const searchForPreviousReleaseTag = async (
   currentReleaseTag: string,
   tagInfo: Octokit.ReposListTagsParams,
 ): Promise<string> => {
-  const validSemver = semver.valid(currentReleaseTag);
+  const validSemver = semverValid(currentReleaseTag);
   if (!validSemver) {
     throw new Error(
       `The parameter "automatic_release_tag" was not set and the current tag "${currentReleaseTag}" does not appear to conform to semantic versioning.`,
@@ -146,18 +148,18 @@ const searchForPreviousReleaseTag = async (
   const tagList = tl
     .map(tag => {
       core.debug(`Currently processing tag ${tag.name}`);
-      const t = semver.valid(tag.name);
+      const t = semverValid(tag.name);
       return {
         ...tag,
         semverTag: t,
       };
     })
     .filter(tag => tag.semverTag !== null)
-    .sort((a, b) => semver.rcompare(a.semverTag, b.semverTag));
+    .sort((a, b) => semverRcompare(a.semverTag, b.semverTag));
 
   let previousReleaseTag = '';
   for (const tag of tagList) {
-    if (semver.lt(tag.semverTag, currentReleaseTag)) {
+    if (semverLt(tag.semverTag, currentReleaseTag)) {
       previousReleaseTag = tag.name;
       break;
     }
