@@ -1,6 +1,6 @@
 {
   "name": "keybase-notifications",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Send GitHub build notifications to your Keybase team or channel",
   "config": {
