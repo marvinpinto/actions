@@ -1,3 +1,6 @@
 module.exports = {
-  extends: ['@commitlint/config-conventional', '@commitlint/config-lerna-scopes'],
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'scope-enum': [2, 'always', ['deps', 'keybase-notifications', 'automatic-releases']],
+  },
 };
