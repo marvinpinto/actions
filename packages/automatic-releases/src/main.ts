@@ -18,9 +18,11 @@ type Args = {
   preRelease: boolean;
   releaseTitle: string;
   files: string[];
+  allowDuplicates: boolean;
 };
 
 const getAndValidateArgs = (): Args => {
+  const allowDuplicates = core.getInput('allow_duplicates', {required: false});
   const args = {
     repoToken: core.getInput('repo_token', {required: true}),
     automaticReleaseTag: core.getInput('automatic_release_tag', {required: false}),
@@ -28,6 +30,7 @@ const getAndValidateArgs = (): Args => {
     preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
     releaseTitle: core.getInput('title', {required: false}),
     files: [] as string[],
+    allowDuplicates: allowDuplicates ? JSON.parse(allowDuplicates) : false,
   };
 
   const inputFilesStr = core.getInput('files', {required: false});
@@ -81,9 +84,24 @@ const deletePreviousGitHubRelease = async (client: github.GitHub, releaseInfo: O
 
 const generateNewGitHubRelease = async (
   client: github.GitHub,
+  allowDuplicates: boolean,
   releaseInfo: Octokit.ReposCreateReleaseParams,
 ): Promise<string> => {
   core.startGroup(`Generating new GitHub release for the "${releaseInfo.tag_name}" tag`);
+
+  if (allowDuplicates) {
+    core.info(`allow_duplicates is true, searching for releases corresponding to the "${releaseInfo.tag_name}" tag`);
+    const existingReleaseResp = await client.repos.getReleaseByTag({
+      owner: releaseInfo.owner,
+      repo: releaseInfo.repo,
+      tag: releaseInfo.tag_name,
+    });
+
+    if (existingReleaseResp.status === 200) {
+      core.info(`Release #${existingReleaseResp.data.id} exists.`);
+      return existingReleaseResp.data.upload_url;
+    }
+  }
 
   core.info('Creating new release');
   const resp = await client.repos.createRelease(releaseInfo);
@@ -302,7 +320,7 @@ export const main = async () => {
       });
     }
 
-    const releaseUploadUrl = await generateNewGitHubRelease(client, {
+    const releaseUploadUrl = await generateNewGitHubRelease(client, args.allowDuplicates, {
       owner: context.repo.owner,
       repo: context.repo.repo,
       tag_name: releaseTag, // eslint-disable-line @typescript-eslint/camelcase
