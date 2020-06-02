@@ -16,7 +16,6 @@ server.post('/', (req, res) => {
 });
 
 export const setupEnv = {
-  INPUT_OPENSENTINEL_OWNER: 'fakeoslowner',
   INPUT_OPENSENTINEL_TOKEN: 'abcd1234fake',
   INPUT_JOB_STATUS: 'Success',
   INPUT_JOB_NAME: 'Testing Production Deployment',

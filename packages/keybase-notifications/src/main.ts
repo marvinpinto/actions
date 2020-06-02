@@ -18,7 +18,6 @@ enum BuildNotification {
 }
 
 type Args = {
-  opensentinelOwner: string;
   opensentinelToken: string;
   jobStatus: JobStatus;
   jobName: string;
@@ -28,7 +27,6 @@ type Args = {
 
 const getAndValidateArgs = (): Args => {
   const args = {
-    opensentinelOwner: core.getInput('opensentinel_owner', {required: true}),
     opensentinelToken: core.getInput('opensentinel_token', {required: true}),
     jobStatus: JobStatus.UNKNOWN,
     jobName: '',
@@ -138,13 +136,12 @@ export const main = async () => {
 
     core.debug(`Outbound message: ${msg}`);
     const params = qs.stringify({
-      owner: args.opensentinelOwner,
       token: args.opensentinelToken,
     });
     const baseUrl = process.env['JEST_MOCK_HTTP_PORT']
       ? `http://localhost:${process.env['JEST_MOCK_HTTP_PORT']}`
-      : 'https://api.opensentinel.com';
-    const url = `${baseUrl}/kb/webhooks?${params}`;
+      : 'https://automations.opensentinel.com';
+    const url = `${baseUrl}/webhook?${params}`;
     await axios.post(url, msg, {
       headers: {
         'Content-Type': 'text/plain',

@@ -2,11 +2,8 @@ name: "Keybase Build Notifications"
 author: "marvinpinto"
 description: "Send GitHub build notifications to your Keybase team or channel"
 inputs:
-  opensentinel_owner:
-    description: 'The "owner" portion of your Opensentinel (generic) Webhook URL (e.g. https://api.opensentinel.com/kb/webhooks?owner=<THIS VALUE>&token=efgh6789)'
-    required: true
   opensentinel_token:
-    description: 'The "token" portion of your Opensentinel (generic) Webhook URL (e.g. https://api.opensentinel.com/kb/webhooks?owner=abcd1234&token=<THIS VALUE>)'
+    description: 'The "token" portion of your opensentinel (generic) Webhook URL (e.g. https://automations.opensentinel.com/webhook?token=<THIS VALUE>)'
     required: true
   job_status:
     description: "Actions build status (e.g. success, failure, cancelled)"
