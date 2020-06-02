@@ -11,7 +11,6 @@ describe('main handler', () => {
     jest.resetModules();
     nock.disableNetConnect();
 
-    process.env['INPUT_OPENSENTINEL_OWNER'] = 'fakeoslowner';
     process.env['INPUT_OPENSENTINEL_TOKEN'] = 'abcd1234fake';
     process.env['INPUT_JOB_STATUS'] = 'Success';
     process.env['INPUT_JOB_NAME'] = 'Testing Production Deployment';
@@ -42,9 +41,9 @@ describe('main handler', () => {
   });
 
   it('is able to send out a "success" build message', async () => {
-    const opensentinelAPIcall = nock('https://api.opensentinel.com')
+    const opensentinelAPIcall = nock('https://automations.opensentinel.com')
       .post(
-        '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
+        '/webhook?token=abcd1234fake',
         'GitHub build **Testing Production Deployment** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` completed successfully :tada: - https://example.com',
       )
       .reply(202, {
@@ -58,9 +57,9 @@ describe('main handler', () => {
 
   it('is able to send out a "failure" build message', async () => {
     process.env['INPUT_JOB_STATUS'] = 'Failure';
-    const opensentinelAPIcall = nock('https://api.opensentinel.com')
+    const opensentinelAPIcall = nock('https://automations.opensentinel.com')
       .post(
-        '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
+        '/webhook?token=abcd1234fake',
         'GitHub build **Testing Production Deployment** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` failed :rotating_light: - https://example.com',
       )
       .reply(202, {
@@ -74,9 +73,9 @@ describe('main handler', () => {
 
   it('is able to send out a "cancel" build message', async () => {
     process.env['INPUT_JOB_STATUS'] = 'Cancelled';
-    const opensentinelAPIcall = nock('https://api.opensentinel.com')
+    const opensentinelAPIcall = nock('https://automations.opensentinel.com')
       .post(
-        '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
+        '/webhook?token=abcd1234fake',
         'GitHub build **Testing Production Deployment** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` was cancelled by `marvinpinto` :warning: - https://example.com',
       )
       .reply(202, {
@@ -90,9 +89,9 @@ describe('main handler', () => {
 
   it('reverts back to using the workflow name if no job name is specified', async () => {
     delete process.env['INPUT_JOB_NAME'];
-    const opensentinelAPIcall = nock('https://api.opensentinel.com')
+    const opensentinelAPIcall = nock('https://automations.opensentinel.com')
       .post(
-        '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
+        '/webhook?token=abcd1234fake',
         'GitHub build **keybase** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` completed successfully :tada: - https://example.com',
       )
       .reply(202, {
@@ -106,9 +105,9 @@ describe('main handler', () => {
 
   it('falls back gracefully if this is not a tagged ref', async () => {
     process.env['GITHUB_REF'] = 'refs/heads/master';
-    const opensentinelAPIcall = nock('https://api.opensentinel.com')
+    const opensentinelAPIcall = nock('https://automations.opensentinel.com')
       .post(
-        '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
+        '/webhook?token=abcd1234fake',
         'GitHub build **Testing Production Deployment** for repository `marvinpinto/private-actions-tester` completed successfully :tada: - https://example.com',
       )
       .reply(202, {
@@ -122,9 +121,9 @@ describe('main handler', () => {
 
   it('falls back gracefully if there is no repository set (for whatever reason)', async () => {
     delete process.env['GITHUB_REPOSITORY'];
-    const opensentinelAPIcall = nock('https://api.opensentinel.com')
+    const opensentinelAPIcall = nock('https://automations.opensentinel.com')
       .post(
-        '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
+        '/webhook?token=abcd1234fake',
         'GitHub build **Testing Production Deployment** (tag v0.0.1) completed successfully :tada: - https://example.com',
       )
       .reply(202, {
@@ -138,9 +137,9 @@ describe('main handler', () => {
 
   it('does not send out success messages if configured not to', async () => {
     process.env['INPUT_ON_SUCCESS'] = 'never';
-    const opensentinelAPIcall = nock('https://api.opensentinel.com')
+    const opensentinelAPIcall = nock('https://automations.opensentinel.com')
       .post(
-        '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
+        '/webhook?token=abcd1234fake',
         'GitHub build **Testing Production Deployment** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` completed successfully :tada: - https://example.com',
       )
       .reply(202, {
@@ -155,9 +154,9 @@ describe('main handler', () => {
   it('does not send out failure messages if configured not to', async () => {
     process.env['INPUT_ON_FAILURE'] = 'never';
     process.env['INPUT_JOB_STATUS'] = 'Failure';
-    const opensentinelAPIcall = nock('https://api.opensentinel.com')
+    const opensentinelAPIcall = nock('https://automations.opensentinel.com')
       .post(
-        '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
+        '/webhook?token=abcd1234fake',
         'GitHub build **Testing Production Deployment** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` failed :rotating_light: - https://example.com',
       )
       .reply(202, {
@@ -170,9 +169,9 @@ describe('main handler', () => {
   });
 
   it('fails gracefully if unable to send out the message via the opensentinel API', async () => {
-    const opensentinelAPIcall = nock('https://api.opensentinel.com')
+    const opensentinelAPIcall = nock('https://automations.opensentinel.com')
       .post(
-        '/kb/webhooks?owner=fakeoslowner&token=abcd1234fake',
+        '/webhook?token=abcd1234fake',
         'GitHub build **Testing Production Deployment** (tag v0.0.1) for repository `marvinpinto/private-actions-tester` completed successfully :tada: - https://example.com',
       )
       .reply(408, {

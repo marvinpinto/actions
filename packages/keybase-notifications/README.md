@@ -1,6 +1,6 @@
 # Keybase Build Notifications
 
-This action allows you to post GitHub build notifications to [Keybase Chat](https://keybase.io/blog/keybase-chat) channels, teams, and DMs. It sends messages via the [opensentinel API](https://keybase.io/sentinelbot), using your `owner` and `token` values.
+This action allows you to post GitHub build notifications to [Keybase Chat](https://keybase.io/blog/keybase-chat) channels, teams, and DMs. It sends messages via the [opensentinel API](https://www.opensentinel.com), using your `token` value.
 
 ![Keybase default GitHub notification](images/keybase-gh-notification-example.png)
 
@@ -18,12 +18,12 @@ This action allows you to post GitHub build notifications to [Keybase Chat](http
 
 ## Using the Action
 
-You will need an opensentinel API token in order to use this action. Go through the [@sentinelbot](https://keybase.io/sentinelbot) setup flow for a **Generic Webhook** and make a note of the `owner` and `token` values in the URL you receive.
+You will need an opensentinel automation API token in order to use this action. Create an account and go through the [Keybase setup information](https://www.opensentinel.com/docs/integrations/keybase). This action utilizes a **Generic Webhook** token.
 
-As a reference, `@sentinelbot` Webhook URLs for Keybase will look something like:
+For reference, opensentinel automation wbhook URLs for Keybase look something like:
 
 ```text
-https://api.opensentinel.com/kb/webhooks?owner=<OSL_OWNER>&token=<OSL_TOKEN>
+https://automations.opensentinel.com/webhook?token=<OSL_TOKEN>
 ```
 
 ### Build notifications for CI Tests
@@ -48,7 +48,6 @@ jobs:
         if: always()
         with:
           job_status: ${{ job.status }}
-          opensentinel_owner: ${{ secrets.OSL_OWNER }}
           opensentinel_token: ${{ secrets.OSL_TOKEN }}
           on_success: "never"
           on_failure: "always"
@@ -82,7 +81,6 @@ jobs:
         with:
           job_status: ${{ job.status }}
           job_name: "Production Release"
-          opensentinel_owner: ${{ secrets.OSL_OWNER }}
           opensentinel_token: ${{ secrets.OSL_TOKEN }}
 ```
 
@@ -92,7 +90,6 @@ This will send you a notification message to let you know if the production rele
 
 | Parameter                | Description                                          | Default       |
 | ------------------------ | ---------------------------------------------------- | ------------- |
-| `opensentinel_owner`\*\* | URL querystring value for owner                      | `null`        |
 | `opensentinel_token`\*\* | URL querystring value for token                      | `null`        |
 | `job_status`\*\*         | GitHub Actions job status - use `${{ job.status }}`  | `null`        |
 | `job_name`               | Display name to use in the chat message              | Workflow name |
@@ -105,11 +102,11 @@ This will send you a notification message to let you know if the production rele
 
 ## What about other GitHub events?
 
-Due to the way the permission system around GitHub Actions works, repo secrets cannot be accessed by users on forks & such. In general, an Action that requires a secret will fail when invoked through a pull request from a fork.
+The opensentinel system itself handles other GitHub events directly. This action is primarily geared toward sending build + other ad-hoc messages.
 
 This action will do its hardest to **NOT fail the build** as a result of a processing error (network/permissions/etc).
 
-If you're still interested in receiving Keybase notifications for other GitHub events (`push`, `pull_request`, etc), set up a **GitHub Notification** webhook with [opensentinel](https://keybase.io/sentinelbot) and add that to your repository. The webhook system is not bound by the permission issues mentioned here!
+If you're still interested in receiving Keybase notifications for other GitHub events (`push`, `pull_request`, etc), set up a **GitHub Notification** webhook with [opensentinel](https://www.opensentinel.com/docs/handlers/github-notification) and add that to your repository.
 
 ## Filtering Notifications
 
@@ -134,7 +131,7 @@ Every commit that lands on master for this project triggers an automatic build a
 
 ## How to get help
 
-The main [README](https://github.com/marvinpinto/actions/blob/master/README.md) for this project has a bunch of information related to debugging & submitting issues. [Opensentinel](https://keybase.io/sentinelbot) help is available in the [opensentinel.users](https://keybase.io/team/opensentinel.users) user group. If you're still stuck, try and get a hold of me on [keybase](https://keybase.io/marvinpinto) and I will do my best to help you out.
+The main [README](https://github.com/marvinpinto/actions/blob/master/README.md) for this project has a bunch of information related to debugging & submitting issues. opensentinel help is available through a few [support channels](https://www.opensentinel.com/docs/general/contact) and if you're still stuck, try and get a hold of me on [keybase](https://keybase.io/marvinpinto) and I will do my best to help you out.
 
 ## License
 
