@@ -56,5 +56,4 @@ jobs:
         if: always()
         with:
           job_status: ${{ job.status }}
-          opensentinel_owner: ${{ secrets.OSL_OWNER }}
           opensentinel_token: ${{ secrets.OSL_TOKEN }}
