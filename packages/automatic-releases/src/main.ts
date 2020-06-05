@@ -14,6 +14,7 @@ import {uploadReleaseArtifacts} from './uploadReleaseArtifacts';
 type Args = {
   repoToken: string;
   automaticReleaseTag: string;
+  filterTagsRegex: string;
   draftRelease: boolean;
   preRelease: boolean;
   releaseTitle: string;
@@ -24,6 +25,7 @@ const getAndValidateArgs = (): Args => {
   const args = {
     repoToken: core.getInput('repo_token', {required: true}),
     automaticReleaseTag: core.getInput('automatic_release_tag', {required: false}),
+    filterTagsRegex: core.getInput('filter_tags_regex', {required: false}),
     draftRelease: JSON.parse(core.getInput('draft', {required: true})),
     preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
     releaseTitle: core.getInput('title', {required: false}),
@@ -94,6 +96,7 @@ const generateNewGitHubRelease = async (
 const searchForPreviousReleaseTag = async (
   client: github.GitHub,
   currentReleaseTag: string,
+  filterTagsRegex: string,
   tagInfo: Octokit.ReposListTagsParams,
 ): Promise<string> => {
   const validSemver = semverValid(currentReleaseTag);
@@ -106,6 +109,8 @@ const searchForPreviousReleaseTag = async (
   const listTagsOptions = client.repos.listTags.endpoint.merge(tagInfo);
   const tl = await client.paginate(listTagsOptions);
 
+  const regexTags = RegExp(filterTagsRegex);
+
   const tagList = tl
     .map(tag => {
       core.debug(`Currently processing tag ${tag.name}`);
@@ -115,7 +120,7 @@ const searchForPreviousReleaseTag = async (
         semverTag: t,
       };
     })
-    .filter(tag => tag.semverTag !== null)
+    .filter(tag => tag.semverTag !== null && regexTags.test(tag.name))
     .sort((a, b) => semverRcompare(a.semverTag, b.semverTag));
 
   let previousReleaseTag = '';
@@ -267,9 +272,11 @@ export const main = async () => {
       );
     }
 
+    const filterTagsRegex = args.filterTagsRegex ? args.filterTagsRegex : '^.*$';
+
     const previousReleaseTag = args.automaticReleaseTag
       ? args.automaticReleaseTag
-      : await searchForPreviousReleaseTag(client, releaseTag, {
+      : await searchForPreviousReleaseTag(client, releaseTag, filterTagsRegex, {
           owner: context.repo.owner,
           repo: context.repo.repo,
         });
