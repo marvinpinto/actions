@@ -1,0 +1,16 @@
+name: "AWS SSM Build Secrets for GitHub Actions"
+author: "marvinpinto"
+description: "Inject AWS SSM Parameter Store secrets as enviroment variables into your GitHub Actions builds"
+inputs:
+  ssm_parameter:
+    description: "The SSM key to look up"
+    required: true
+  env_variable_name:
+    description: "The corresponding environment variable name to assign the secret to"
+    required: true
+runs:
+  using: "node12"
+  main: "dist/index.js"
+branding:
+  icon: "lock"
+  color: "orange"

@@ -50,6 +50,7 @@ jobs:
 
       # marvinpinto/action-keybase-notifications
       # marvinpinto/action-automatic-releases
+      # marvinpinto/action-inject-ssm-secrets
       - name: "Automatically mirror release artifacts"
         env:
           GITHUB_SUPER_TOKEN: ${{ secrets.GITHUB_SUPER_TOKEN }}

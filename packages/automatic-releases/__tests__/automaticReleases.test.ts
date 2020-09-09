@@ -4,6 +4,7 @@ import nock from 'nock';
 import fs from 'fs';
 import {uploadReleaseArtifacts} from '../src/uploadReleaseArtifacts';
 import {main} from '../src/main';
+import * as core from '@actions/core';
 
 jest.mock('../src/uploadReleaseArtifacts');
 
@@ -18,7 +19,7 @@ describe('main handler processing automatic releases', () => {
   const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
 
   beforeEach(() => {
-    jest.resetModules();
+    jest.clearAllMocks();
     nock.disableNetConnect();
     process.env['INPUT_REPO_TOKEN'] = testGhToken;
     process.env['INPUT_AUTOMATIC_RELEASE_TAG'] = testInputAutomaticReleaseTag;
@@ -40,7 +41,6 @@ describe('main handler processing automatic releases', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
     nock.cleanAll();
     nock.enableNetConnect();
     delete process.env['AUTOMATIC_RELEASES_TAG'];
@@ -106,9 +106,6 @@ describe('main handler processing automatic releases', () => {
         upload_url: releaseUploadUrl, // eslint-disable-line @typescript-eslint/camelcase
       });
 
-    // Output env variable should be empty
-    expect(process.env['AUTOMATIC_RELEASES_TAG']).toBeUndefined();
-
     await main();
 
     expect(createRef.isDone()).toBe(true);
@@ -125,7 +122,12 @@ describe('main handler processing automatic releases', () => {
     expect(uploadReleaseArtifacts.mock.calls[0][2]).toEqual([]);
 
     // Should populate the output env variable
-    expect(process.env['AUTOMATIC_RELEASES_TAG']).toBe(testInputAutomaticReleaseTag);
+    expect(core.exportVariable).toHaveBeenCalledTimes(1);
+    expect(core.exportVariable).toHaveBeenCalledWith('AUTOMATIC_RELEASES_TAG', testInputAutomaticReleaseTag);
+
+    // Should output the releasetag
+    expect(core.setOutput).toHaveBeenCalledTimes(1);
+    expect(core.setOutput).toHaveBeenCalledWith('automatic_releases_tag', testInputAutomaticReleaseTag);
   });
 
   it('should update an existing release tag', async () => {
@@ -197,9 +199,6 @@ describe('main handler processing automatic releases', () => {
         upload_url: releaseUploadUrl, // eslint-disable-line @typescript-eslint/camelcase
       });
 
-    // Output env variable should be empty
-    expect(process.env['AUTOMATIC_RELEASES_TAG']).toBeUndefined();
-
     await main();
 
     expect(createRef.isDone()).toBe(true);
@@ -216,6 +215,11 @@ describe('main handler processing automatic releases', () => {
     expect(uploadReleaseArtifacts.mock.calls[0][2]).toEqual(['file1.txt', 'file2.txt', '*.jar']);
 
     // Should populate the output env variable
-    expect(process.env['AUTOMATIC_RELEASES_TAG']).toBe(testInputAutomaticReleaseTag);
+    expect(core.exportVariable).toHaveBeenCalledTimes(1);
+    expect(core.exportVariable).toHaveBeenCalledWith('AUTOMATIC_RELEASES_TAG', testInputAutomaticReleaseTag);
+
+    // Should output the releasetag
+    expect(core.setOutput).toHaveBeenCalledTimes(1);
+    expect(core.setOutput).toHaveBeenCalledWith('automatic_releases_tag', testInputAutomaticReleaseTag);
   });
 });

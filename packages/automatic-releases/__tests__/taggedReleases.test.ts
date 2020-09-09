@@ -6,6 +6,7 @@ import nock from 'nock';
 import fs from 'fs';
 import {uploadReleaseArtifacts} from '../src/uploadReleaseArtifacts';
 import {main} from '../src/main';
+import * as core from '@actions/core';
 
 jest.mock('../src/uploadReleaseArtifacts');
 
@@ -18,7 +19,7 @@ describe('main handler processing tagged releases', () => {
   const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
 
   beforeEach(() => {
-    jest.resetModules();
+    jest.clearAllMocks();
     nock.disableNetConnect();
     process.env['INPUT_REPO_TOKEN'] = testGhToken;
     process.env['INPUT_DRAFT'] = testInputDraft.toString();
@@ -38,7 +39,6 @@ describe('main handler processing tagged releases', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
     nock.cleanAll();
     nock.enableNetConnect();
     delete process.env['AUTOMATIC_RELEASES_TAG'];
@@ -118,9 +118,6 @@ describe('main handler processing tagged releases', () => {
         upload_url: releaseUploadUrl,
       });
 
-    // Output env variable should be empty
-    expect(process.env['AUTOMATIC_RELEASES_TAG']).toBeUndefined();
-
     await main();
 
     expect(getCommitsSinceRelease.isDone()).toBe(true);
@@ -133,6 +130,7 @@ describe('main handler processing tagged releases', () => {
     expect(uploadReleaseArtifacts.mock.calls[0][2]).toEqual(['file1.txt', 'file2.txt', '*.jar']);
 
     // Should populate the output env variable
-    expect(process.env['AUTOMATIC_RELEASES_TAG']).toBe('v0.0.1');
+    expect(core.exportVariable).toHaveBeenCalledTimes(1);
+    expect(core.exportVariable).toHaveBeenCalledWith('AUTOMATIC_RELEASES_TAG', 'v0.0.1');
   });
 });
