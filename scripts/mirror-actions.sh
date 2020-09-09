@@ -100,7 +100,7 @@ create_tagged_release "$ACTION_AUTOMATIC_RELEASES_REPO"
 
 # Mirroring SSM Secrets
 rm -rf "/tmp/${ACTION_INJECT_SSM_SECRETS_REPO}"
-git clone "https://marvinpinto:${GITHUB_SUPER_TOKEN}@github.com/marvinpinto/${ACTION_INJECT_SSM_SECRETS_REPO}.git" /tmp/${ACTION_AUTOMATIC_RELEASES_REPO}
+git clone "https://marvinpinto:${GITHUB_SUPER_TOKEN}@github.com/marvinpinto/${ACTION_INJECT_SSM_SECRETS_REPO}.git" /tmp/${ACTION_INJECT_SSM_SECRETS_REPO}
 cp -R packages/aws-ssm-secrets/dist /tmp/${ACTION_INJECT_SSM_SECRETS_REPO}/
 cp packages/aws-ssm-secrets/README.md /tmp/${ACTION_INJECT_SSM_SECRETS_REPO}/
 cp packages/aws-ssm-secrets/action.yml /tmp/${ACTION_INJECT_SSM_SECRETS_REPO}/
