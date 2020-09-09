@@ -62,9 +62,10 @@ jobs:
 
 ## Supported Parameters
 
-| Parameter        | Description                                                                                              | Default |
-| ---------------- | -------------------------------------------------------------------------------------------------------- | ------- |
-| `parameters`\*\* | A mapped object consisting of an environment variable (to set), and its corresponding AWS SSM parameter. | `null`  |
+| Parameter               | Description                                                          | Default |
+| ----------------------- | -------------------------------------------------------------------- | ------- |
+| `ssm_parameter`\*\*     | The AWS SSM parameter key to look up.                                | `null`  |
+| `env_variable_name`\*\* | The corresponding environment variable name to assign the secret to. | `null`  |
 
 ### Notes:
 
