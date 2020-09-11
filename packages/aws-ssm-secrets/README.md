@@ -45,12 +45,12 @@ jobs:
           role-to-assume: "arn:aws:iam::111111111111:role/build-and-deploy-website"
           role-duration-seconds: 1800 # 30 mins
 
-      - uses: "marvinpinto/action-inject-ssm-secrets@v1"
+      - uses: "marvinpinto/action-inject-ssm-secrets@latest"
         with:
           ssm_parameter: "/build-secrets/${{ env.BUILD_STAGE }}/cloudflare-account-id"
           env_variable_name: "cloudflare_account_id"
 
-      - uses: "marvinpinto/action-inject-ssm-secrets@v1"
+      - uses: "marvinpinto/action-inject-ssm-secrets@latest"
         with:
           ssm_parameter: "/build-secrets/${{ env.BUILD_STAGE }}/cloudflare-api-token"
           env_variable_name: "cloudflare_api_token"

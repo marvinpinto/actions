@@ -29,12 +29,18 @@ export const main = async () => {
   const ssm = new SSM();
   core.startGroup('Injecting secret environment variables');
 
-  const result = await ssm
-    .getParameter({
-      Name: actionParam.ssmParameter,
-      WithDecryption: true, // NOTE: this flag is ignored for String and StringList parameter types
-    })
-    .promise();
+  let result;
+  try {
+    result = await ssm
+      .getParameter({
+        Name: actionParam.ssmParameter,
+        WithDecryption: true, // NOTE: this flag is ignored for String and StringList parameter types
+      })
+      .promise();
+  } catch (error) /* istanbul ignore next */ {
+    core.setFailed(error.message);
+    throw error;
+  }
 
   const envVar = actionParam.envVariable.toUpperCase();
   const secret = result?.Parameter?.Value;
