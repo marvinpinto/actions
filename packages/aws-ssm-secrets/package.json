@@ -18,7 +18,7 @@
     "lintfix:prettier": "prettier --color --write $npm_package_config_prettierPaths"
   },
   "dependencies": {
-    "@actions/core": "^1.2.5",
+    "@actions/core": "^1.2.6",
     "aws-sdk": "^2.748.0"
   },
   "main": "dist/index.js",

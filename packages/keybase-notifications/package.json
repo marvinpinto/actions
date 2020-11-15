@@ -18,7 +18,7 @@
     "lintfix:prettier": "prettier --color --write $npm_package_config_prettierPaths"
   },
   "dependencies": {
-    "@actions/core": "^1.2.0",
+    "@actions/core": "^1.2.6",
     "@actions/github": "^2.0.0",
     "axios": "^0.19.0"
   },

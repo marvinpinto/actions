@@ -38,7 +38,7 @@ describe('automatic releases smoke tests', () => {
     });
 
     // Should set the AUTOMATIC_RELEASES_TAG env variable to "testingtaglatest"
-    expect(stdout).toEqual(expect.stringMatching(/::set-env name=AUTOMATIC_RELEASES_TAG,::testingtaglatest/));
+    expect(stdout).toEqual(expect.stringMatching(/::set-env name=AUTOMATIC_RELEASES_TAG::testingtaglatest/));
 
     // There should not be any stderr output
     expect(stderr).toEqual('');
@@ -62,7 +62,7 @@ describe('automatic releases smoke tests', () => {
     });
 
     // Should set the AUTOMATIC_RELEASES_TAG env variable to "testingtaglatest"
-    expect(stdout).toEqual(expect.stringMatching(/::set-env name=AUTOMATIC_RELEASES_TAG,::testingtaglatest/));
+    expect(stdout).toEqual(expect.stringMatching(/::set-env name=AUTOMATIC_RELEASES_TAG::testingtaglatest/));
 
     // There should not be any stderr output
     expect(stderr).toEqual('');
