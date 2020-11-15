@@ -3,7 +3,7 @@ import * as github from '@actions/github';
 import globby from 'globby';
 import {lstatSync, readFileSync} from 'fs';
 import path from 'path';
-import md5File from 'md5-file/promise';
+import md5File from 'md5-file';
 
 export const uploadReleaseArtifacts = async (client: github.GitHub, uploadUrl: string, files: string[]) => {
   core.startGroup('Uploading release artifacts');
