@@ -23,11 +23,11 @@
     "@actions/core": "^1.2.6",
     "@actions/github": "^2.0.0",
     "@octokit/rest": "^16.36.0",
-    "conventional-changelog-angular": "^5.0.6",
-    "conventional-commits-parser": "^3.0.8",
-    "globby": "^10.0.1",
-    "md5-file": "^4.0.0",
-    "semver": "^7.1.1"
+    "conventional-changelog-angular": "^5.0.12",
+    "conventional-commits-parser": "^3.2.0",
+    "globby": "^11.0.1",
+    "md5-file": "^5.0.0",
+    "semver": "^7.3.2"
   },
   "devDependencies": {
     "express": "^4.17.1",

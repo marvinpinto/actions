@@ -16,7 +16,7 @@
     "prettierPaths": "*.{json,md,yaml,yml} .github/**/*.{json,md,yaml,yml} !package.json !lerna.json"
   },
   "scripts": {
-    "test": "yarn jest --colors",
+    "test": "yarn jest --env=node --colors",
     "build": "lerna run build --stream",
     "clean": "lerna run clean --stream && rm -rf node_modules yarn-error.log",
     "reinstall": "yarn clean; yarn install",

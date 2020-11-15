@@ -33,7 +33,7 @@ jobs:
       - run: "yarn install --frozen-lockfile"
       - run: "yarn lint"
       - run: "yarn build"
-      - run: "yarn jest --colors --forceExit"
+      - run: "yarn jest --env=node --colors --forceExit"
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
