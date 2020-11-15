@@ -107,7 +107,7 @@ const searchForPreviousReleaseTag = async (
   const tl = await client.paginate(listTagsOptions);
 
   const tagList = tl
-    .map(tag => {
+    .map((tag) => {
       core.debug(`Currently processing tag ${tag.name}`);
       const t = semverValid(tag.name);
       return {
@@ -115,7 +115,7 @@ const searchForPreviousReleaseTag = async (
         semverTag: t,
       };
     })
-    .filter(tag => tag.semverTag !== null)
+    .filter((tag) => tag.semverTag !== null)
     .sort((a, b) => semverRcompare(a.semverTag, b.semverTag));
 
   let previousReleaseTag = '';
@@ -212,7 +212,7 @@ export const getChangelog = async (
       breakingChange: false,
     };
 
-    parsedCommitMsg.extra.pullRequests = pulls.data.map(pr => {
+    parsedCommitMsg.extra.pullRequests = pulls.data.map((pr) => {
       return {
         number: pr.number,
         url: pr.html_url,

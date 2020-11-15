@@ -29,8 +29,8 @@
   ],
   "devDependencies": {
     "express": "^4.17.1",
-    "nock": "^11.7.0",
-    "portfinder": "^1.0.25",
+    "nock": "^13.0.5",
+    "portfinder": "^1.0.28",
     "terser-webpack-plugin": "^2.3.1",
     "ts-loader": "^6.2.1",
     "webpack": "^4.41.4",
