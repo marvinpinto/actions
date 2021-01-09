@@ -29,28 +29,27 @@ https://automations.opensentinel.com/webhook?token=<OSL_TOKEN>
 ### Build notifications for CI Tests
 
 ```yaml
-name: "CI Tests"
+name: CI Tests
 
 on:
   push:
 
 jobs:
   ci:
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     steps:
       # ...
-      - name: "Build & test"
-        run: |
-          echo "done!"
+      - name: Build & test
+        run: echo "done!"
 
       # Add the notification step as the last one
-      - uses: "marvinpinto/action-keybase-notifications@latest"
+      - uses: marvinpinto/action-keybase-notifications@latest
         if: always()
         with:
           job_status: ${{ job.status }}
           opensentinel_token: ${{ secrets.OSL_TOKEN }}
-          on_success: "never"
-          on_failure: "always"
+          on_success: never
+          on_failure: always
 ```
 
 This will send you a Keybase chat notification whenever a CI build fails but not when it passes (if you wanted to reduce channel noise). The `if: always()` stanza above ensures that the notification step [runs no matter what](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#job-status-check-functions).
@@ -65,22 +64,20 @@ on:
 
 jobs:
   ci:
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     steps:
       # ...
-      - name: "Build & test"
-        run: |
-          echo "done!"
+      - name: Build & test
+        run: echo "done!"
 
-      - name: "Deploy to production"
-        run: |
-          echo "+1"
+      - name: Deploy to production
+        run: echo "+1"
 
-      - uses: "marvinpinto/action-keybase-notifications@latest"
+      - uses: marvinpinto/action-keybase-notifications@latest
         if: always()
         with:
           job_status: ${{ job.status }}
-          job_name: "Production Release"
+          job_name: Production Release
           opensentinel_token: ${{ secrets.OSL_TOKEN }}
 ```
 
@@ -126,7 +123,7 @@ Read through the [GitHub documentation](https://help.github.com/en/articles/work
 Every commit that lands on master for this project triggers an automatic build as well as a tagged release called `latest`. If you don't wish to live on the bleeding edge you may use a stable release instead. See [releases](../../releases/latest) for the available versions.
 
 ```yaml
-- uses: "marvinpinto/action-keybase-notifications@<VERSION>"
+- uses: marvinpinto/action-keybase-notifications@<VERSION>
 ```
 
 ## How to get help
