@@ -21,43 +21,42 @@ It makes it easier to follow [Amazon IAM best practices](https://docs.aws.amazon
 
 ```yaml
 ---
-name: "build-and-invalidate-cf-cache"
+name: build-and-invalidate-cf-cache
 
 on:
   push:
     branches:
-      - "master"
+      - master
 
 jobs:
   ci:
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     env:
-      BUILD_STAGE: "production"
+      BUILD_STAGE: production
 
     steps:
       # ...
 
-      - uses: "aws-actions/configure-aws-credentials@v1"
+      - uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: "us-east-1"
-          role-to-assume: "arn:aws:iam::111111111111:role/build-and-deploy-website"
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::111111111111:role/build-and-deploy-website
           role-duration-seconds: 1800 # 30 mins
 
-      - uses: "marvinpinto/action-inject-ssm-secrets@latest"
+      - uses: marvinpinto/action-inject-ssm-secrets@latest
         with:
-          ssm_parameter: "/build-secrets/${{ env.BUILD_STAGE }}/cloudflare-account-id"
-          env_variable_name: "cloudflare_account_id"
+          ssm_parameter: /build-secrets/${{ env.BUILD_STAGE }}/cloudflare-account-id
+          env_variable_name: cloudflare_account_id
 
-      - uses: "marvinpinto/action-inject-ssm-secrets@latest"
+      - uses: marvinpinto/action-inject-ssm-secrets@latest
         with:
-          ssm_parameter: "/build-secrets/${{ env.BUILD_STAGE }}/cloudflare-api-token"
-          env_variable_name: "cloudflare_api_token"
+          ssm_parameter: /build-secrets/${{ env.BUILD_STAGE }}/cloudflare-api-token
+          env_variable_name: cloudflare_api_token
 
-      - name: "Build & Deploy"
-        run: |
-          echo "You will now have access to the CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN environment variables in all your subsequent build steps"
+      - name: Build & Deploy
+        run: echo "You will now have access to the CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN environment variables in all your subsequent build steps"
 ```
 
 ## Supported Parameters
@@ -76,7 +75,7 @@ jobs:
 Every commit that lands on master for this project triggers an automatic build as well as a tagged release called `latest`. If you don't wish to live on the bleeding edge you may use a stable release instead. See [releases](../../releases/latest) for the available versions.
 
 ```yaml
-- uses: "marvinpinto/action-inject-ssm-secrets@<VERSION>"
+- uses: marvinpinto/action-inject-ssm-secrets@<VERSION>
 ```
 
 ## How to get help
