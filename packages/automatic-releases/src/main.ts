@@ -14,6 +14,7 @@ import {uploadReleaseArtifacts} from './uploadReleaseArtifacts';
 type Args = {
   repoToken: string;
   automaticReleaseTag: string;
+  refReleaseTag: string;
   draftRelease: boolean;
   preRelease: boolean;
   releaseTitle: string;
@@ -24,6 +25,7 @@ const getAndValidateArgs = (): Args => {
   const args = {
     repoToken: core.getInput('repo_token', {required: true}),
     automaticReleaseTag: core.getInput('automatic_release_tag', {required: false}),
+    refReleaseTag: core.getInput('reference_release_tag', {required: false}),
     draftRelease: JSON.parse(core.getInput('draft', {required: true})),
     preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
     releaseTitle: core.getInput('title', {required: false}),
@@ -267,12 +269,14 @@ export const main = async () => {
       );
     }
 
-    const previousReleaseTag = args.automaticReleaseTag
-      ? args.automaticReleaseTag
-      : await searchForPreviousReleaseTag(client, releaseTag, {
-          owner: context.repo.owner,
-          repo: context.repo.repo,
-        });
+
+    const previousReleaseTag = args.refReleaseTag ? 
+      args.refReleaseTag : (args.automaticReleaseTag
+        ? args.automaticReleaseTag
+        : await searchForPreviousReleaseTag(client, releaseTag, {
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          }));
     core.endGroup();
 
     const commitsSinceRelease = await getCommitsSinceRelease(
