@@ -1,0 +1,23 @@
+# Validator: https://dependabot.com/docs/config-file-beta/validator/
+version: 2
+updates:
+  # node packages
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    # set this to 0 to disable updates
+    open-pull-requests-limit: 10
+
+  # github actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    open-pull-requests-limit: 10
