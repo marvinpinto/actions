@@ -27,7 +27,7 @@
     "!.*.js"
   ],
   "devDependencies": {
-    "terser-webpack-plugin": "^2.3.1",
+    "terser-webpack-plugin": "^4.2.3",
     "ts-loader": "^6.2.1",
     "webpack": "^4.41.4",
     "webpack-cli": "^3.3.10"
