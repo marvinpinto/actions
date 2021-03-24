@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.2.6",
-    "@actions/github": "^2.0.0",
+    "@actions/github": "^3.0.0",
     "axios": "^0.21.0"
   },
   "main": "dist/index.js",
