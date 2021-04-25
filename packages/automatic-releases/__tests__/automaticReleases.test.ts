@@ -125,9 +125,10 @@ describe('main handler processing automatic releases', () => {
     expect(core.exportVariable).toHaveBeenCalledTimes(1);
     expect(core.exportVariable).toHaveBeenCalledWith('AUTOMATIC_RELEASES_TAG', testInputAutomaticReleaseTag);
 
-    // Should output the releasetag
-    expect(core.setOutput).toHaveBeenCalledTimes(1);
+    // Should output the releasetag and the release upload url
+    expect(core.setOutput).toHaveBeenCalledTimes(2);
     expect(core.setOutput).toHaveBeenCalledWith('automatic_releases_tag', testInputAutomaticReleaseTag);
+    expect(core.setOutput).toHaveBeenCalledWith('upload_url', releaseUploadUrl);
   });
 
   it('should update an existing release tag', async () => {
@@ -218,8 +219,9 @@ describe('main handler processing automatic releases', () => {
     expect(core.exportVariable).toHaveBeenCalledTimes(1);
     expect(core.exportVariable).toHaveBeenCalledWith('AUTOMATIC_RELEASES_TAG', testInputAutomaticReleaseTag);
 
-    // Should output the releasetag
-    expect(core.setOutput).toHaveBeenCalledTimes(1);
+    // Should output the releasetag and the release upload url
+    expect(core.setOutput).toHaveBeenCalledTimes(2);
     expect(core.setOutput).toHaveBeenCalledWith('automatic_releases_tag', testInputAutomaticReleaseTag);
+    expect(core.setOutput).toHaveBeenCalledWith('upload_url', releaseUploadUrl);
   });
 });
