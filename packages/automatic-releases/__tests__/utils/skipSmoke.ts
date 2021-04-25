@@ -1,6 +1,6 @@
 /* eslint-disable jest/no-focused-tests,jest/no-export */
 
-const skipSmokeTestsLocally = () => {
+const skipSmokeTestsLocally = (): void => {
   if (process.env['GITHUB_ACTIONS'] !== 'true') {
     test.only('only run on the CI server', () => {
       console.warn(

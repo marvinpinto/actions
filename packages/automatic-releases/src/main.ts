@@ -71,7 +71,7 @@ const deletePreviousGitHubRelease = async (client: github.GitHub, releaseInfo: O
     await client.repos.deleteRelease({
       owner: releaseInfo.owner,
       repo: releaseInfo.repo,
-      release_id: resp.data.id, // eslint-disable-line @typescript-eslint/camelcase
+      release_id: resp.data.id,
     });
   } catch (err) {
     core.info(`Could not find release associated with tag "${releaseInfo.tag}" (${err.message})`);
@@ -191,7 +191,7 @@ export const getChangelog = async (
     const pulls = await client.repos.listPullRequestsAssociatedWithCommit({
       owner: owner,
       repo: repo,
-      commit_sha: commit.sha, // eslint-disable-line @typescript-eslint/camelcase
+      commit_sha: commit.sha,
     });
     if (pulls.data.length) {
       core.info(`Found ${pulls.data.length} pull request(s) associated with commit ${commit.sha}`);
@@ -236,7 +236,7 @@ export const getChangelog = async (
   return changelog;
 };
 
-export const main = async () => {
+export const main = async (): Promise<void> => {
   try {
     const args = getAndValidateArgs();
     const context = new Context();
@@ -305,7 +305,7 @@ export const main = async () => {
     const releaseUploadUrl = await generateNewGitHubRelease(client, {
       owner: context.repo.owner,
       repo: context.repo.repo,
-      tag_name: releaseTag, // eslint-disable-line @typescript-eslint/camelcase
+      tag_name: releaseTag,
       name: args.automaticReleaseTag && args.releaseTitle ? args.releaseTitle : releaseTag,
       draft: args.draftRelease,
       prerelease: args.preRelease,

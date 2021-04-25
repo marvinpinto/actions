@@ -38,7 +38,7 @@ server.delete('/', (req, res) => {
 server.post('/repos/marvinpinto/private-actions-tester/releases', (req, res) => {
   const releaseUploadUrl = 'https://releaseupload.example.com';
   res.json({
-    upload_url: releaseUploadUrl, // eslint-disable-line @typescript-eslint/camelcase
+    upload_url: releaseUploadUrl,
   });
 });
 
