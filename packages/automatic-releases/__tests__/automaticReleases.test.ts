@@ -96,14 +96,14 @@ describe('main handler processing automatic releases', () => {
     const createRelease = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
       .post('/repos/marvinpinto/private-actions-tester/releases', {
-        tag_name: testInputAutomaticReleaseTag, // eslint-disable-line @typescript-eslint/camelcase
+        tag_name: testInputAutomaticReleaseTag,
         name: testInputTitle,
         draft: testInputDraft,
         prerelease: testInputPrerelease,
         body: testInputBody,
       })
       .reply(200, {
-        upload_url: releaseUploadUrl, // eslint-disable-line @typescript-eslint/camelcase
+        upload_url: releaseUploadUrl,
       });
 
     await main();
@@ -156,7 +156,7 @@ describe('main handler processing automatic releases', () => {
     const listAssociatedPRs = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
       .get(`/repos/marvinpinto/private-actions-tester/commits/${testGhSHA}/pulls`)
-      .reply(200, [{number: '22', html_url: 'https://example.com/PR22'}]); // eslint-disable-line @typescript-eslint/camelcase
+      .reply(200, [{number: '22', html_url: 'https://example.com/PR22'}]);
 
     const createRef = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
@@ -189,14 +189,14 @@ describe('main handler processing automatic releases', () => {
     const createRelease = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
       .post('/repos/marvinpinto/private-actions-tester/releases', {
-        tag_name: testInputAutomaticReleaseTag, // eslint-disable-line @typescript-eslint/camelcase
+        tag_name: testInputAutomaticReleaseTag,
         name: testInputTitle,
         draft: testInputDraft,
         prerelease: testInputPrerelease,
         body: testInputBody,
       })
       .reply(200, {
-        upload_url: releaseUploadUrl, // eslint-disable-line @typescript-eslint/camelcase
+        upload_url: releaseUploadUrl,
       });
 
     await main();

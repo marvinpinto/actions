@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
-
 import express from 'express';
 import path from 'path';
 import fs from 'fs';

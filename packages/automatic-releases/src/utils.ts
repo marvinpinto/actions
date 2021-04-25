@@ -141,12 +141,12 @@ export const generateChangelogFromParsedCommits = (parsedCommits: ParsedCommits[
   return changelog.trim();
 };
 
-export const isBreakingChange = ({body, footer}): boolean => {
+export const isBreakingChange = ({body, footer}: {body: string; footer: string}): boolean => {
   const re = /^BREAKING\s+CHANGES?:\s+/;
   return re.test(body || '') || re.test(footer || '');
 };
 
-export const parseGitTag = (inputRef): string => {
+export const parseGitTag = (inputRef: string): string => {
   const re = /^(refs\/)?tags\/(.*)$/;
   const resMatch = inputRef.match(re);
   if (!resMatch || !resMatch[2]) {
@@ -156,6 +156,7 @@ export const parseGitTag = (inputRef): string => {
   return resMatch[2];
 };
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const getChangelogOptions = async () => {
   const defaultOpts = defaultChangelogOpts;
   defaultOpts['mergePattern'] = '^Merge pull request #(.*) from (.*)$';
@@ -165,6 +166,7 @@ export const getChangelogOptions = async () => {
 };
 
 // istanbul ignore next
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const octokitLogger = (...args): string => {
   return args
     .map((arg) => {

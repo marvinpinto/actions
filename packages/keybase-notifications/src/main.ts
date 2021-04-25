@@ -79,7 +79,7 @@ const getAndValidateArgs = (): Args => {
   return args;
 };
 
-export const main = async () => {
+export const main = async (): Promise<void> => {
   try {
     const defaultUrl = `https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/commit/${github.context.sha}/checks`;
     const args = getAndValidateArgs();

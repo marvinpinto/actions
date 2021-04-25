@@ -24,7 +24,7 @@ const getAndValidateArgs = (): ActionParams => {
   return param;
 };
 
-export const main = async () => {
+export const main = async (): Promise<void> => {
   const actionParam = getAndValidateArgs();
   const ssm = new SSM();
   core.startGroup('Injecting secret environment variables');

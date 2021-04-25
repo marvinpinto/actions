@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.2.6",
-    "aws-sdk": "^2.792.0"
+    "aws-sdk": "^2.892.0"
   },
   "main": "dist/index.js",
   "license": "MIT",

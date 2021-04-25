@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
-
 import * as process from 'process';
 import * as path from 'path';
 import nock from 'nock';

@@ -5,7 +5,11 @@ import {lstatSync, readFileSync} from 'fs';
 import path from 'path';
 import md5File from 'md5-file';
 
-export const uploadReleaseArtifacts = async (client: github.GitHub, uploadUrl: string, files: string[]) => {
+export const uploadReleaseArtifacts = async (
+  client: github.GitHub,
+  uploadUrl: string,
+  files: string[],
+): Promise<void> => {
   core.startGroup('Uploading release artifacts');
   for (const fileGlob of files) {
     const paths = await globby(fileGlob);
