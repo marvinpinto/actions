@@ -19,7 +19,7 @@
     "test": "yarn jest --env=node --colors",
     "build": "lerna run build --stream",
     "clean": "lerna run clean --stream && rm -rf node_modules yarn-error.log",
-    "reinstall": "yarn clean; yarn install",
+    "reinstall": "yarn clean; yarn install --frozen-lockfile",
     "lint": "lerna run lint --stream && yarn run lint:eslint && yarn run lint:prettier && yarn run lint:commits",
     "lint:eslint": "eslint --max-warnings=0 $npm_package_config_eslintPaths",
     "lint:prettier": "prettier --list-different $npm_package_config_prettierPaths",
@@ -54,5 +54,6 @@
   },
   "eslintIgnore": [
     "!.*.js"
-  ]
+  ],
+  "dependencies": {}
 }
