@@ -1,6 +1,6 @@
 {
   "name": "aws-ssm-secrets",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "private": true,
   "description": "Inject AWS SSM Parameter Store secrets as enviroment variables into your GitHub Actions builds",
   "config": {
