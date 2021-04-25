@@ -317,6 +317,7 @@ export const main = async (): Promise<void> => {
     core.debug(`Exporting environment variable AUTOMATIC_RELEASES_TAG with value ${releaseTag}`);
     core.exportVariable('AUTOMATIC_RELEASES_TAG', releaseTag);
     core.setOutput('automatic_releases_tag', releaseTag);
+    core.setOutput('upload_url', releaseUploadUrl);
   } catch (error) {
     core.setFailed(error.message);
     throw error;
