@@ -15,7 +15,7 @@ describe('main handler processing automatic releases', () => {
   const testInputDraft = false;
   const testInputPrerelease = true;
   const testInputTitle = 'Development Build';
-  const testInputBody = `## Commits\n- [[f6f40d9](https://github.com/octocat/Hello-World/commit/${testGhSHA})]: Fix all the bugs (Monalisa Octocat)`;
+  const testInputBody = `## Commits\n- f6f40d9: Fix all the bugs (Monalisa Octocat)`;
   const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
 
   beforeEach(() => {
@@ -138,7 +138,7 @@ describe('main handler processing automatic releases', () => {
     const compareCommitsPayload = JSON.parse(
       fs.readFileSync(path.join(__dirname, 'payloads', 'compare-commits.json'), 'utf8'),
     );
-    const testInputBody = `## Commits\n- [[f6f40d9](https://github.com/octocat/Hello-World/commit/${testGhSHA})]: Fix all the bugs (Monalisa Octocat) [#22](https://example.com/PR22)`;
+    const testInputBody = `## Commits\n- f6f40d9: Fix all the bugs (Monalisa Octocat) [#22](https://example.com/PR22)`;
 
     const getPreviousReleaseSHA = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
