@@ -1,6 +1,6 @@
 {
   "name": "automatic-releases",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "description": "Generate automatic releases whenever changes land on master",
   "main": "dist/index.js",
