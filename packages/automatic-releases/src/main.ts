@@ -18,12 +18,14 @@ type Args = {
   preRelease: boolean;
   releaseTitle: string;
   files: string[];
+  body: string;
 };
 
 const getAndValidateArgs = (): Args => {
   const args = {
     repoToken: core.getInput('repo_token', {required: true}),
     automaticReleaseTag: core.getInput('automatic_release_tag', {required: false}),
+    body: core.getInput('body', {required: false}),
     draftRelease: JSON.parse(core.getInput('draft', {required: true})),
     preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
     releaseTitle: core.getInput('title', {required: false}),
@@ -236,6 +238,17 @@ export const getChangelog = async (
   return changelog;
 };
 
+export const getChangelogWithOverrides = async (
+  args: Args,
+  client: github.GitHub,
+  owner: string,
+  repo: string,
+  commits: Octokit.ReposCompareCommitsResponseCommitsItem[],
+): Promise<string> => {
+  const changelog = await getChangelog(client, owner, repo, commits);
+  return args.body ? args.body : changelog;
+};
+
 export const main = async (): Promise<void> => {
   try {
     const args = getAndValidateArgs();
@@ -285,7 +298,13 @@ export const main = async (): Promise<void> => {
       context.sha,
     );
 
-    const changelog = await getChangelog(client, context.repo.owner, context.repo.repo, commitsSinceRelease);
+    const bodyText = await getChangelogWithOverrides(
+      args,
+      client,
+      context.repo.owner,
+      context.repo.repo,
+      commitsSinceRelease,
+    );
 
     if (args.automaticReleaseTag) {
       await createReleaseTag(client, {
@@ -309,7 +328,7 @@ export const main = async (): Promise<void> => {
       name: args.releaseTitle ? args.releaseTitle : releaseTag,
       draft: args.draftRelease,
       prerelease: args.preRelease,
-      body: changelog,
+      body: bodyText,
     });
 
     await uploadReleaseArtifacts(client, releaseUploadUrl, args.files);
