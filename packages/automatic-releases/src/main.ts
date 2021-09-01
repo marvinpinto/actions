@@ -306,7 +306,7 @@ export const main = async (): Promise<void> => {
       owner: context.repo.owner,
       repo: context.repo.repo,
       tag_name: releaseTag,
-      name: args.automaticReleaseTag && args.releaseTitle ? args.releaseTitle : releaseTag,
+      name: args.releaseTitle ? args.releaseTitle : releaseTag,
       draft: args.draftRelease,
       prerelease: args.preRelease,
       body: changelog,
