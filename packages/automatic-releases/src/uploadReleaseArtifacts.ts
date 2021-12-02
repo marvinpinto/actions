@@ -39,11 +39,40 @@ export const uploadReleaseArtifacts = async (
         const hash = await md5File(filePath);
         const basename = path.basename(filePath, path.extname(filePath));
         const ext = path.extname(filePath);
-        const newName = ext ? `${basename}-${hash}.${ext}` : `${basename}-${hash}`;
-        await client.repos.uploadReleaseAsset({
-          ...uploadArgs,
-          name: newName,
-        });
+        let newName = ext ? `${basename}-${hash}.${ext}` : `${basename}-${hash}`;
+        try {
+          await client.repos.uploadReleaseAsset({
+            ...uploadArgs,
+            name: newName,
+          });
+        } catch (err) {
+          const attempts = 5;
+          let i = 0;
+          let error;
+          do {
+            i++;
+            error = false;
+            core.info(
+              `Problem uploading ${filePath} as a release asset (${err.message}). Will retry with the md5 hash appended to the filename plus a digit (attempt ${i}).`,
+            );
+            newName = ext ? `${basename}-${hash}-${i}.${ext}` : `${basename}-${hash}-${i}`;
+            if (i >= attempts) {
+              await client.repos.uploadReleaseAsset({
+                ...uploadArgs,
+                name: newName,
+              });
+            } else {
+              try {
+                await client.repos.uploadReleaseAsset({
+                  ...uploadArgs,
+                  name: newName,
+                });
+              } catch (err) {
+                error = true;
+              }
+            }
+          } while (error && i < attempts);
+        }
       }
     }
   }
