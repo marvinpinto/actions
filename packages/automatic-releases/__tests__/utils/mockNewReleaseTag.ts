@@ -10,7 +10,7 @@ const testInputAutomaticReleaseTag = 'testingtaglatest';
 const testInputDraft = false;
 const testInputPrerelease = true;
 const testInputTitle = 'Development Build';
-const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
+const testInputFiles = `${path.join(__dirname, '../assets/LICENSE')}\n${path.join(__dirname, '../assets/*.jar')}\n\n`;
 
 server.get(`/repos/marvinpinto/private-actions-tester/compare/HEAD...${testGhSHA}`, (req, res) => {
   const compareCommitsPayload = JSON.parse(
