@@ -8,6 +8,9 @@ inputs:
   automatic_release_tag:
     description: "Git tag (for automatic releases)"
     required: false
+  reference_release_tag:
+    description: "Reference Git tag for changelog creation"
+    required: false
   draft:
     description: "Should this release be marked as a draft?"
     required: false
