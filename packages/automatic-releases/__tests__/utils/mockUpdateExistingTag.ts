@@ -53,13 +53,6 @@ server.delete(`/repos/marvinpinto/private-actions-tester/releases/${foundRelease
   res.json({});
 });
 
-server.post('/repos/marvinpinto/private-actions-tester/releases', (req, res) => {
-  const releaseUploadUrl = 'https://releaseupload.example.com';
-  res.json({
-    upload_url: releaseUploadUrl,
-  });
-});
-
 export const setupEnv = {
   INPUT_REPO_TOKEN: testGhToken,
   INPUT_AUTOMATIC_RELEASE_TAG: testInputAutomaticReleaseTag,

@@ -7,6 +7,7 @@ import os from 'os';
 import portfinder from 'portfinder';
 import * as mockNewTaggedRelease from './utils/mockNewTaggedRelease';
 import which from 'which';
+import net from 'net';
 
 const exec = util.promisify(child_process.exec)
 
@@ -23,7 +24,15 @@ describe('tagged releases smoke tests', () => {
 
   it('should create a new release', async (cb) => {
     const httpPort = await portfinder.getPortPromise();
-    const mockHttp = mockNewTaggedRelease.server.listen(httpPort);
+    const mockHttp = mockNewTaggedRelease.server.listen(httpPort, () => {
+      let host = mockHttp.address().address;
+      host = net.isIPv4(host) ? host : `[${host}]`;
+      mockNewTaggedRelease.server.post('/repos/marvinpinto/private-actions-tester/releases', (req, res) => {
+        res.status(201).json({
+          upload_url: `http://${host}:${httpPort}/repos/marvinpinto/private-actions-tester/releases`,
+        });
+      });
+    });
     const bundle = await sanitizeEnvironment();
 
     const node = which.sync('node')

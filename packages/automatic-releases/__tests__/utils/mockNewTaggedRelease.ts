@@ -53,13 +53,6 @@ server.get(`/repos/marvinpinto/private-actions-tester/commits/${testGhSHA}/pulls
   res.json([]);
 });
 
-server.post('/repos/marvinpinto/private-actions-tester/releases', (req, res) => {
-  const releaseUploadUrl = 'https://releaseupload.example.com';
-  res.json({
-    upload_url: releaseUploadUrl,
-  });
-});
-
 export const setupEnv = {
   INPUT_REPO_TOKEN: testGhToken,
   INPUT_DRAFT: testInputDraft.toString(),
