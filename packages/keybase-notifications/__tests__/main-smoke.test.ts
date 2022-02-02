@@ -6,7 +6,6 @@ import os from 'os';
 import fs from 'fs';
 import portfinder from 'portfinder';
 import * as mockSuccessBuildMsg from './utils/mockSuccessBuildMsg';
-import which from 'which';
 
 const exec = util.promisify(child_process.exec)
 
@@ -26,8 +25,7 @@ describe('main handler smoke tests', () => {
     const mockHttp = mockSuccessBuildMsg.server.listen(httpPort);
     const bundle = await sanitizeEnvironment();
 
-    const node = which.sync('node')
-    const {stdout, stderr} = await exec(`${node} ${bundle}`, {
+    const {stdout, stderr} = await exec(`${process.execPath} ${bundle}`, {
       cwd: os.tmpdir(),
       env: {
         ...mockSuccessBuildMsg.setupEnv,

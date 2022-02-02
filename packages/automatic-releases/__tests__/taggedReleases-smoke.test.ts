@@ -6,7 +6,6 @@ import fs from 'fs';
 import os from 'os';
 import portfinder from 'portfinder';
 import * as mockNewTaggedRelease from './utils/mockNewTaggedRelease';
-import which from 'which';
 
 const exec = util.promisify(child_process.exec)
 
@@ -26,8 +25,7 @@ describe('tagged releases smoke tests', () => {
     const mockHttp = mockNewTaggedRelease.server.listen(httpPort);
     const bundle = await sanitizeEnvironment();
 
-    const node = which.sync('node')
-    const {stdout, stderr} = await exec(`${node} ${bundle}`, {
+    const {stdout, stderr} = await exec(`${process.execPath} ${bundle}`, {
       cwd: os.tmpdir(),
       env: {
         ...mockNewTaggedRelease.setupEnv,
