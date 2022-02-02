@@ -10,7 +10,7 @@ const testInputAutomaticReleaseTag = 'testingtaglatest';
 const testInputDraft = false;
 const testInputPrerelease = true;
 const testInputTitle = 'Development Build';
-const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
+const testInputFiles = `${path.join(__dirname, '../assets/LICENSE')}\n${path.join(__dirname, '../assets/*.jar')}\n\n`;
 
 const previousReleaseSHA = '4398ef4ea6f5a61880ca94ecfb8e60d1a38497dd';
 const foundReleaseId = 1235523222;
@@ -51,13 +51,6 @@ server.get(`/repos/marvinpinto/private-actions-tester/releases/tags/${testInputA
 
 server.delete(`/repos/marvinpinto/private-actions-tester/releases/${foundReleaseId}`, (req, res) => {
   res.json({});
-});
-
-server.post('/repos/marvinpinto/private-actions-tester/releases', (req, res) => {
-  const releaseUploadUrl = 'https://releaseupload.example.com';
-  res.json({
-    upload_url: releaseUploadUrl,
-  });
 });
 
 export const setupEnv = {

@@ -8,6 +8,7 @@ import portfinder from 'portfinder';
 import * as mockNewReleaseTag from './utils/mockNewReleaseTag';
 import * as mockUpdateExistingTag from './utils/mockUpdateExistingTag';
 import which from 'which';
+import net from 'net';
 
 const exec = util.promisify(child_process.exec)
 
@@ -24,7 +25,15 @@ describe('automatic releases smoke tests', () => {
 
   it('should create a new release tag', async (cb) => {
     const httpPort = await portfinder.getPortPromise();
-    const mockHttp = mockNewReleaseTag.server.listen(httpPort);
+    const mockHttp = mockNewReleaseTag.server.listen(httpPort, () => {
+      let host = mockHttp.address().address;
+      host = net.isIPv4(host) ? host : `[${host}]`;
+      mockNewReleaseTag.server.post('/repos/marvinpinto/private-actions-tester/releases', (req, res) => {
+        res.status(201).json({
+          upload_url: `http://${host}:${httpPort}/repos/marvinpinto/private-actions-tester/releases`,
+        });
+      });
+    });
     const bundle = await sanitizeEnvironment();
 
     const node = which.sync('node')
@@ -48,7 +57,15 @@ describe('automatic releases smoke tests', () => {
 
   it('should update an existing release tag', async (cb) => {
     const httpPort = await portfinder.getPortPromise();
-    const mockHttp = mockUpdateExistingTag.server.listen(httpPort);
+    const mockHttp = mockUpdateExistingTag.server.listen(httpPort, () => {
+      let host = mockHttp.address().address;
+      host = net.isIPv4(host) ? host : `[${host}]`;
+      mockUpdateExistingTag.server.post('/repos/marvinpinto/private-actions-tester/releases', (req, res) => {
+        res.status(201).json({
+          upload_url: `http://${host}:${httpPort}/repos/marvinpinto/private-actions-tester/releases`,
+        });
+      });
+    });
     const bundle = await sanitizeEnvironment();
 
     const node = which.sync('node')
