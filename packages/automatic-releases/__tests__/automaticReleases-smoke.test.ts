@@ -7,7 +7,6 @@ import os from 'os';
 import portfinder from 'portfinder';
 import * as mockNewReleaseTag from './utils/mockNewReleaseTag';
 import * as mockUpdateExistingTag from './utils/mockUpdateExistingTag';
-import which from 'which';
 
 const exec = util.promisify(child_process.exec)
 
@@ -27,8 +26,7 @@ describe('automatic releases smoke tests', () => {
     const mockHttp = mockNewReleaseTag.server.listen(httpPort);
     const bundle = await sanitizeEnvironment();
 
-    const node = which.sync('node')
-    const {stdout, stderr} = await exec(`${node} ${bundle}`, {
+    const {stdout, stderr} = await exec(`${process.execPath} ${bundle}`, {
       cwd: os.tmpdir(),
       env: {
         ...mockNewReleaseTag.setupEnv,
@@ -51,8 +49,7 @@ describe('automatic releases smoke tests', () => {
     const mockHttp = mockUpdateExistingTag.server.listen(httpPort);
     const bundle = await sanitizeEnvironment();
 
-    const node = which.sync('node')
-    const {stdout, stderr} = await exec(`${node} ${bundle}`, {
+    const {stdout, stderr} = await exec(`${process.execPath} ${bundle}`, {
       cwd: os.tmpdir(),
       env: {
         ...mockUpdateExistingTag.setupEnv,
