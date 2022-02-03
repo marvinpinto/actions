@@ -26,7 +26,7 @@ describe('tagged releases smoke tests', () => {
     const mockHttp = mockNewTaggedRelease.server.listen(httpPort);
     const bundle = await sanitizeEnvironment();
 
-    const node = which.sync('node')
+    const node = which.sync('node').replace(/ /g, '\\ ')
     const {stdout, stderr} = await exec(`${node} ${bundle}`, {
       cwd: os.tmpdir(),
       env: {
