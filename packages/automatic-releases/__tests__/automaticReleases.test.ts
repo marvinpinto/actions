@@ -53,7 +53,7 @@ describe('main handler processing automatic releases', () => {
     );
   });
 
-  it('should create a new release tag', async () => {
+  it('should create a new release tag w/o artifacts', async () => {
     delete process.env.INPUT_FILES;
     const releaseUploadUrl = 'https://releaseupload.example.com';
     const compareCommitsPayload = JSON.parse(
@@ -116,10 +116,8 @@ describe('main handler processing automatic releases', () => {
     expect(getCommitsSinceRelease.isDone()).toBe(true);
     expect(listAssociatedPRs.isDone()).toBe(true);
 
-    expect(uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
-    expect(uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
     // Should not attempt to upload any release artifacts, as there are none
-    expect(uploadReleaseArtifacts.mock.calls[0][2]).toEqual([]);
+    expect(uploadReleaseArtifacts).toHaveBeenCalledTimes(0);
 
     // Should populate the output env variable
     expect(core.exportVariable).toHaveBeenCalledTimes(1);
