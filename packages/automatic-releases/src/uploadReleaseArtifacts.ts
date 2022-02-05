@@ -11,11 +11,14 @@ export const uploadReleaseArtifacts = async (
   files: string[],
 ): Promise<void> => {
   core.startGroup('Uploading release artifacts');
+  let noFileFound = true;
   for (const fileGlob of files) {
     const paths = await globby(fileGlob);
     if (paths.length == 0) {
       core.error(`${fileGlob} doesn't match any files`);
+      continue;
     }
+    noFileFound = false;
 
     for (const filePath of paths) {
       core.info(`Uploading: ${filePath}`);
@@ -46,6 +49,9 @@ export const uploadReleaseArtifacts = async (
         });
       }
     }
+  }
+  if (noFileFound) {
+    throw new Error(`No file matched by the glob pattern: [${files.map((pattern) => '"' + pattern + '"').join(', ')}]`);
   }
   core.endGroup();
 };

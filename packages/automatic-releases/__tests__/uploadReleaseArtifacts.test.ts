@@ -52,7 +52,7 @@ describe('uploadReleaseArtifacts handler', () => {
       jest.clearAllMocks();
     });
 
-    it('should upload nothing, if "input.files" is ["assets/*.txt", "assets/*.md"]', async () => {
+    it('throws as nothing found, if "input.files" is ["assets/*.txt", "assets/*.md"]', async () => {
       const testInputFiles = [
         path.join(__dirname, 'assets/*.txt'),
         path.join(__dirname, 'assets/*.md'),
@@ -62,7 +62,9 @@ describe('uploadReleaseArtifacts handler', () => {
         path.join(__dirname, 'assets/*.md'),
       ];
 
-      await uploadReleaseArtifacts(new github.GitHub(undefined), releaseUploadUrl, testInputFiles);
+      await expect(uploadReleaseArtifacts(new github.GitHub(undefined), releaseUploadUrl, testInputFiles)).rejects.toThrow(
+        `No file matched by the glob pattern: ["${missingFiles[0]}", "${missingFiles[1]}"]`,
+      );
 
       expect(github.GitHub.prototype.repos.uploadReleaseAsset).toHaveBeenCalledTimes(0);
 
