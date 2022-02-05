@@ -52,7 +52,7 @@ describe('uploadReleaseArtifacts handler', () => {
       jest.clearAllMocks();
     });
 
-    it('should upload nothing, if "input.files" is ["assets/*.txt", "assets/*.md"]', async () => {
+    it('throws as nothing matched by 1st pattern, if "input.files" is ["assets/*.txt", "assets/*.md"]', async () => {
       const testInputFiles = [
         path.join(__dirname, 'assets/*.txt'),
         path.join(__dirname, 'assets/*.md'),
@@ -62,16 +62,16 @@ describe('uploadReleaseArtifacts handler', () => {
         path.join(__dirname, 'assets/*.md'),
       ];
 
-      await uploadReleaseArtifacts(new github.GitHub(undefined), releaseUploadUrl, testInputFiles);
+      await expect(uploadReleaseArtifacts(new github.GitHub(undefined), releaseUploadUrl, testInputFiles)).rejects.toThrow(
+        `${missingFiles[0]} doesn't match any files`
+      );
 
       expect(github.GitHub.prototype.repos.uploadReleaseAsset).toHaveBeenCalledTimes(0);
 
-      expect(core.error).toHaveBeenCalledTimes(2);
-      expect(core.error.mock.calls[0][0]).toStrictEqual(`${missingFiles[0]} doesn't match any files`);
-      expect(core.error.mock.calls[1][0]).toStrictEqual(`${missingFiles[1]} doesn't match any files`);
+      expect(core.error).toHaveBeenCalledTimes(0);
     });
 
-    it('should upload "LICENSE", if "input.files" is ["assets/*.txt", "assets/LICENSE"]', async () => {
+    it('throws as nothing matched by 1st pattern, if "input.files" is ["assets/*.txt", "assets/LICENSE"]', async () => {
       const testInputFiles = [
         path.join(__dirname, 'assets/*.txt'),
         path.join(__dirname, 'assets/LICENSE'),
@@ -83,16 +83,16 @@ describe('uploadReleaseArtifacts handler', () => {
         path.join(__dirname, 'assets/*.txt'),
       ];
 
-      await uploadReleaseArtifacts(new github.GitHub(undefined), releaseUploadUrl, testInputFiles);
+      await expect(uploadReleaseArtifacts(new github.GitHub(undefined), releaseUploadUrl, testInputFiles)).rejects.toThrow(
+        `${missingFiles[0]} doesn't match any files`
+      );
 
-      expect(github.GitHub.prototype.repos.uploadReleaseAsset).toHaveBeenCalledTimes(1);
-      expect(github.GitHub.prototype.repos.uploadReleaseAsset.mock.calls[0][0]).toStrictEqual(constructUploadArgs(actualFoundFiles[0], releaseUploadUrl));
+      expect(github.GitHub.prototype.repos.uploadReleaseAsset).toHaveBeenCalledTimes(0);
 
-      expect(core.error).toHaveBeenCalledTimes(1);
-      expect(core.error.mock.calls[0][0]).toStrictEqual(`${missingFiles[0]} doesn't match any files`);
+      expect(core.error).toHaveBeenCalledTimes(0);
     });
 
-    it('should upload "LICENSE", if "input.files" is ["assets/LICENSE", "assets/*.txt"]', async () => {
+    it('should upload "LICENSE" and then throw as nothing matched by 2nd pattern, if "input.files" is ["assets/LICENSE", "assets/*.txt"]', async () => {
       const testInputFiles = [
         path.join(__dirname, 'assets/LICENSE'),
         path.join(__dirname, 'assets/*.txt'),
@@ -104,13 +104,14 @@ describe('uploadReleaseArtifacts handler', () => {
         path.join(__dirname, 'assets/*.txt'),
       ];
 
-      await uploadReleaseArtifacts(new github.GitHub(undefined), releaseUploadUrl, testInputFiles);
+      await expect(uploadReleaseArtifacts(new github.GitHub(undefined), releaseUploadUrl, testInputFiles)).rejects.toThrow(
+        `${missingFiles[0]} doesn't match any files`
+      );
 
       expect(github.GitHub.prototype.repos.uploadReleaseAsset).toHaveBeenCalledTimes(1);
       expect(github.GitHub.prototype.repos.uploadReleaseAsset.mock.calls[0][0]).toStrictEqual(constructUploadArgs(actualFoundFiles[0], releaseUploadUrl));
 
-      expect(core.error).toHaveBeenCalledTimes(1);
-      expect(core.error.mock.calls[0][0]).toStrictEqual(`${missingFiles[0]} doesn't match any files`);
+      expect(core.error).toHaveBeenCalledTimes(0);
     });
 
     it('should upload "LICENSE" and "test.jar", if "input.files" is ["assets/LICENSE", "assets/*.jar"]', async () => {
