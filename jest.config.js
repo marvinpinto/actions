@@ -45,7 +45,6 @@ module.exports = {
     '!**/packages/keybase-notifications/src/index.ts',
     '!**/packages/keybase-notifications/src/utils.ts',
     '!**/packages/automatic-releases/src/index.ts',
-    '!**/packages/automatic-releases/src/uploadReleaseArtifacts.ts',
     '!**/packages/aws-ssm-secrets/src/index.ts',
   ],
 };
