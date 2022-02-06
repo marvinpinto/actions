@@ -14,7 +14,7 @@ export const uploadReleaseArtifacts = async (
   for (const fileGlob of files) {
     const paths = await globby(fileGlob);
     if (paths.length == 0) {
-      core.error(`${fileGlob} doesn't match any files`);
+      throw new Error(`${fileGlob} doesn't match any files`);
     }
 
     for (const filePath of paths) {
