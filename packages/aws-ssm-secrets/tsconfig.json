@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig-base",
   "compilerOptions": {
-    "rootDir": "./src"
+    "rootDirs": ["./src", "./__tests__"]
   }
 }
