@@ -16,6 +16,7 @@ type Args = {
   preRelease: boolean;
   releaseTitle: string;
   files: string[];
+  changeLogFile: string;
 };
 
 const getAndValidateArgs = (): Args => {
@@ -26,6 +27,7 @@ const getAndValidateArgs = (): Args => {
     preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
     releaseTitle: core.getInput('title', {required: false}),
     files: [] as string[],
+    changeLogFile: core.getInput('changelog_file', {required: false}),
   };
 
   const inputFilesStr = core.getInput('files', {required: false});
@@ -223,7 +225,13 @@ export const main = async (): Promise<void> => {
       context.sha,
     );
 
-    const changelog = await getChangelog(client, context.repo.owner, context.repo.repo, commitsSinceRelease);
+    const changelog = await getChangelog(
+      client,
+      context.repo.owner,
+      context.repo.repo,
+      commitsSinceRelease,
+      args.changeLogFile,
+    );
 
     if (args.automaticReleaseTag) {
       await createReleaseTag(client, {

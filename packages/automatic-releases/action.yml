@@ -22,6 +22,9 @@ inputs:
   files:
     description: "Assets to upload to the release"
     required: false
+  changelog_file:
+    description: "Text you want to put in the release/changelog info. (Disables auto changelog)"
+    required: false
 outputs:
   automatic_releases_tag:
     description: "The release tag this action just processed"

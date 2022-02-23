@@ -1,6 +1,6 @@
 import * as path from 'path';
 import fs from 'fs';
-import {generateChangelogFromParsedCommits, octokitLogger} from '../src/utils';
+import {getChangelog, generateChangelogFromParsedCommits, octokitLogger} from '../src/utils';
 
 describe('changelog generator', () => {
   beforeEach(() => {
@@ -103,5 +103,13 @@ describe('changelog generator', () => {
 
     expect(args[0].file).toEqual('this should not be overridden');
     expect(args[1].file).toEqual('');
+  });
+
+  it('check if a changelog can be read from file', () => {
+    const changeLogFile = path.join(__dirname, 'payloads', 'changelog-file.txt');
+    const expected = fs.readFileSync(changeLogFile, 'utf8');
+    return getChangelog(null, null, null, null, changeLogFile).then(result => {
+      expect(result.trim()).toEqual(expected.trim());
+    });
   });
 });

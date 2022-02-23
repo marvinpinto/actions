@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
 import {sync as commitParser} from 'conventional-commits-parser';
+import * as fs from 'fs';
 import * as github from '@actions/github';
 import * as Octokit from '@octokit/rest';
 import defaultChangelogOpts from 'conventional-changelog-angular/conventional-recommended-bump';
@@ -196,9 +197,14 @@ export const getChangelog = async (
   owner: string,
   repo: string,
   commits: Octokit.ReposCompareCommitsResponseCommitsItem[],
+  changeLogFile: string,
 ): Promise<string> => {
   const parsedCommits: ParsedCommits[] = [];
   core.startGroup('Generating changelog');
+
+  if (changeLogFile) {
+    return fs.readFileSync(changeLogFile, 'utf8');
+  }
 
   for (const commit of commits) {
     core.debug(`Processing commit: ${JSON.stringify(commit)}`);
