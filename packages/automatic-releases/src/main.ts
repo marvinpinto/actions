@@ -18,6 +18,7 @@ type Args = {
   preRelease: boolean;
   releaseTitle: string;
   files: string[];
+  generateReleaseNotes: boolean;
 };
 
 const getAndValidateArgs = (): Args => {
@@ -28,6 +29,7 @@ const getAndValidateArgs = (): Args => {
     preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
     releaseTitle: core.getInput('title', {required: false}),
     files: [] as string[],
+    generateReleaseNotes: JSON.parse(core.getInput('generate_release_notes')) || false,
   };
 
   const inputFilesStr = core.getInput('files', {required: false});
@@ -310,6 +312,7 @@ export const main = async (): Promise<void> => {
       draft: args.draftRelease,
       prerelease: args.preRelease,
       body: changelog,
+      generate_release_notes: args.generateReleaseNotes
     });
 
     await uploadReleaseArtifacts(client, releaseUploadUrl, args.files);
