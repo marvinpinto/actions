@@ -22,6 +22,10 @@ inputs:
   files:
     description: "Assets to upload to the release"
     required: false
+  auto_generate_release_notes:
+    description: "Let GitHub generate release notes automatically"
+    required: false
+    default: false
 outputs:
   automatic_releases_tag:
     description: "The release tag this action just processed"

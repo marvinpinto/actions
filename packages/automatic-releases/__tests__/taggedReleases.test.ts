@@ -15,6 +15,7 @@ describe('main handler processing tagged releases', () => {
   const testInputPrerelease = false;
   const testInputBody = `## Commits\n- f6f40d9: Fix all the bugs (Monalisa Octocat)`;
   const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
+  const testInputAutoGenerateReleaseNotes = false;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -23,6 +24,7 @@ describe('main handler processing tagged releases', () => {
     process.env['INPUT_DRAFT'] = testInputDraft.toString();
     process.env['INPUT_PRERELEASE'] = testInputPrerelease.toString();
     process.env['INPUT_FILES'] = testInputFiles;
+    process.env['INPUT_AUTO_GENERATE_RELEASE_NOTES'] = testInputAutoGenerateReleaseNotes.toString();
 
     process.env['GITHUB_EVENT_NAME'] = 'push';
     process.env['GITHUB_SHA'] = testGhSHA;
@@ -103,14 +105,15 @@ describe('main handler processing tagged releases', () => {
       .get(`/repos/marvinpinto/private-actions-tester/commits/${testGhSHA}/pulls`)
       .reply(200, []);
 
-    const createRelease = nock('https://api.github.com')
-      .matchHeader('authorization', `token ${testGhToken}`)
-      .post('/repos/marvinpinto/private-actions-tester/releases', {
-        tag_name: 'v0.0.1',
-        name: 'v0.0.1',
+    const createRelease = nock("https://api.github.com")
+      .matchHeader("authorization", `token ${testGhToken}`)
+      .post("/repos/marvinpinto/private-actions-tester/releases", {
+        tag_name: "v0.0.1",
+        name: "v0.0.1",
         draft: testInputDraft,
         prerelease: testInputPrerelease,
         body: testInputBody,
+        generate_release_notes: testInputAutoGenerateReleaseNotes,
       })
       .reply(200, {
         upload_url: releaseUploadUrl,

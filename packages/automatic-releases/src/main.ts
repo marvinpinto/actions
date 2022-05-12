@@ -1,15 +1,21 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import {Context} from '@actions/github/lib/context';
-import * as Octokit from '@octokit/rest';
+import {Endpoints} from '@octokit/types';
 import {dumpGitHubEventPayload} from '../../keybase-notifications/src/utils';
 import {sync as commitParser} from 'conventional-commits-parser';
-import {getChangelogOptions} from './utils';
+import {getChangelogOptions, ReposCompareCommitsResponseCommitsItem} from './utils';
 import {isBreakingChange, generateChangelogFromParsedCommits, parseGitTag, ParsedCommits, octokitLogger} from './utils';
 import semverValid from 'semver/functions/valid';
 import semverRcompare from 'semver/functions/rcompare';
 import semverLt from 'semver/functions/lt';
 import {uploadReleaseArtifacts} from './uploadReleaseArtifacts';
+
+type GitCreateRefParams = Endpoints['POST /repos/{owner}/{repo}/git/refs']['parameters'];
+type GitGetRefParams = Endpoints['GET /repos/{owner}/{repo}/git/ref/{ref}']['parameters'];
+type ReposListTagsParams = Endpoints['GET /repos/{owner}/{repo}/tags']['parameters'];
+type ReposGetReleaseByTagParams = Endpoints['GET /repos/{owner}/{repo}/releases/tags/{tag}']['parameters'];
+type ReposCreateReleaseParams = Endpoints['POST /repos/{owner}/{repo}/releases']['parameters'];
 
 type Args = {
   repoToken: string;
@@ -18,16 +24,20 @@ type Args = {
   preRelease: boolean;
   releaseTitle: string;
   files: string[];
+  autoGenerateReleaseNotes: boolean;
 };
 
 const getAndValidateArgs = (): Args => {
   const args = {
     repoToken: core.getInput('repo_token', {required: true}),
-    automaticReleaseTag: core.getInput('automatic_release_tag', {required: false}),
+    automaticReleaseTag: core.getInput('automatic_release_tag', {
+      required: false,
+    }),
     draftRelease: JSON.parse(core.getInput('draft', {required: true})),
     preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
     releaseTitle: core.getInput('title', {required: false}),
     files: [] as string[],
+    autoGenerateReleaseNotes: JSON.parse(core.getInput('auto_generate_release_notes', {required: true})),
   };
 
   const inputFilesStr = core.getInput('files', {required: false});
@@ -38,7 +48,7 @@ const getAndValidateArgs = (): Args => {
   return args;
 };
 
-const createReleaseTag = async (client: github.GitHub, refInfo: Octokit.GitCreateRefParams) => {
+const createReleaseTag = async (client: github.GitHub, refInfo: GitCreateRefParams) => {
   core.startGroup('Generating release tag');
   const friendlyTagName = refInfo.ref.substring(10); // 'refs/tags/latest' => 'latest'
   core.info(`Attempting to create or update release tag "${friendlyTagName}"`);
@@ -61,7 +71,7 @@ const createReleaseTag = async (client: github.GitHub, refInfo: Octokit.GitCreat
   core.endGroup();
 };
 
-const deletePreviousGitHubRelease = async (client: github.GitHub, releaseInfo: Octokit.ReposGetReleaseByTagParams) => {
+const deletePreviousGitHubRelease = async (client: github.GitHub, releaseInfo: ReposGetReleaseByTagParams) => {
   core.startGroup(`Deleting GitHub releases associated with the tag "${releaseInfo.tag}"`);
   try {
     core.info(`Searching for releases corresponding to the "${releaseInfo.tag}" tag`);
@@ -81,7 +91,7 @@ const deletePreviousGitHubRelease = async (client: github.GitHub, releaseInfo: O
 
 const generateNewGitHubRelease = async (
   client: github.GitHub,
-  releaseInfo: Octokit.ReposCreateReleaseParams,
+  releaseInfo: ReposCreateReleaseParams,
 ): Promise<string> => {
   core.startGroup(`Generating new GitHub release for the "${releaseInfo.tag_name}" tag`);
 
@@ -94,7 +104,7 @@ const generateNewGitHubRelease = async (
 const searchForPreviousReleaseTag = async (
   client: github.GitHub,
   currentReleaseTag: string,
-  tagInfo: Octokit.ReposListTagsParams,
+  tagInfo: ReposListTagsParams,
 ): Promise<string> => {
   const validSemver = semverValid(currentReleaseTag);
   if (!validSemver) {
@@ -131,9 +141,9 @@ const searchForPreviousReleaseTag = async (
 
 const getCommitsSinceRelease = async (
   client: github.GitHub,
-  tagInfo: Octokit.GitGetRefParams,
+  tagInfo: GitGetRefParams,
   currentSha: string,
-): Promise<Octokit.ReposCompareCommitsResponseCommitsItem[]> => {
+): Promise<ReposCompareCommitsResponseCommitsItem[]> => {
   core.startGroup('Retrieving commit history');
   let resp;
 
@@ -180,7 +190,7 @@ export const getChangelog = async (
   client: github.GitHub,
   owner: string,
   repo: string,
-  commits: Octokit.ReposCompareCommitsResponseCommitsItem[],
+  commits: ReposCompareCommitsResponseCommitsItem[],
 ): Promise<string> => {
   const parsedCommits: ParsedCommits[] = [];
   core.startGroup('Generating changelog');
@@ -306,10 +316,11 @@ export const main = async (): Promise<void> => {
       owner: context.repo.owner,
       repo: context.repo.repo,
       tag_name: releaseTag,
-      name: args.releaseTitle ? args.releaseTitle : releaseTag,
+      ...(args.autoGenerateReleaseNotes ? {} : {name: args.releaseTitle ? args.releaseTitle : releaseTag}),
       draft: args.draftRelease,
       prerelease: args.preRelease,
-      body: changelog,
+      ...(args.autoGenerateReleaseNotes ? {} : {body: changelog}),
+      generate_release_notes: args.autoGenerateReleaseNotes,
     });
 
     await uploadReleaseArtifacts(client, releaseUploadUrl, args.files);
