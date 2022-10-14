@@ -19,8 +19,8 @@ jobs:
           lfs: true
           fetch-depth: 0
 
-      - id: "yarn-cache"
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - id: yarn-cache
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
       - uses: "actions/cache@v2.1.6"
         with:
           path: ${{ steps.yarn-cache.outputs.dir }}
