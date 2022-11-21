@@ -9,7 +9,7 @@ inputs:
     description: "Git tag (for automatic releases)"
     required: false
   delete_exist_tag:
-    description: "Should exist Tag delete"
+    description: "Should exist Tag delete or not"
     required: false
     default: true
   draft:
