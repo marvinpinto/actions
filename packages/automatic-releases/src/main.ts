@@ -303,9 +303,7 @@ export const main = async (): Promise<void> => {
           repo: context.repo.repo,
           tag: args.automaticReleaseTag,
         });
-        
       }
-      
     }
 
     const releaseUploadUrl = await generateNewGitHubRelease(client, {
