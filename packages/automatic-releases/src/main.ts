@@ -296,7 +296,6 @@ export const main = async (): Promise<void> => {
         repo: context.repo.repo,
         sha: context.sha,
       });
-
       if(args.removeExistReleaseTag) {
         await deletePreviousGitHubRelease(client, {
           owner: context.repo.owner,
