@@ -8,6 +8,10 @@ inputs:
   automatic_release_tag:
     description: "Git tag (for automatic releases)"
     required: false
+  delete_exist_tag:
+    description: "Should exist Tag delete or not"
+    required: false
+    default: true
   draft:
     description: "Should this release be marked as a draft?"
     required: false
@@ -28,7 +32,7 @@ outputs:
   upload_url:
     description: "The URL for uploading additional assets to the release"
 runs:
-  using: "node12"
+  using: "node16"
   main: "dist/index.js"
 branding:
   icon: "git-merge"
