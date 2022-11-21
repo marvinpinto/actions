@@ -14,6 +14,7 @@ import {uploadReleaseArtifacts} from './uploadReleaseArtifacts';
 type Args = {
   repoToken: string;
   automaticReleaseTag: string;
+  removeExistReleaseTag: boolean;
   draftRelease: boolean;
   preRelease: boolean;
   releaseTitle: string;
@@ -27,6 +28,7 @@ const getAndValidateArgs = (): Args => {
     draftRelease: JSON.parse(core.getInput('draft', {required: true})),
     preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
     releaseTitle: core.getInput('title', {required: false}),
+    removeExistReleaseTag: JSON.parse(core.getInput('delete_exist_tag', {required: true})),
     files: [] as string[],
   };
 
@@ -295,11 +297,14 @@ export const main = async (): Promise<void> => {
         sha: context.sha,
       });
 
-      await deletePreviousGitHubRelease(client, {
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        tag: args.automaticReleaseTag,
-      });
+      if(args.removeExistReleaseTag) {
+        await deletePreviousGitHubRelease(client, {
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          tag: args.automaticReleaseTag,
+        });
+      }
+      
     }
 
     const releaseUploadUrl = await generateNewGitHubRelease(client, {
