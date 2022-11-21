@@ -296,12 +296,14 @@ export const main = async (): Promise<void> => {
         repo: context.repo.repo,
         sha: context.sha,
       });
-      if(args.removeExistReleaseTag) {
+
+      if (args.removeExistReleaseTag) {
         await deletePreviousGitHubRelease(client, {
           owner: context.repo.owner,
           repo: context.repo.repo,
           tag: args.automaticReleaseTag,
         });
+        
       }
       
     }
