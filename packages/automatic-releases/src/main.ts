@@ -28,7 +28,7 @@ const getAndValidateArgs = (): Args => {
     draftRelease: JSON.parse(core.getInput('draft', {required: true})),
     preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
     releaseTitle: core.getInput('title', {required: false}),
-    removeExistReleaseTag: JSON.parse(core.getInput('delete_exist_tag', {required: true})),
+    removeExistReleaseTag: JSON.parse(core.getInput('delete_exist_tag', {required: false})),
     files: [] as string[],
   };
 

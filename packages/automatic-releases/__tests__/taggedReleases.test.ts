@@ -13,6 +13,7 @@ describe('main handler processing tagged releases', () => {
   const testGhSHA = 'f6f40d9fbd1130f7f2357bb54225567dbd7a3793';
   const testInputDraft = false;
   const testInputPrerelease = false;
+  const testInputDeleteExistTag = false;
   const testInputBody = `## Commits\n- f6f40d9: Fix all the bugs (Monalisa Octocat)`;
   const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
 
@@ -23,6 +24,7 @@ describe('main handler processing tagged releases', () => {
     process.env['INPUT_DRAFT'] = testInputDraft.toString();
     process.env['INPUT_PRERELEASE'] = testInputPrerelease.toString();
     process.env['INPUT_FILES'] = testInputFiles;
+    process.env['INPUT_DELETE_EXIST_TAG'] = testInputDeleteExistTag.toString();
 
     process.env['GITHUB_EVENT_NAME'] = 'push';
     process.env['GITHUB_SHA'] = testGhSHA;

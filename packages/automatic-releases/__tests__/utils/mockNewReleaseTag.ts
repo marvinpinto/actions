@@ -9,6 +9,7 @@ const testGhSHA = 'f6f40d9fbd1130f7f2357bb54225567dbd7a3793';
 const testInputAutomaticReleaseTag = 'testingtaglatest';
 const testInputDraft = false;
 const testInputPrerelease = true;
+const testInputDeleteExistTag = false;
 const testInputTitle = 'Development Build';
 const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
 
@@ -49,6 +50,7 @@ export const setupEnv = {
   INPUT_PRERELEASE: testInputPrerelease.toString(),
   INPUT_TITLE: testInputTitle,
   INPUT_FILES: testInputFiles,
+  INPUT_DELETE_EXIST_TAGL: testInputDeleteExistTag.toString(),
 
   GITHUB_EVENT_NAME: 'push',
   GITHUB_SHA: testGhSHA,
