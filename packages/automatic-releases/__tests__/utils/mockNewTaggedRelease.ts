@@ -8,6 +8,7 @@ const testGhToken = 'fake-secret-token';
 const testGhSHA = 'f6f40d9fbd1130f7f2357bb54225567dbd7a3793';
 const testInputDraft = false;
 const testInputPrerelease = true;
+const testInputDeleteExistTag = true;
 const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
 
 server.get(`/repos/marvinpinto/private-actions-tester/tags`, (req, res) => {
@@ -65,6 +66,7 @@ export const setupEnv = {
   INPUT_DRAFT: testInputDraft.toString(),
   INPUT_PRERELEASE: testInputPrerelease.toString(),
   INPUT_FILES: testInputFiles,
+  INPUT_DELETE_EXIST_TAG: testInputDeleteExistTag.toString(),
 
   GITHUB_EVENT_NAME: 'push',
   GITHUB_SHA: testGhSHA,

@@ -9,6 +9,7 @@ const testGhSHA = 'f6f40d9fbd1130f7f2357bb54225567dbd7a3793';
 const testInputAutomaticReleaseTag = 'testingtaglatest';
 const testInputDraft = false;
 const testInputPrerelease = true;
+const testInputDeleteExistTag = true;
 const testInputTitle = 'Development Build';
 const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
 
@@ -65,6 +66,7 @@ export const setupEnv = {
   INPUT_AUTOMATIC_RELEASE_TAG: testInputAutomaticReleaseTag,
   INPUT_DRAFT: testInputDraft.toString(),
   INPUT_PRERELEASE: testInputPrerelease.toString(),
+  INPUT_DELETE_EXIST_TAG: testInputDeleteExistTag.toString(),
   INPUT_TITLE: testInputTitle,
   INPUT_FILES: testInputFiles,
 

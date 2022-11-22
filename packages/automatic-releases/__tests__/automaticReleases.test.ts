@@ -14,6 +14,7 @@ describe('main handler processing automatic releases', () => {
   const testInputAutomaticReleaseTag = 'testingtaglatest';
   const testInputDraft = false;
   const testInputPrerelease = true;
+  const testDeleteExistTag = true;
   const testInputTitle = 'Development Build';
   const testInputBody = `## Commits\n- f6f40d9: Fix all the bugs (Monalisa Octocat)`;
   const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
@@ -27,6 +28,7 @@ describe('main handler processing automatic releases', () => {
     process.env['INPUT_PRERELEASE'] = testInputPrerelease.toString();
     process.env['INPUT_TITLE'] = testInputTitle;
     process.env['INPUT_FILES'] = testInputFiles;
+    process.env['INPUT_DELETE_EXIST_TAG'] = testDeleteExistTag.toString();
 
     process.env['GITHUB_EVENT_NAME'] = 'push';
     process.env['GITHUB_SHA'] = testGhSHA;
@@ -101,6 +103,7 @@ describe('main handler processing automatic releases', () => {
         draft: testInputDraft,
         prerelease: testInputPrerelease,
         body: testInputBody,
+        delete_exist_tag:testDeleteExistTag,
       })
       .reply(200, {
         upload_url: releaseUploadUrl,
@@ -195,6 +198,7 @@ describe('main handler processing automatic releases', () => {
         draft: testInputDraft,
         prerelease: testInputPrerelease,
         body: testInputBody,
+        delete_exist_tag: testDeleteExistTag,
       })
       .reply(200, {
         upload_url: releaseUploadUrl,
