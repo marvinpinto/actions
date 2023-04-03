@@ -9,7 +9,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marvinpinto/actions.git"
+    "url": "git+https://github.com/timcosgrove/aws-secrets-actions.git"
   },
   "config": {
     "eslintPaths": ".*.js *.js",
