@@ -14,13 +14,13 @@ jobs:
 
     steps:
       - name: "Checkout source code"
-        uses: "actions/checkout@v2.3.4"
+        uses: "actions/checkout@v3"
         with:
           lfs: true
           fetch-depth: 0
 
       - id: "yarn-cache"
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
       - uses: "actions/cache@v3"
         with:
           path: ${{ steps.yarn-cache.outputs.dir }}
