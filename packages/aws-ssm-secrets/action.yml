@@ -1,5 +1,5 @@
 name: "AWS SSM Build Secrets for GitHub Actions"
-author: "marvinpinto"
+author: "timcosgrove"
 description: "Inject AWS SSM Parameter Store secrets as enviroment variables into your GitHub Actions builds"
 inputs:
   ssm_parameter:

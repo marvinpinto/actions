@@ -1,5 +1,5 @@
 name: "Keybase Build Notifications"
-author: "marvinpinto"
+author: "timcosgrove"
 description: "Send GitHub build notifications to your Keybase team or channel"
 inputs:
   opensentinel_token:

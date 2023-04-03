@@ -48,9 +48,9 @@ jobs:
             packages/keybase-notifications/dist/index.js
         id: "automatic_releases"
 
-      # marvinpinto/action-keybase-notifications
-      # marvinpinto/action-automatic-releases
-      # marvinpinto/action-inject-ssm-secrets
+      # timcosgrove/action-keybase-notifications
+      # timcosgrove/action-automatic-releases
+      # timcosgrove/action-inject-ssm-secrets
       - name: "Automatically mirror release artifacts"
         env:
           GITHUB_SUPER_TOKEN: ${{ secrets.SHARED_TOKEN }}

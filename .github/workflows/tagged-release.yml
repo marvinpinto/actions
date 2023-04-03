@@ -26,12 +26,16 @@ jobs:
           path: ${{ steps.yarn-cache.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
       - run: "yarn install --frozen-lockfile"
       - run: "yarn lint"
       - run: "yarn build"
       - run: "yarn jest --env=node --colors --forceExit"
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: "timcosgrove/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
@@ -40,15 +44,15 @@ jobs:
             packages/keybase-notifications/dist/index.js
         id: "automatic_releases"
 
-      # marvinpinto/action-keybase-notifications
-      # marvinpinto/action-automatic-releases
+      # timcosgrove/action-keybase-notifications
+      # timcosgrove/action-automatic-releases
       - name: "Automatically mirror release artifacts"
         env:
           GITHUB_SUPER_TOKEN: ${{ secrets.SHARED_TOKEN }}
         run: |
           ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
 
-      - uses: "marvinpinto/action-keybase-notifications@latest"
+      - uses: "timcosgrove/action-keybase-notifications@latest"
         if: always()
         with:
           job_status: ${{ job.status }}
