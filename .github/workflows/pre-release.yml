@@ -21,6 +21,11 @@ jobs:
           lfs: true
           fetch-depth: 0
 
+      - name: Use Node.js Own version
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: ".nvmrc"
+
       - id: "yarn-cache"
         run: echo "::set-output name=dir::$(yarn cache dir)"
       - uses: "actions/cache@v2.1.6"
