@@ -8,7 +8,7 @@ on:
 
 jobs:
   gh_tagged_release:
-    runs-on: "ubuntu-latest"
+    runs-on: "ubuntu-22.04"
     env:
       JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
 
