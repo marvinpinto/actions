@@ -29,7 +29,7 @@ This example workflow will kick in as soon as changes land on `master`. After ru
 You can see a working example of this workflow over at [marvinpinto/actions](https://github.com/marvinpinto/actions/releases/tag/latest).
 
 ```yaml
----
+---marvinpinto
 name: "pre-release"
 
 on:
@@ -50,6 +50,55 @@ jobs:
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            LICENSE.txt
+            *.jar
+```
+
+### Automatically generate a pre-release when changes land on master, with override body text
+
+This example workflow will kick in as soon as changes land on `master`. After running the steps to build and test your project:
+
+1. It will create (or replace) a git tag called `latest`.
+1. Use your custom body text instead of a generated changelog.
+1. Generate a new release associated with the `latest` tag (removing any previous associated releases).
+1. Update this new release with the specified title (e.g. `Development Build`).
+1. Upload `LICENSE.txt` and any `jar` files as release assets.
+1. Mark this release as a `pre-release`.
+
+TODO: this workflow needs a working example.
+
+```yaml
+---marvinpinto
+name: "pre-release"
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  pre-release:
+    name: "Pre Release"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      # ...
+      - name: "Build & test"
+        run: |
+          echo "done!"
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          # The following double pipes may be necessary if your body text contains multiple lines.
+          body: |
+            |
+            This is line one of the body!
+            This is line two of the body!
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: true
@@ -100,14 +149,15 @@ jobs:
 
 ## Supported Parameters
 
-| Parameter               | Description                                                | Default  |
-| ----------------------- | ---------------------------------------------------------- | -------- |
-| `repo_token`\*\*        | GitHub Action token, e.g. `"${{ secrets.GITHUB_TOKEN }}"`. | `null`   |
-| `draft`                 | Mark this release as a draft?                              | `false`  |
-| `prerelease`            | Mark this release as a pre-release?                        | `true`   |
-| `automatic_release_tag` | Tag name to use for automatic releases, e.g `latest`.      | `null`   |
-| `title`                 | Release title; defaults to the tag name if none specified. | Tag Name |
-| `files`                 | Files to upload as part of the release assets.             | `null`   |
+| Parameter               | Description                                                        | Default  |
+| ----------------------- | ------------------------------------------------------------------ | -------- |
+| `repo_token`\*\*        | GitHub Action token, e.g. `"${{ secrets.GITHUB_TOKEN }}"`.         | `null`   |
+| `draft`                 | Mark this release as a draft?                                      | `false`  |
+| `prerelease`            | Mark this release as a pre-release?                                | `true`   |
+| `automatic_release_tag` | Tag name to use for automatic releases, e.g `latest`.              | `null`   |
+| `title`                 | Release title; defaults to the tag name if none specified.         | Tag Name |
+| `files`                 | Files to upload as part of the release assets.                     | `null`   |
+| `body`                  | Body text to use instead of the automatically generated changelog. | `null`   |
 
 ## Outputs
 
