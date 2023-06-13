@@ -1,4 +1,7 @@
 import * as core from '@actions/core';
+import {sync as commitParser} from 'conventional-commits-parser';
+import * as fs from 'fs';
+import * as github from '@actions/github';
 import * as Octokit from '@octokit/rest';
 import defaultChangelogOpts from 'conventional-changelog-angular/conventional-recommended-bump';
 
@@ -187,4 +190,69 @@ export const octokitLogger = (...args): string => {
       return JSON.stringify(argCopy);
     })
     .reduce((acc, val) => `${acc} ${val}`, '');
+};
+
+export const getChangelog = async (
+  client: github.GitHub,
+  owner: string,
+  repo: string,
+  commits: Octokit.ReposCompareCommitsResponseCommitsItem[],
+  changeLogFile: string,
+): Promise<string> => {
+  const parsedCommits: ParsedCommits[] = [];
+  core.startGroup('Generating changelog');
+
+  if (changeLogFile) {
+    return fs.readFileSync(changeLogFile, 'utf8');
+  }
+
+  for (const commit of commits) {
+    core.debug(`Processing commit: ${JSON.stringify(commit)}`);
+    core.debug(`Searching for pull requests associated with commit ${commit.sha}`);
+    const pulls = await client.repos.listPullRequestsAssociatedWithCommit({
+      owner: owner,
+      repo: repo,
+      commit_sha: commit.sha,
+    });
+    if (pulls.data.length) {
+      core.info(`Found ${pulls.data.length} pull request(s) associated with commit ${commit.sha}`);
+    }
+
+    const clOptions = await getChangelogOptions();
+    const parsedCommitMsg = commitParser(commit.commit.message, clOptions);
+
+    // istanbul ignore next
+    if (parsedCommitMsg.merge) {
+      core.debug(`Ignoring merge commit: ${parsedCommitMsg.merge}`);
+      continue;
+    }
+
+    parsedCommitMsg.extra = {
+      commit: commit,
+      pullRequests: [],
+      breakingChange: false,
+    };
+
+    parsedCommitMsg.extra.pullRequests = pulls.data.map((pr) => {
+      return {
+        number: pr.number,
+        url: pr.html_url,
+      };
+    });
+
+    parsedCommitMsg.extra.breakingChange = isBreakingChange({
+      body: parsedCommitMsg.body,
+      footer: parsedCommitMsg.footer,
+    });
+    core.debug(`Parsed commit: ${JSON.stringify(parsedCommitMsg)}`);
+    parsedCommits.push(parsedCommitMsg);
+    core.info(`Adding commit "${parsedCommitMsg.header}" to the changelog`);
+  }
+
+  const changelog = generateChangelogFromParsedCommits(parsedCommits);
+  core.debug('Changelog:');
+  core.debug(changelog);
+
+  core.endGroup();
+  return changelog;
 };
