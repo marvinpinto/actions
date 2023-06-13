@@ -5,5 +5,9 @@ module.exports = {
     'footer-max-line-length': [0, 'never'],
     'body-max-line-length': [0, 'never'],
   },
-  ignores: [(message) => message.startsWith('chore(deps): ')],
+  ignores: [
+    (message) =>
+      message.startsWith('chore(deps): ') ||
+      message.includes('Update Github Runner Node version and deprecate set-output'),
+  ],
 };
