@@ -28,5 +28,5 @@ export const dumpGitHubEventPayload = (): void => {
   }
   const contents = fs.readFileSync(ghpath, 'utf8');
   const jsonContent = JSON.parse(contents);
-  core.info(`GitHub payload: ${JSON.stringify(jsonContent)}`);
+  core.debug(`GitHub payload: ${JSON.stringify(jsonContent)}`);
 };

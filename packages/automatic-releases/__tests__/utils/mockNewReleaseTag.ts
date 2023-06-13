@@ -11,6 +11,7 @@ const testInputDraft = false;
 const testInputPrerelease = true;
 const testInputTitle = 'Development Build';
 const testInputFiles = 'file1.txt\nfile2.txt\n*.jar\n\n';
+const testInputAutoGenerateReleaseNotes = false;
 
 server.get(`/repos/marvinpinto/private-actions-tester/compare/HEAD...${testGhSHA}`, (req, res) => {
   const compareCommitsPayload = JSON.parse(
@@ -49,6 +50,7 @@ export const setupEnv = {
   INPUT_PRERELEASE: testInputPrerelease.toString(),
   INPUT_TITLE: testInputTitle,
   INPUT_FILES: testInputFiles,
+  INPUT_AUTO_GENERATE_RELEASE_NOTES: testInputAutoGenerateReleaseNotes.toString(),
 
   GITHUB_EVENT_NAME: 'push',
   GITHUB_SHA: testGhSHA,

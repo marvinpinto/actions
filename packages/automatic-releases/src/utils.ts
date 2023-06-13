@@ -1,13 +1,27 @@
 import * as core from '@actions/core';
-import * as Octokit from '@octokit/rest';
+import {Octokit} from '@octokit/rest';
+
 import defaultChangelogOpts from 'conventional-changelog-angular/conventional-recommended-bump';
+
+const octokit = new Octokit();
+
+declare type Unwrap<T> = T extends Promise<infer U> ? U : T;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare type AnyFunction = (...args: any[]) => any;
+declare type GetResponseDataCommitsTypeFromEndpointMethod<T extends AnyFunction> = Unwrap<
+  ReturnType<T>
+>['data']['commits'][0];
+
+export type ReposCompareCommitsResponseCommitsItem = GetResponseDataCommitsTypeFromEndpointMethod<
+  typeof octokit.repos.compareCommits
+>;
 
 export const getShortSHA = (sha: string): string => {
   const coreAbbrev = 7;
   return sha.substring(0, coreAbbrev);
 };
 
-export type ParsedCommitsExtraCommit = Octokit.ReposCompareCommitsResponseCommitsItem & {
+export type ParsedCommitsExtraCommit = ReposCompareCommitsResponseCommitsItem & {
   author: {
     email: string;
     name: string;
@@ -79,7 +93,7 @@ const getFormattedChangelogEntry = (parsedCommit: ParsedCommits): string => {
 
   const url = parsedCommit.extra.commit.html_url;
   const sha = getShortSHA(parsedCommit.extra.commit.sha);
-  const author = parsedCommit.extra.commit.commit.author.name;
+  const author = parsedCommit.extra.commit.commit.author?.name;
 
   let prString = '';
   prString = parsedCommit.extra.pullRequests.reduce((acc, pr) => {
