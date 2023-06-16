@@ -3,11 +3,13 @@ name: "tagged-release"
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - "master"
+    tags-ignore:
+      - "*"
 
 jobs:
-  gh_tagged_release:
+  gh_release:
     runs-on: "ubuntu-latest"
     env:
       JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
@@ -31,25 +33,35 @@ jobs:
       - run: "yarn build"
       - run: "yarn jest --env=node --colors --forceExit"
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          files: |
-            packages/automatic-releases/dist/index.js
-            packages/keybase-notifications/dist/index.js
-        id: "automatic_releases"
-
-      # marvinpinto/action-keybase-notifications
-      # marvinpinto/action-automatic-releases
-      - name: "Automatically mirror release artifacts"
-        env:
-          GITHUB_SUPER_TOKEN: ${{ secrets.GITHUB_SUPER_TOKEN }}
+      # read the automatic-releases version from file
+      - name: version_automatic
+        id: version_automatic
         run: |
-          ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
+          VERSION_FILE="automatic-releases/VERSION"
+          echo "version=$(cat $VERSION_FILE)" >> "${GITHUB_OUTPUT}"
 
-      - uses: "marvinpinto/action-keybase-notifications@latest"
-        if: always()
+      # create a tar
+      - name: tar_automatic
+        id: tar_automatic
+        run: |
+          tar cf \
+            automatic-releases-${{ steps.version.outputs.version }}.tar \
+            ./packages/automatic-releases/VERSION \
+            ./packages/automatic-releases/README.md \
+            ./packages/automatic-releases/action.yml \
+            ./packages/automatic-releases/dist/* \
+          echo "tar=automatic-releases-${{ steps.version_automatic.outputs.version }}.tar" >> "${GITHUB_OUTPUT}"
+
+      - name: release_automatic
+        id: release_automatic
+        uses: "./packages/automatic-releases/"
         with:
-          job_status: ${{ job.status }}
-          opensentinel_token: ${{ secrets.OSL_TOKEN }}
+          title: "automatic-releases: ${{ steps.version_automatic.outputs.version }}"
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: ${{ steps.version_automatic.outputs.version }}
+          prerelease: false
+          draft: true
+          files: |
+            ${{ steps.tar_automatic.outputs.tar }}
+
+      # each repo pulls the releases from this master builds
