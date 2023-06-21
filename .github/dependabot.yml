@@ -12,6 +12,24 @@ updates:
     # set this to 0 to disable updates
     open-pull-requests-limit: 10
 
+  # node packages
+  - package-ecosystem: "npm"
+    directory: "/packages/aws-ssm-secrets"
+    schedule:
+      interval: "weekly"
+    # Setting the limit of open pull requests to zero is the documented way
+    # to disable Dependabot.
+    open-pull-requests-limit: 0
+
+  # node packages
+  - package-ecosystem: "npm"
+    directory: "/packages/keybase-notifications"
+    schedule:
+      interval: "weekly"
+    # Setting the limit of open pull requests to zero is the documented way
+    # to disable Dependabot.
+    open-pull-requests-limit: 0
+
   # github actions
   - package-ecosystem: "github-actions"
     directory: "/"
