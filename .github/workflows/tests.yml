@@ -34,9 +34,3 @@ jobs:
       - run: "yarn lint"
       - run: "yarn build"
       - run: "yarn jest --env=node --colors --forceExit"
-
-      - uses: "./packages/keybase-notifications"
-        if: always()
-        with:
-          job_status: ${{ job.status }}
-          opensentinel_token: ${{ secrets.OSL_TOKEN }}

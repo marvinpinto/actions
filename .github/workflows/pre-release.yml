@@ -41,20 +41,12 @@ jobs:
           title: "Development Build"
           files: |
             packages/automatic-releases/dist/index.js
-            packages/keybase-notifications/dist/index.js
         id: "automatic_releases"
 
-      # marvinpinto/action-keybase-notifications
       # marvinpinto/action-automatic-releases
-      # marvinpinto/action-inject-ssm-secrets
       - name: "Automatically mirror release artifacts"
         env:
           GITHUB_SUPER_TOKEN: ${{ secrets.GITHUB_SUPER_TOKEN }}
         run: |
           ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
 
-      - uses: "./packages/keybase-notifications"
-        if: always()
-        with:
-          job_status: ${{ job.status }}
-          opensentinel_token: ${{ secrets.OSL_TOKEN }}

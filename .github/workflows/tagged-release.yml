@@ -37,19 +37,11 @@ jobs:
           prerelease: false
           files: |
             packages/automatic-releases/dist/index.js
-            packages/keybase-notifications/dist/index.js
         id: "automatic_releases"
 
-      # marvinpinto/action-keybase-notifications
       # marvinpinto/action-automatic-releases
       - name: "Automatically mirror release artifacts"
         env:
           GITHUB_SUPER_TOKEN: ${{ secrets.GITHUB_SUPER_TOKEN }}
         run: |
           ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
-
-      - uses: "marvinpinto/action-keybase-notifications@latest"
-        if: always()
-        with:
-          job_status: ${{ job.status }}
-          opensentinel_token: ${{ secrets.OSL_TOKEN }}

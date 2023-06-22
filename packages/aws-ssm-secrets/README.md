@@ -1,5 +1,7 @@
 # AWS SSM Build Secrets for GitHub Actions
 
+## Action deprecated, [looking for maintainers](https://github.com/marvinpinto/actions/issues/660)
+
 This action injects AWS SSM Parameter Store secrets as environment variables into your GitHub Actions builds.
 
 It makes it easier to follow [Amazon IAM best practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html) in respect to principle of least privilege and tracking credentials usage. Combined with the `aws-actions/configure-aws-credentials` action, this allows you to inject any combination of secrets from multiple stores, using different credential contexts.
