@@ -117,6 +117,7 @@ The following output values can be accessed via `${{ steps.<step-id>.outputs.<ou
 | ------------------------ | ------------------------------------------------------ | ------ |
 | `automatic_releases_tag` | The release tag this action just processed             | string |
 | `upload_url`             | The URL for uploading additional assets to the release | string |
+| `release_id`             | The release ID                                         | string |
 
 ### Notes:
 
