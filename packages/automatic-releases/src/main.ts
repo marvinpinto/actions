@@ -88,7 +88,7 @@ const generateNewGitHubRelease = async (
   core.info('Creating new release');
   const resp = await client.repos.createRelease(releaseInfo);
   core.endGroup();
-  return resp.data.upload_url;
+  return resp.data;
 };
 
 const searchForPreviousReleaseTag = async (
@@ -302,7 +302,7 @@ export const main = async (): Promise<void> => {
       });
     }
 
-    const releaseUploadUrl = await generateNewGitHubRelease(client, {
+    const release = await generateNewGitHubRelease(client, {
       owner: context.repo.owner,
       repo: context.repo.repo,
       tag_name: releaseTag,
@@ -312,12 +312,13 @@ export const main = async (): Promise<void> => {
       body: changelog,
     });
 
-    await uploadReleaseArtifacts(client, releaseUploadUrl, args.files);
+    await uploadReleaseArtifacts(client, release.releaseUploadUrl, args.files);
 
     core.debug(`Exporting environment variable AUTOMATIC_RELEASES_TAG with value ${releaseTag}`);
     core.exportVariable('AUTOMATIC_RELEASES_TAG', releaseTag);
     core.setOutput('automatic_releases_tag', releaseTag);
-    core.setOutput('upload_url', releaseUploadUrl);
+    core.setOutput('upload_url', release.releaseUploadUrl);
+    core.setOutput('release_id', release.id);
   } catch (error) {
     core.setFailed(error.message);
     throw error;
