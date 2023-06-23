@@ -101,7 +101,7 @@ describe('changelog generator', () => {
 
     octokitLogger(...args);
 
-    expect(args[0].file).toEqual('this should not be overridden');
-    expect(args[1].file).toEqual('');
+    expect(args[0].file).toBe('this should not be overridden');
+    expect(args[1].file).toBe('');
   });
 });

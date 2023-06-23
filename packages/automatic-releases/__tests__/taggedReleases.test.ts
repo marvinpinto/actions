@@ -93,7 +93,7 @@ describe('main handler processing tagged releases', () => {
       .get(`/repos/marvinpinto/private-actions-tester/compare/HEAD...${testGhSHA}`)
       .reply(200, compareCommitsPayload);
 
-    const getRef = nock('https://api.github.com')
+    const _getRef = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
       .get(`/repos/marvinpinto/private-actions-tester/git/refs/tags/v0.0.0`)
       .reply(404);

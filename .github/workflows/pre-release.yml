@@ -1,52 +1,51 @@
 ---
-name: "pre-release"
+name: 'pre-release'
 
 on:
   push:
     branches:
-      - "master"
+      - 'master'
     tags-ignore:
-      - "*"
+      - '*'
 
 jobs:
   gh_pre_release:
-    runs-on: "ubuntu-latest"
+    runs-on: 'ubuntu-latest'
     env:
       JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
 
     steps:
-      - name: "Checkout source code"
-        uses: "actions/checkout@v3"
+      - name: 'Checkout source code'
+        uses: 'actions/checkout@v3'
         with:
           lfs: true
           fetch-depth: 0
 
-      - name: "🔧 setup node"
+      - name: '🔧 setup node'
         uses: actions/setup-node@v3
         with:
-          cache: "yarn"
+          cache: 'yarn'
           node-version: 16
-          cache-dependency-path: "yarn.lock"
+          cache-dependency-path: 'yarn.lock'
 
-      - run: "yarn install --frozen-lockfile"
-      - run: "yarn lint"
-      - run: "yarn build"
-      - run: "yarn jest --env=node --colors --forceExit"
+      - run: 'yarn install --frozen-lockfile'
+      - run: 'yarn lint'
+      - run: 'yarn build'
+      - run: 'yarn jest --env=node --colors --forceExit'
 
-      - uses: "./packages/automatic-releases/"
+      - uses: './packages/automatic-releases/'
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
+          repo_token: '${{ secrets.GITHUB_TOKEN }}'
+          automatic_release_tag: 'latest'
           prerelease: true
-          title: "Development Build"
+          title: 'Development Build'
           files: |
             packages/automatic-releases/dist/index.js
-        id: "automatic_releases"
+        id: 'automatic_releases'
 
       # marvinpinto/action-automatic-releases
-      - name: "Automatically mirror release artifacts"
+      - name: 'Automatically mirror release artifacts'
         env:
           GITHUB_SUPER_TOKEN: ${{ secrets.GITHUB_SUPER_TOKEN }}
         run: |
           ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
-

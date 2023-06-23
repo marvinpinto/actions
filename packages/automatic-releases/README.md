@@ -30,30 +30,30 @@ You can see a working example of this workflow over at [marvinpinto/actions](htt
 
 ```yaml
 ---
-name: "pre-release"
+name: 'pre-release'
 
 on:
   push:
     branches:
-      - "master"
+      - 'master'
 
 jobs:
   pre-release:
-    name: "Pre Release"
-    runs-on: "ubuntu-latest"
+    name: 'Pre Release'
+    runs-on: 'ubuntu-latest'
 
     steps:
       # ...
-      - name: "Build & test"
+      - name: 'Build & test'
         run: |
           echo "done!"
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: 'marvinpinto/action-automatic-releases@latest'
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
+          repo_token: '${{ secrets.GITHUB_TOKEN }}'
+          automatic_release_tag: 'latest'
           prerelease: true
-          title: "Development Build"
+          title: 'Development Build'
           files: |
             LICENSE.txt
             *.jar
@@ -71,27 +71,27 @@ Once again there's an example of this over at [marvinpinto/actions](https://gith
 
 ```yaml
 ---
-name: "tagged-release"
+name: 'tagged-release'
 
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 jobs:
   tagged-release:
-    name: "Tagged Release"
-    runs-on: "ubuntu-latest"
+    name: 'Tagged Release'
+    runs-on: 'ubuntu-latest'
 
     steps:
       # ...
-      - name: "Build & test"
+      - name: 'Build & test'
         run: |
           echo "done!"
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: 'marvinpinto/action-automatic-releases@latest'
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          repo_token: '${{ secrets.GITHUB_TOKEN }}'
           prerelease: false
           files: |
             LICENSE.txt
@@ -132,7 +132,7 @@ The GitHub Actions framework allows you to trigger this (and other) actions on _
 Every commit that lands on master for this project triggers an automatic build as well as a tagged release called `latest`. If you don't wish to live on the bleeding edge you may use a stable release instead. See [releases](../../releases/latest) for the available versions.
 
 ```yaml
-- uses: "marvinpinto/action-automatic-releases@<VERSION>"
+- uses: 'marvinpinto/action-automatic-releases@<VERSION>'
 ```
 
 ## How to get help

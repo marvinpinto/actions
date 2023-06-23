@@ -8,14 +8,14 @@
     "prettierPaths": "**/*.{json,md,yaml,yml} !package.json"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js --colors",
+    "build": "webpack --config webpack.config.js",
     "clean": "rm -rf node_modules yarn-error.log dist",
     "lint": "yarn run lint:eslint && yarn run lint:prettier",
-    "lint:eslint": "eslint --color --max-warnings=0 $npm_package_config_eslintPaths",
-    "lint:prettier": "prettier --color --list-different $npm_package_config_prettierPaths",
+    "lint:eslint": "eslint --max-warnings=0 $npm_package_config_eslintPaths",
+    "lint:prettier": "prettier --list-different $npm_package_config_prettierPaths",
     "lintfix": "yarn run lintfix:eslint && yarn run lintfix:prettier",
-    "lintfix:eslint": "eslint --color --fix $npm_package_config_eslintPaths",
-    "lintfix:prettier": "prettier --color --write $npm_package_config_prettierPaths"
+    "lintfix:eslint": "eslint --fix $npm_package_config_eslintPaths",
+    "lintfix:prettier": "prettier --write $npm_package_config_prettierPaths"
   },
   "dependencies": {
     "@actions/core": "^1.10.0",

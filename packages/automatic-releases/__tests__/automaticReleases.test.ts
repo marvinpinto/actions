@@ -5,8 +5,11 @@ import fs from 'fs';
 import {uploadReleaseArtifacts} from '../src/uploadReleaseArtifacts';
 import {main} from '../src/main';
 import * as core from '@actions/core';
+import * as utils from '../src/utils';
 
 jest.mock('../src/uploadReleaseArtifacts');
+
+const mockedUploadReleaseArtifacts = uploadReleaseArtifacts as jest.MockedFunction<typeof uploadReleaseArtifacts>;
 
 describe('main handler processing automatic releases', () => {
   const testGhToken = 'fake-secret-token';
@@ -37,7 +40,7 @@ describe('main handler processing automatic releases', () => {
     process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'git-push.json');
     process.env['GITHUB_REPOSITORY'] = 'marvinpinto/private-actions-tester';
 
-    uploadReleaseArtifacts.mockImplementation().mockResolvedValue({});
+    mockedUploadReleaseArtifacts.mockImplementation().mockResolvedValue({});
   });
 
   afterEach(() => {
@@ -51,6 +54,11 @@ describe('main handler processing automatic releases', () => {
     await expect(main()).rejects.toThrow(
       'The parameter "automatic_release_tag" was not set and this does not appear to be a GitHub tag event. (Event: refs/heads/automatic-pre-releaser)',
     );
+  });
+
+  it('throws an error when "GITHUB_EVENT_PATH" is not supplied', async () => {
+    delete process.env.GITHUB_EVENT_PATH;
+    await expect(main()).rejects.toThrow('Environment variable GITHUB_EVENT_PATH does not appear to be set.');
   });
 
   it('should create a new release tag', async () => {
@@ -116,10 +124,10 @@ describe('main handler processing automatic releases', () => {
     expect(getCommitsSinceRelease.isDone()).toBe(true);
     expect(listAssociatedPRs.isDone()).toBe(true);
 
-    expect(uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
-    expect(uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
+    expect(mockedUploadReleaseArtifacts).toHaveBeenCalledTimes(1);
+    expect(mockedUploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
     // Should not attempt to upload any release artifacts, as there are none
-    expect(uploadReleaseArtifacts.mock.calls[0][2]).toEqual([]);
+    expect(mockedUploadReleaseArtifacts.mock.calls[0][2]).toEqual([]);
 
     // Should populate the output env variable
     expect(core.exportVariable).toHaveBeenCalledTimes(1);
@@ -200,6 +208,8 @@ describe('main handler processing automatic releases', () => {
         upload_url: releaseUploadUrl,
       });
 
+    const dumpGitHubEventPayload = jest.spyOn(utils, 'dumpGitHubEventPayload');
+
     await main();
 
     expect(createRef.isDone()).toBe(true);
@@ -211,9 +221,11 @@ describe('main handler processing automatic releases', () => {
     expect(getCommitsSinceRelease.isDone()).toBe(true);
     expect(listAssociatedPRs.isDone()).toBe(true);
 
-    expect(uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
-    expect(uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
-    expect(uploadReleaseArtifacts.mock.calls[0][2]).toEqual(['file1.txt', 'file2.txt', '*.jar']);
+    expect(mockedUploadReleaseArtifacts).toHaveBeenCalledTimes(1);
+    expect(dumpGitHubEventPayload).toHaveBeenCalledTimes(1);
+
+    expect(mockedUploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
+    expect(mockedUploadReleaseArtifacts.mock.calls[0][2]).toEqual(['file1.txt', 'file2.txt', '*.jar']);
 
     // Should populate the output env variable
     expect(core.exportVariable).toHaveBeenCalledTimes(1);
