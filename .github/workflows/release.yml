@@ -1,0 +1,66 @@
+---
+name: release
+
+on:
+  push:
+    branches:
+      - master
+    tags-ignore:
+      - "*"
+
+jobs:
+  gh_release:
+    runs-on: ubuntu-latest
+    env:
+      JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: "🔧 setup node"
+        uses: actions/setup-node@v3
+        with:
+          cache: yarn
+          node-version: 16
+          cache-dependency-path: yarn.lock
+
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: yarn jest --env=node --colors --forceExit
+
+      # read the automatic-releases version from file
+      - name: version_automatic
+        id: version_automatic
+        run: |
+          VERSION_FILE="automatic-releases/VERSION"
+          echo "version=$(cat $VERSION_FILE)" >> "${GITHUB_OUTPUT}"
+
+      # create a tar
+      - name: tar_automatic
+        id: tar_automatic
+        run: |
+          tar cf \
+            automatic-releases-${{ steps.version.outputs.version }}.tar \
+            ./packages/automatic-releases/VERSION \
+            ./packages/automatic-releases/README.md \
+            ./packages/automatic-releases/action.yml \
+            ./packages/automatic-releases/dist/* \
+          echo "tar=automatic-releases-${{ steps.version_automatic.outputs.version }}.tar" >> "${GITHUB_OUTPUT}"
+
+      - name: release_automatic
+        id: release_automatic
+        uses: "./packages/automatic-releases/"
+        with:
+          title: "automatic-releases: ${{ steps.version_automatic.outputs.version }}"
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: ${{ steps.version_automatic.outputs.version }}
+          prerelease: false
+          draft: true
+          files: |
+            ${{ steps.tar_automatic.outputs.tar }}
+
+      # each repo pulls the releases from this master builds
