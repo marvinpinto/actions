@@ -1,33 +1,44 @@
 module.exports = {
   root: true,
+  env: {
+    es2021: true,
+    jest: true,
+    node: true,
+  },
   parser: '@typescript-eslint/parser',
   extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
-    'prettier',
-    'plugin:prettier/recommended',
     'plugin:jest/recommended',
     'plugin:jest/style',
+    'plugin:prettier/recommended',
   ],
-  plugins: ['prettier', 'jest'],
+  plugins: ['@typescript-eslint', 'prettier', 'jest'],
   parserOptions: {
-    ecmaVersion: 2018,
+    tsconfigRootDir: __dirname,
+    ecmaVersion: 2021,
     sourceType: 'module',
+    project: './tsconfig.eslint.json',
   },
+  ignorePatterns: ['dist', 'node_modules'],
   rules: {
-    '@typescript-eslint/explicit-function-return-type': 0,
-    'prettier/prettier': [
+    'prettier/prettier': 'error',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': [
       'error',
       {
-        semi: true,
-        trailingComma: 'all',
-        bracketSpacing: false,
-        singleQuote: true,
-        printWidth: 120,
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_',
+        caughtErrors: 'all',
       },
     ],
+    '@typescript-eslint/no-explicit-any': ['off'],
   },
-  env: {
-    'jest/globals': true,
+  settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
   },
   reportUnusedDisableDirectives: true,
 };

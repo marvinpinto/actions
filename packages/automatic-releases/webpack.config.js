@@ -10,7 +10,7 @@ module.exports = {
   entry: {
     index: './src/index.ts',
   },
-
+  devtool: 'nosources-source-map',
   module: {
     rules: [
       {
@@ -42,11 +42,14 @@ module.exports = {
             comments: false,
           },
         },
-        sourceMap: true,
         extractComments: false,
       }),
     ],
   },
 
-  plugins: [new webpack.IgnorePlugin(/\/iconv-loader$/)],
+  plugins: [
+    new webpack.IgnorePlugin({
+      resourceRegExp: /\/iconv-loader$/,
+    }),
+  ],
 };

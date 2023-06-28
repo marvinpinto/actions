@@ -1,3 +1,4 @@
+import fs from 'fs';
 import * as core from '@actions/core';
 import * as Octokit from '@octokit/rest';
 import defaultChangelogOpts from 'conventional-changelog-angular/conventional-recommended-bump';
@@ -156,7 +157,6 @@ export const parseGitTag = (inputRef: string): string => {
   return resMatch[2];
 };
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const getChangelogOptions = async () => {
   const defaultOpts = defaultChangelogOpts;
   defaultOpts['mergePattern'] = '^Merge pull request #(.*) from (.*)$';
@@ -166,7 +166,6 @@ export const getChangelogOptions = async () => {
 };
 
 // istanbul ignore next
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const octokitLogger = (...args): string => {
   return args
     .map((arg) => {
@@ -187,4 +186,14 @@ export const octokitLogger = (...args): string => {
       return JSON.stringify(argCopy);
     })
     .reduce((acc, val) => `${acc} ${val}`, '');
+};
+
+export const dumpGitHubEventPayload = (): void => {
+  const ghpath: string = process.env['GITHUB_EVENT_PATH'] || '';
+  if (!ghpath) {
+    throw new Error('Environment variable GITHUB_EVENT_PATH does not appear to be set.');
+  }
+  const contents = fs.readFileSync(ghpath, 'utf8');
+  const jsonContent = JSON.parse(contents);
+  core.info(`GitHub payload: ${JSON.stringify(jsonContent)}`);
 };

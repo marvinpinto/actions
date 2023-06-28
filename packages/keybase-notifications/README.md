@@ -1,5 +1,7 @@
 # Keybase Build Notifications
 
+## Action deprecated, [looking for maintainers](https://github.com/marvinpinto/actions/issues/660)
+
 This action allows you to post GitHub build notifications to [Keybase Chat](https://keybase.io/blog/keybase-chat) channels, teams, and DMs. It sends messages via the [opensentinel API](https://www.opensentinel.com), using your `token` value.
 
 ![Keybase default GitHub notification](images/keybase-gh-notification-example.png)

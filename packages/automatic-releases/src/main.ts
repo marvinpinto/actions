@@ -2,9 +2,8 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import {Context} from '@actions/github/lib/context';
 import * as Octokit from '@octokit/rest';
-import {dumpGitHubEventPayload} from '../../keybase-notifications/src/utils';
 import {sync as commitParser} from 'conventional-commits-parser';
-import {getChangelogOptions} from './utils';
+import {getChangelogOptions, dumpGitHubEventPayload} from './utils';
 import {isBreakingChange, generateChangelogFromParsedCommits, parseGitTag, ParsedCommits, octokitLogger} from './utils';
 import semverValid from 'semver/functions/valid';
 import semverRcompare from 'semver/functions/rcompare';
@@ -23,7 +22,9 @@ type Args = {
 const getAndValidateArgs = (): Args => {
   const args = {
     repoToken: core.getInput('repo_token', {required: true}),
-    automaticReleaseTag: core.getInput('automatic_release_tag', {required: false}),
+    automaticReleaseTag: core.getInput('automatic_release_tag', {
+      required: false,
+    }),
     draftRelease: JSON.parse(core.getInput('draft', {required: true})),
     preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
     releaseTitle: core.getInput('title', {required: false}),
@@ -45,7 +46,7 @@ const createReleaseTag = async (client: github.GitHub, refInfo: Octokit.GitCreat
 
   try {
     await client.git.createRef(refInfo);
-  } catch (err) {
+  } catch (err: any) {
     const existingTag = refInfo.ref.substring(5); // 'refs/tags/latest' => 'tags/latest'
     core.info(
       `Could not create new tag "${refInfo.ref}" (${err.message}) therefore updating existing tag "${existingTag}"`,
@@ -73,7 +74,7 @@ const deletePreviousGitHubRelease = async (client: github.GitHub, releaseInfo: O
       repo: releaseInfo.repo,
       release_id: resp.data.id,
     });
-  } catch (err) {
+  } catch (err: any) {
     core.info(`Could not find release associated with tag "${releaseInfo.tag}" (${err.message})`);
   }
   core.endGroup();
@@ -143,7 +144,7 @@ const getCommitsSinceRelease = async (
   try {
     resp = await client.git.getRef(tagInfo);
     previousReleaseRef = parseGitTag(tagInfo.ref);
-  } catch (err) {
+  } catch (err: any) {
     core.info(
       `Could not find SHA corresponding to tag "${tagInfo.ref}" (${err.message}). Assuming this is the first release.`,
     );
@@ -161,7 +162,7 @@ const getCommitsSinceRelease = async (
     core.info(
       `Successfully retrieved ${resp.data.commits.length} commits between ${previousReleaseRef} and ${currentSha}`,
     );
-  } catch (err) {
+  } catch (_err) {
     // istanbul ignore next
     core.warning(`Could not find any commits between ${previousReleaseRef} and ${currentSha}`);
   }
@@ -318,7 +319,7 @@ export const main = async (): Promise<void> => {
     core.exportVariable('AUTOMATIC_RELEASES_TAG', releaseTag);
     core.setOutput('automatic_releases_tag', releaseTag);
     core.setOutput('upload_url', releaseUploadUrl);
-  } catch (error) {
+  } catch (error: any) {
     core.setFailed(error.message);
     throw error;
   }

@@ -16,8 +16,13 @@ This repository is a collection of said actions which you are free to re-use and
 
 ## Actions in this Repository
 
-- [Keybase Notifications](https://github.com/marketplace/actions/keybase-build-notifications) - send GitHub notifications to Keybase Chat channels, teams, and DMs.
 - [GitHub Automatic Releases](https://github.com/marketplace/actions/automatic-releases) - automatically upload assets, generate changelogs, pre-releases, and so on.
+
+## Deprecated Actions (Looking for Maintainers)
+
+The following actions are deprecated and no longer actively maintained. We are currently looking for maintainers to take over these projects. If you are interested in contributing or becoming the new maintainer, please check out the [GitHub issue here](https://github.com/marvinpinto/actions/issues/660).
+
+- [Keybase Notifications](https://github.com/marketplace/actions/keybase-build-notifications) - send GitHub notifications to Keybase Chat channels, teams, and DMs.
 - [SSM Build Secrets](https://github.com/marketplace/actions/aws-ssm-build-secrets-for-github-actions) - inject AWS SSM Parameter Store secrets as environment variables into your GitHub Actions builds.
 
 ## Development

@@ -5,28 +5,24 @@
   "license": "MIT",
   "private": true,
   "workspaces": [
-    "packages/**"
+    "packages/!(aws-ssm-secrets|keybase-notifications)"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marvinpinto/actions.git"
-  },
-  "config": {
-    "eslintPaths": ".*.js *.js",
-    "prettierPaths": "*.{json,md} .github/**/*.yml"
+    "url": "https://github.com/marvinpinto/actions"
   },
   "scripts": {
-    "test": "yarn jest --env=node --colors",
-    "build": "lerna run build --stream",
-    "clean": "lerna run clean --stream && rm -rf node_modules yarn-error.log",
+    "test": "yarn jest --env=node --colors --verbose true",
+    "build": "lerna run build",
+    "clean": "lerna run clean && rm -rf node_modules yarn-error.log",
     "reinstall": "yarn clean; yarn install --frozen-lockfile",
-    "lint": "lerna run lint --stream && yarn run lint:eslint && yarn run lint:prettier && yarn run lint:commits",
-    "lint:eslint": "eslint --max-warnings=0 $npm_package_config_eslintPaths",
-    "lint:prettier": "prettier --list-different $npm_package_config_prettierPaths",
+    "lint": "lerna run lint && yarn run lint:eslint && yarn run lint:prettier && yarn run lint:commits",
+    "lint:eslint": "eslint --max-warnings=0 .",
+    "lint:prettier": "prettier --check .",
     "lint:commits": "commitlint --to .",
-    "lintfix": "lerna run lintfix --stream && yarn run lintfix:eslint && yarn run lintfix:prettier",
-    "lintfix:eslint": "eslint --fix  $npm_package_config_eslintPaths",
-    "lintfix:prettier": "prettier --write $npm_package_config_prettierPaths",
+    "lintfix": "lerna run lintfix && yarn run lintfix:eslint && yarn run lintfix:prettier",
+    "lintfix:eslint": "eslint --fix .",
+    "lintfix:prettier": "prettier --write .",
     "release": "lerna version"
   },
   "devDependencies": {
@@ -35,25 +31,22 @@
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@babel/preset-env": "^7.22.5",
     "@babel/preset-typescript": "^7.22.5",
-    "@commitlint/cli": "^12.0.1",
-    "@commitlint/config-conventional": "^12.0.1",
-    "@types/jest": "^26.0.22",
+    "@commitlint/cli": "^17.6.5",
+    "@commitlint/config-conventional": "^17.6.5",
+    "@types/jest": "^29.5.2",
     "@types/node": "^15.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.22.0",
-    "@typescript-eslint/parser": "^4.22.0",
-    "babel-jest": "^26.6.3",
-    "eslint": "^7.25.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-jest": "^24.3.2",
-    "eslint-plugin-prettier": "^3.1.2",
-    "jest": "^26.6.3",
-    "jest-circus": "^26.6.3",
-    "lerna": "^4.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.60.0",
+    "@typescript-eslint/parser": "^5.60.0",
+    "babel-jest": "^29.5.0",
+    "eslint": "^8.43.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-jest": "^27.2.2",
+    "eslint-plugin-prettier": "^4.2.1",
+    "jest": "^29.5.0",
+    "jest-circus": "^29.5.0",
+    "lerna": "^7.0.2",
     "prettier": "^2.8.8",
-    "typescript": "4.2.4"
+    "typescript": "5.0.4"
   },
-  "eslintIgnore": [
-    "!.*.js"
-  ],
   "dependencies": {}
 }

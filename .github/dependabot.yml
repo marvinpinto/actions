@@ -2,22 +2,40 @@
 version: 2
 updates:
   # node packages
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'
     commit-message:
-      prefix: "chore"
-      include: "scope"
+      prefix: 'chore'
+      include: 'scope'
     # set this to 0 to disable updates
     open-pull-requests-limit: 10
 
-  # github actions
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  # node packages
+  - package-ecosystem: 'npm'
+    directory: '/packages/aws-ssm-secrets'
     schedule:
-      interval: "daily"
+      interval: 'weekly'
+    # Setting the limit of open pull requests to zero is the documented way
+    # to disable Dependabot.
+    open-pull-requests-limit: 0
+
+  # node packages
+  - package-ecosystem: 'npm'
+    directory: '/packages/keybase-notifications'
+    schedule:
+      interval: 'weekly'
+    # Setting the limit of open pull requests to zero is the documented way
+    # to disable Dependabot.
+    open-pull-requests-limit: 0
+
+  # github actions
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'daily'
     commit-message:
-      prefix: "chore"
-      include: "scope"
+      prefix: 'chore'
+      include: 'scope'
     open-pull-requests-limit: 10

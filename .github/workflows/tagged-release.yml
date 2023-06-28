@@ -1,55 +1,47 @@
 ---
-name: "tagged-release"
+name: 'tagged-release'
 
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 jobs:
   gh_tagged_release:
-    runs-on: "ubuntu-latest"
+    runs-on: 'ubuntu-latest'
     env:
       JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
 
     steps:
-      - name: "Checkout source code"
-        uses: "actions/checkout@v3"
+      - name: 'Checkout source code'
+        uses: 'actions/checkout@v3'
         with:
           lfs: true
           fetch-depth: 0
 
-      - name: "🔧 setup node"
+      - name: '🔧 setup node'
         uses: actions/setup-node@v3
         with:
-          cache: "yarn"
+          cache: 'yarn'
           node-version: 16
-          cache-dependency-path: "yarn.lock"
+          cache-dependency-path: 'yarn.lock'
 
-      - run: "yarn install --frozen-lockfile"
-      - run: "yarn lint"
-      - run: "yarn build"
-      - run: "yarn jest --env=node --colors --forceExit"
+      - run: 'yarn install --frozen-lockfile'
+      - run: 'yarn lint'
+      - run: 'yarn build'
+      - run: 'yarn jest --env=node --colors --forceExit'
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: 'marvinpinto/action-automatic-releases@latest'
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          repo_token: '${{ secrets.GITHUB_TOKEN }}'
           prerelease: false
           files: |
             packages/automatic-releases/dist/index.js
-            packages/keybase-notifications/dist/index.js
-        id: "automatic_releases"
+        id: 'automatic_releases'
 
-      # marvinpinto/action-keybase-notifications
       # marvinpinto/action-automatic-releases
-      - name: "Automatically mirror release artifacts"
+      - name: 'Automatically mirror release artifacts'
         env:
           GITHUB_SUPER_TOKEN: ${{ secrets.GITHUB_SUPER_TOKEN }}
         run: |
           ./scripts/mirror-actions.sh "$AUTOMATIC_RELEASES_TAG"
-
-      - uses: "marvinpinto/action-keybase-notifications@latest"
-        if: always()
-        with:
-          job_status: ${{ job.status }}
-          opensentinel_token: ${{ secrets.OSL_TOKEN }}

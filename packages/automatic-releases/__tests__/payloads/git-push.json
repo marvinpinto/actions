@@ -18,10 +18,7 @@
       "distinct": true,
       "id": "f6f40d9fbd1130f7f2357bb54225567dbd7a3793",
       "message": "test: dump it this way",
-      "modified": [
-        "packages/automatic-releases/src/main.ts",
-        "packages/keybase-notifications/src/utils.ts"
-      ],
+      "modified": ["packages/automatic-releases/src/main.ts"],
       "removed": [],
       "timestamp": "2019-09-29T14:20:22-04:00",
       "tree_id": "35f90a9b899287309a1b1d0cc17a44fd8ec07bfe",
@@ -47,16 +44,13 @@
     "distinct": true,
     "id": "f6f40d9fbd1130f7f2357bb54225567dbd7a3793",
     "message": "test: dump it this way",
-    "modified": [
-      "packages/automatic-releases/src/main.ts",
-      "packages/keybase-notifications/src/utils.ts"
-    ],
+    "modified": ["packages/automatic-releases/src/main.ts"],
     "removed": [],
     "timestamp": "2019-09-29T14:20:22-04:00",
     "tree_id": "35f90a9b899287309a1b1d0cc17a44fd8ec07bfe",
     "url": "https://github.com/marvinpinto/private-actions-tester/commit/f6f40d9fbd1130f7f2357bb54225567dbd7a3793"
   },
-  "pusher": { "email": "github@pinto.im", "name": "marvinpinto" },
+  "pusher": {"email": "github@pinto.im", "name": "marvinpinto"},
   "ref": "refs/heads/automatic-pre-releaser",
   "repository": {
     "archive_url": "https://api.github.com/repos/marvinpinto/private-actions-tester/{archive_format}{/ref}",

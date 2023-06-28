@@ -32,7 +32,7 @@ export const uploadReleaseArtifacts = async (
 
       try {
         await client.repos.uploadReleaseAsset(uploadArgs);
-      } catch (err) {
+      } catch (err: any) {
         core.info(
           `Problem uploading ${filePath} as a release asset (${err.message}). Will retry with the md5 hash appended to the filename.`,
         );
