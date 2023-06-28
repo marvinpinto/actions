@@ -62,5 +62,3 @@ jobs:
           draft: true
           files: |
             ${{ steps.tar_automatic.outputs.tar }}
-
-      # each repo pulls the releases from this master builds
