@@ -49,13 +49,16 @@ jobs:
         run: yarn run lintfix:eslint && yarn run lintfix:prettier
 
       - name: Commit changes
+        env:
+          branch: ${{ github.head_ref }}
+          repository: ${{ github.repository }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${repository}
           git add .
           git diff-index --quiet HEAD || git commit -m "[actions-bot] Apply ESLint and Prettier fixes"
-          git push origin HEAD:${{ github.head_ref }}
+          git push origin HEAD:${branch}
 
       - run: 'yarn lint'
       - run: 'yarn build'
