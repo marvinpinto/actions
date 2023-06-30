@@ -18,8 +18,8 @@ concurrency:
 
 jobs:
   gh_tests:
-  permissions:
-    contents: read
+    permissions:
+      contents: read
     runs-on: 'ubuntu-latest'
     env:
       JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
