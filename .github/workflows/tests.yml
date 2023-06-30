@@ -40,7 +40,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git add .
           git diff-index --quiet HEAD || git commit -m "[actions-bot] Apply ESLint and Prettier fixes"
-          git push
+          git push origin ${{ github.ref.split('/').last }}
 
       - run: 'yarn lint'
       - run: 'yarn build'
