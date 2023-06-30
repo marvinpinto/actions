@@ -45,7 +45,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git add .
-          git diff-index --quiet HEAD || git commit -m "[actions-bot] Apply ESLint and Prettier fixes"
+          git commit -m "[actions-bot] Apply ESLint and Prettier fixes"
           git push
 
       - run: 'yarn lint'
