@@ -2,7 +2,6 @@
 name: 'tests'
 
 on:
-  push:
   pull_request:
     types:
       - 'opened'
@@ -12,8 +11,6 @@ on:
 
 jobs:
   gh_tests:
-    permissions:
-      contents: write
     runs-on: 'ubuntu-latest'
     env:
       JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
@@ -39,6 +36,8 @@ jobs:
 
       - name: Commit changes
         run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           git add .
           git diff-index --quiet HEAD || git commit -m "[actions-bot] Apply ESLint and Prettier fixes"
 
