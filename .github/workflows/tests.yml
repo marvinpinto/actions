@@ -12,6 +12,8 @@ on:
 
 jobs:
   gh_tests:
+    permissions:
+      contents: write
     runs-on: 'ubuntu-latest'
     env:
       JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
@@ -31,6 +33,15 @@ jobs:
           cache-dependency-path: 'yarn.lock'
 
       - run: 'yarn install --frozen-lockfile'
+
+      - name: Run ESLint and Prettier
+        run: yarn run lintfix:eslint && yarn run lintfix:prettier
+
+      - name: Commit changes
+        run: |
+          git add .
+          git diff-index --quiet HEAD || git commit -m "[actions-bot] Apply ESLint and Prettier fixes"
+
       - run: 'yarn lint'
       - run: 'yarn build'
       - run: 'yarn jest --env=node --colors --forceExit'
