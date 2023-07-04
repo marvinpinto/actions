@@ -1,4 +1,3 @@
----
 name: 'pre-release'
 
 on:
@@ -9,6 +8,11 @@ on:
       - '*'
 
 jobs:
+  test:
+    name: '🧪 Test'
+    secrets: inherit
+    uses: ./.github/workflows/tests.yml
+
   gh_pre_release:
     runs-on: 'ubuntu-latest'
     env:

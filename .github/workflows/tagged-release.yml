@@ -1,4 +1,3 @@
----
 name: 'tagged-release'
 
 on:
@@ -7,6 +6,11 @@ on:
       - 'v*'
 
 jobs:
+  test:
+    name: '🧪 Test'
+    secrets: inherit
+    uses: ./.github/workflows/tests.yml
+
   gh_tagged_release:
     runs-on: 'ubuntu-latest'
     env:

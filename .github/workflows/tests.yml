@@ -1,30 +1,16 @@
----
 name: 'tests'
 
 on:
-  push:
-  pull_request:
-    types:
-      - 'opened'
-      - 'closed'
-      - 'reopened'
-      - 'synchronize'
+  workflow_call:
 
 jobs:
   gh_tests:
+    name: 'Run tests'
     runs-on: 'ubuntu-latest'
-    permissions:
-      statuses: write
     env:
       JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
 
     steps:
-      - name: 'Check conventional PR title'
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: aslafy-z/conventional-pr-title-action@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: 'Checkout source code'
         uses: 'actions/checkout@v3'
         with:
@@ -42,3 +28,7 @@ jobs:
       - run: 'yarn lint'
       - run: 'yarn build'
       - run: 'yarn jest --env=node --colors --forceExit'
+
+      - name: 'Cancelling parallel jobs'
+        if: failure()
+        uses: andymckay/cancel-action@0.3

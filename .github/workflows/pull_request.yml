@@ -1,0 +1,36 @@
+name: Pull Request
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+      - closed
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pr-verification:
+    name: '👀 PR Verification'
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    if: ${{ github.event.action != 'closed' }}
+    steps:
+      - name: 'Check conventional PR title'
+        uses: aslafy-z/conventional-pr-title-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test:
+    name: '🧪 Test'
+    if: ${{ github.event.action != 'closed' }}
+    secrets: inherit
+    needs: [pr-verification]
+    uses: ./.github/workflows/tests.yml
