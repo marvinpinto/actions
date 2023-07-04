@@ -13,6 +13,7 @@ jobs:
 
   gh_tagged_release:
     runs-on: 'ubuntu-latest'
+    needs: [test]
     env:
       JEST_VERBOSE: ${{ secrets.JEST_VERBOSE }}
 
@@ -36,14 +37,13 @@ jobs:
       - run: 'yarn jest --env=node --colors --forceExit'
 
       - uses: 'marvinpinto/action-automatic-releases@latest'
+        id: 'automatic_releases'
         with:
           repo_token: '${{ secrets.GITHUB_TOKEN }}'
           prerelease: false
           files: |
             packages/automatic-releases/dist/index.js
-        id: 'automatic_releases'
 
-      # marvinpinto/action-automatic-releases
       - name: 'Automatically mirror release artifacts'
         env:
           GITHUB_SUPER_TOKEN: ${{ secrets.GITHUB_SUPER_TOKEN }}

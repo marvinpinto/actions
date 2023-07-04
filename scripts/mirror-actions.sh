@@ -12,9 +12,8 @@ if [[ -z "$GITHUB_SUPER_TOKEN" ]]; then
   exit 1
 fi
 
-ACTION_KEYBASE_NOTIFICATIONS_REPO="action-keybase-notifications"
 ACTION_AUTOMATIC_RELEASES_REPO="action-automatic-releases"
-ACTION_INJECT_SSM_SECRETS_REPO="action-inject-ssm-secrets"
+
 TAG=$1
 GITHUB_LOGIN="marvinpinto"
 RELEASE_BODY="Details available at [marvinpinto/actions@${TAG}](https://github.com/marvinpinto/actions/releases/tag/${TAG})."
@@ -79,15 +78,6 @@ END
   popd
 }
 
-# Mirroring Keybase Notifications
-rm -rf "/tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}"
-git clone "https://marvinpinto:${GITHUB_SUPER_TOKEN}@github.com/marvinpinto/${ACTION_KEYBASE_NOTIFICATIONS_REPO}.git" /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}
-cp -R packages/keybase-notifications/dist /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}/
-cp -R packages/keybase-notifications/images /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}/
-cp packages/keybase-notifications/README.md /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}/
-cp packages/keybase-notifications/action.yml /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}/
-cp LICENSE /tmp/${ACTION_KEYBASE_NOTIFICATIONS_REPO}/
-create_tagged_release "$ACTION_KEYBASE_NOTIFICATIONS_REPO"
 
 # Mirroring Automatic Releases
 rm -rf "/tmp/${ACTION_AUTOMATIC_RELEASES_REPO}"
@@ -97,12 +87,3 @@ cp packages/automatic-releases/README.md /tmp/${ACTION_AUTOMATIC_RELEASES_REPO}/
 cp packages/automatic-releases/action.yml /tmp/${ACTION_AUTOMATIC_RELEASES_REPO}/
 cp LICENSE /tmp/${ACTION_AUTOMATIC_RELEASES_REPO}/
 create_tagged_release "$ACTION_AUTOMATIC_RELEASES_REPO"
-
-# Mirroring SSM Secrets
-rm -rf "/tmp/${ACTION_INJECT_SSM_SECRETS_REPO}"
-git clone "https://marvinpinto:${GITHUB_SUPER_TOKEN}@github.com/marvinpinto/${ACTION_INJECT_SSM_SECRETS_REPO}.git" /tmp/${ACTION_INJECT_SSM_SECRETS_REPO}
-cp -R packages/aws-ssm-secrets/dist /tmp/${ACTION_INJECT_SSM_SECRETS_REPO}/
-cp packages/aws-ssm-secrets/README.md /tmp/${ACTION_INJECT_SSM_SECRETS_REPO}/
-cp packages/aws-ssm-secrets/action.yml /tmp/${ACTION_INJECT_SSM_SECRETS_REPO}/
-cp LICENSE /tmp/${ACTION_INJECT_SSM_SECRETS_REPO}/
-create_tagged_release "$ACTION_INJECT_SSM_SECRETS_REPO"
