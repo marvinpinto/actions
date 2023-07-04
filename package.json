@@ -23,7 +23,8 @@
     "lintfix": "lerna run lintfix && yarn run lintfix:eslint && yarn run lintfix:prettier",
     "lintfix:eslint": "eslint --fix .",
     "lintfix:prettier": "prettier --write .",
-    "release": "lerna version"
+    "release": "lerna version",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",
@@ -46,7 +47,8 @@
     "jest-circus": "^29.5.0",
     "lerna": "^7.1.1",
     "prettier": "^2.8.8",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "husky": "^8.0.0"
   },
   "dependencies": {}
 }

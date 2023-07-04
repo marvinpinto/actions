@@ -12,6 +12,9 @@ module.exports = {
   ignores: [
     (message) =>
       message.startsWith('chore(deps): ') ||
-      message.includes('Update Github Runner Node version and deprecate set-output'),
+      [
+        'Update Github Runner Node version and deprecate set-output',
+        'Deprecation of aws-ssm-secrets and keybase-notifications packages',
+      ].some((skipString) => message.includes(skipString)),
   ],
 };
