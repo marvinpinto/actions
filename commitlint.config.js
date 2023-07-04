@@ -13,6 +13,7 @@ module.exports = {
     (message) =>
       message.startsWith('chore(deps): ') ||
       [
+        'Merge pull request',
         'Update Github Runner Node version and deprecate set-output',
         'Deprecation of aws-ssm-secrets and keybase-notifications packages',
       ].some((skipString) => message.includes(skipString)),
