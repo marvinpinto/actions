@@ -13,7 +13,7 @@ if [[ -z "$GITHUB_SUPER_TOKEN" ]]; then
 fi
 
 ACTION_AUTOMATIC_RELEASES_REPO="action-automatic-releases"
-GITHUB_LOGIN="marvinpinto"
+GITHUB_LOGIN="Enase"
 TAG=$1
 RELEASE_BODY="Details available at [${GITHUB_LOGIN}/actions@${TAG}](https://github.com/${GITHUB_LOGIN}/actions/releases/tag/${TAG})."
 
