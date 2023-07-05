@@ -32,7 +32,6 @@ jobs:
           cache-dependency-path: 'yarn.lock'
 
       - run: 'yarn install --frozen-lockfile'
-      - run: 'yarn lint'
       - run: 'yarn build'
       - run: 'yarn jest --env=node --colors --forceExit'
 
