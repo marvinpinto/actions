@@ -22,8 +22,8 @@
   },
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "@actions/github": "2.0.0",
-    "@octokit/rest": "16.36.0",
+    "@actions/github": "5.1.1",
+    "@octokit/rest": "18.12.0",
     "conventional-changelog-angular": "^6.0.0",
     "conventional-commits-parser": "^4.0.0",
     "globby": "^11.1.0",
@@ -31,6 +31,8 @@
     "semver": "^7.5.3"
   },
   "devDependencies": {
+    "@octokit/types": "^10.0.0",
+    "@octokit/openapi-types": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
     "eslint": "^8.44.0",

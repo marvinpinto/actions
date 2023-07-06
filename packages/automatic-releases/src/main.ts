@@ -1,10 +1,29 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+
+import type {GetResponseTypeFromEndpointMethod, GetResponseDataTypeFromEndpointMethod} from '@octokit/types';
 import {Context} from '@actions/github/lib/context';
-import * as Octokit from '@octokit/rest';
 import {sync as commitParser} from 'conventional-commits-parser';
-import {getChangelogOptions, dumpGitHubEventPayload} from './utils';
-import {isBreakingChange, generateChangelogFromParsedCommits, parseGitTag, ParsedCommits, octokitLogger} from './utils';
+
+import type {
+  GitHub,
+  GithubCommitType,
+  GetReleaseByTagParameters,
+  CreateRefParameters,
+  ListTagsParameters,
+  CreateReleaseParameters,
+  GetRefParameters,
+  ParsedCommits,
+} from './utils';
+import {
+  getChangelogOptions,
+  dumpGitHubEventPayload,
+  isBreakingChange,
+  generateChangelogFromParsedCommits,
+  parseGitTag,
+  octokitLogger,
+  CreateReleaseResponse,
+} from './utils';
 import semverValid from 'semver/functions/valid';
 import semverRcompare from 'semver/functions/rcompare';
 import semverLt from 'semver/functions/lt';
@@ -39,19 +58,19 @@ const getAndValidateArgs = (): Args => {
   return args;
 };
 
-const createReleaseTag = async (client: github.GitHub, refInfo: Octokit.GitCreateRefParams) => {
+const createReleaseTag = async (client: GitHub, refInfo: CreateRefParameters) => {
   core.startGroup('Generating release tag');
   const friendlyTagName = refInfo.ref.substring(10); // 'refs/tags/latest' => 'latest'
   core.info(`Attempting to create or update release tag "${friendlyTagName}"`);
 
   try {
-    await client.git.createRef(refInfo);
+    await client.rest.git.createRef(refInfo);
   } catch (err: any) {
     const existingTag = refInfo.ref.substring(5); // 'refs/tags/latest' => 'tags/latest'
     core.info(
       `Could not create new tag "${refInfo.ref}" (${err.message}) therefore updating existing tag "${existingTag}"`,
     );
-    await client.git.updateRef({
+    await client.rest.git.updateRef({
       ...refInfo,
       ref: existingTag,
       force: true,
@@ -62,14 +81,14 @@ const createReleaseTag = async (client: github.GitHub, refInfo: Octokit.GitCreat
   core.endGroup();
 };
 
-const deletePreviousGitHubRelease = async (client: github.GitHub, releaseInfo: Octokit.ReposGetReleaseByTagParams) => {
+const deletePreviousGitHubRelease = async (client: GitHub, releaseInfo: GetReleaseByTagParameters) => {
   core.startGroup(`Deleting GitHub releases associated with the tag "${releaseInfo.tag}"`);
   try {
     core.info(`Searching for releases corresponding to the "${releaseInfo.tag}" tag`);
-    const resp = await client.repos.getReleaseByTag(releaseInfo);
+    const resp = await client.rest.repos.getReleaseByTag(releaseInfo);
 
     core.info(`Deleting release: ${resp.data.id}`);
-    await client.repos.deleteRelease({
+    await client.rest.repos.deleteRelease({
       owner: releaseInfo.owner,
       repo: releaseInfo.repo,
       release_id: resp.data.id,
@@ -81,21 +100,21 @@ const deletePreviousGitHubRelease = async (client: github.GitHub, releaseInfo: O
 };
 
 const generateNewGitHubRelease = async (
-  client: github.GitHub,
-  releaseInfo: Octokit.ReposCreateReleaseParams,
-): Promise<string> => {
+  client: GitHub,
+  releaseInfo: CreateReleaseParameters,
+): Promise<CreateReleaseResponse> => {
   core.startGroup(`Generating new GitHub release for the "${releaseInfo.tag_name}" tag`);
 
   core.info('Creating new release');
-  const resp = await client.repos.createRelease(releaseInfo);
+  const resp: CreateReleaseResponse = await client.rest.repos.createRelease(releaseInfo);
   core.endGroup();
-  return resp.data.upload_url;
+  return resp;
 };
 
 const searchForPreviousReleaseTag = async (
-  client: github.GitHub,
+  client: GitHub,
   currentReleaseTag: string,
-  tagInfo: Octokit.ReposListTagsParams,
+  tagInfo: ListTagsParameters,
 ): Promise<string> => {
   const validSemver = semverValid(currentReleaseTag);
   if (!validSemver) {
@@ -104,19 +123,21 @@ const searchForPreviousReleaseTag = async (
     );
   }
 
-  const listTagsOptions = client.repos.listTags.endpoint.merge(tagInfo);
-  const tl = await client.paginate(listTagsOptions);
+  type ListTagsResponseDataType = GetResponseDataTypeFromEndpointMethod<typeof client.rest.repos.listTags>;
+  const tagListResponse: ListTagsResponseDataType = await client.paginate(
+    client.rest.repos.listTags.endpoint.merge(tagInfo),
+  );
 
-  const tagList = tl
+  const tagList = tagListResponse
     .map((tag) => {
       core.debug(`Currently processing tag ${tag.name}`);
-      const t = semverValid(tag.name);
+      const semverTag = semverValid(tag.name) || 'not_valid';
       return {
         ...tag,
-        semverTag: t,
+        semverTag: semverTag,
       };
     })
-    .filter((tag) => tag.semverTag !== null)
+    .filter((tag) => tag.semverTag !== 'not_valid')
     .sort((a, b) => semverRcompare(a.semverTag, b.semverTag));
 
   let previousReleaseTag = '';
@@ -131,18 +152,17 @@ const searchForPreviousReleaseTag = async (
 };
 
 const getCommitsSinceRelease = async (
-  client: github.GitHub,
-  tagInfo: Octokit.GitGetRefParams,
+  client: GitHub,
+  tagInfo: GetRefParameters,
   currentSha: string,
-): Promise<Octokit.ReposCompareCommitsResponseCommitsItem[]> => {
+): Promise<GithubCommitType[]> => {
   core.startGroup('Retrieving commit history');
-  let resp;
 
   core.info('Determining state of the previous release');
-  let previousReleaseRef = '' as string;
+  let previousReleaseRef;
   core.info(`Searching for SHA corresponding to previous "${tagInfo.ref}" release tag`);
   try {
-    resp = await client.git.getRef(tagInfo);
+    await client.rest.git.getRef(tagInfo);
     previousReleaseRef = parseGitTag(tagInfo.ref);
   } catch (err: any) {
     core.info(
@@ -152,25 +172,27 @@ const getCommitsSinceRelease = async (
   }
 
   core.info(`Retrieving commits between ${previousReleaseRef} and ${currentSha}`);
+
+  let commits: GithubCommitType[] = [];
   try {
-    resp = await client.repos.compareCommits({
-      owner: tagInfo.owner,
-      repo: tagInfo.repo,
-      base: previousReleaseRef,
-      head: currentSha,
-    });
+    const resp: GetResponseTypeFromEndpointMethod<typeof client.rest.repos.compareCommits> =
+      await client.rest.repos.compareCommits({
+        owner: tagInfo.owner,
+        repo: tagInfo.repo,
+        base: previousReleaseRef,
+        head: currentSha,
+      });
     core.info(
       `Successfully retrieved ${resp.data.commits.length} commits between ${previousReleaseRef} and ${currentSha}`,
     );
+    if (resp && resp?.data?.commits) {
+      commits = resp.data.commits;
+    }
   } catch (_err) {
     // istanbul ignore next
     core.warning(`Could not find any commits between ${previousReleaseRef} and ${currentSha}`);
   }
 
-  let commits = [];
-  if (resp?.data?.commits) {
-    commits = resp.data.commits;
-  }
   core.debug(`Currently ${commits.length} number of commits between ${previousReleaseRef} and ${currentSha}`);
 
   core.endGroup();
@@ -178,10 +200,10 @@ const getCommitsSinceRelease = async (
 };
 
 export const getChangelog = async (
-  client: github.GitHub,
+  client: GitHub,
   owner: string,
   repo: string,
-  commits: Octokit.ReposCompareCommitsResponseCommitsItem[],
+  commits: GithubCommitType[],
 ): Promise<string> => {
   const parsedCommits: ParsedCommits[] = [];
   core.startGroup('Generating changelog');
@@ -189,7 +211,7 @@ export const getChangelog = async (
   for (const commit of commits) {
     core.debug(`Processing commit: ${JSON.stringify(commit)}`);
     core.debug(`Searching for pull requests associated with commit ${commit.sha}`);
-    const pulls = await client.repos.listPullRequestsAssociatedWithCommit({
+    const pulls = await client.rest.repos.listPullRequestsAssociatedWithCommit({
       owner: owner,
       repo: repo,
       commit_sha: commit.sha,
@@ -243,7 +265,7 @@ export const main = async (): Promise<void> => {
     const context = new Context();
 
     // istanbul ignore next
-    const client = new github.GitHub(args.repoToken, {
+    const client: GitHub = github.getOctokit(args.repoToken, {
       baseUrl: process.env['JEST_MOCK_HTTP_PORT']
         ? `http://localhost:${process.env['JEST_MOCK_HTTP_PORT']}`
         : undefined,
@@ -303,7 +325,7 @@ export const main = async (): Promise<void> => {
       });
     }
 
-    const releaseUploadUrl = await generateNewGitHubRelease(client, {
+    const releaseResponse = await generateNewGitHubRelease(client, {
       owner: context.repo.owner,
       repo: context.repo.repo,
       tag_name: releaseTag,
@@ -313,12 +335,21 @@ export const main = async (): Promise<void> => {
       body: changelog,
     });
 
-    await uploadReleaseArtifacts(client, releaseUploadUrl, args.files);
+    await uploadReleaseArtifacts(
+      client,
+      {
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        release_id: releaseResponse.data.id,
+      },
+      args.files,
+    );
 
     core.debug(`Exporting environment variable AUTOMATIC_RELEASES_TAG with value ${releaseTag}`);
     core.exportVariable('AUTOMATIC_RELEASES_TAG', releaseTag);
     core.setOutput('automatic_releases_tag', releaseTag);
-    core.setOutput('upload_url', releaseUploadUrl);
+    core.setOutput('release_id', releaseResponse.data.id);
+    core.setOutput('upload_url', releaseResponse.data.upload_url);
   } catch (error: any) {
     core.setFailed(error.message);
     throw error;

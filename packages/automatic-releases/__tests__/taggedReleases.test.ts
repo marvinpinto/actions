@@ -8,6 +8,8 @@ import * as core from '@actions/core';
 
 jest.mock('../src/uploadReleaseArtifacts');
 
+const mockedUploadReleaseArtifacts = uploadReleaseArtifacts as jest.MockedFunction<typeof uploadReleaseArtifacts>;
+
 describe('main handler processing tagged releases', () => {
   const testGhToken = 'fake-secret-token';
   const testGhSHA = 'f6f40d9fbd1130f7f2357bb54225567dbd7a3793';
@@ -33,7 +35,7 @@ describe('main handler processing tagged releases', () => {
     process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'git-push.json');
     process.env['GITHUB_REPOSITORY'] = 'marvinpinto/private-actions-tester';
 
-    uploadReleaseArtifacts.mockImplementation().mockResolvedValue({});
+    mockedUploadReleaseArtifacts.mockImplementation().mockResolvedValue(Promise.resolve());
   });
 
   afterEach(() => {
@@ -50,6 +52,7 @@ describe('main handler processing tagged releases', () => {
   });
 
   it('should create a new release', async () => {
+    const releaseId = '123';
     const releaseUploadUrl = 'https://releaseupload.example.com';
     const compareCommitsPayload = JSON.parse(
       fs.readFileSync(path.join(__dirname, 'payloads', 'compare-commits.json'), 'utf8'),
@@ -113,6 +116,7 @@ describe('main handler processing tagged releases', () => {
         body: testInputBody,
       })
       .reply(200, {
+        id: releaseId,
         upload_url: releaseUploadUrl,
       });
 
@@ -123,9 +127,13 @@ describe('main handler processing tagged releases', () => {
     expect(createRelease.isDone()).toBe(true);
     expect(searchForPreviousReleaseTag.isDone()).toBe(true);
 
-    expect(uploadReleaseArtifacts).toHaveBeenCalledTimes(1);
-    expect(uploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
-    expect(uploadReleaseArtifacts.mock.calls[0][2]).toEqual(['file1.txt', 'file2.txt', '*.jar']);
+    expect(mockedUploadReleaseArtifacts).toHaveBeenCalledTimes(1);
+    expect(mockedUploadReleaseArtifacts.mock.calls[0][1]).toEqual({
+      owner: 'marvinpinto',
+      release_id: releaseId,
+      repo: 'private-actions-tester',
+    });
+    expect(mockedUploadReleaseArtifacts.mock.calls[0][2]).toEqual(['file1.txt', 'file2.txt', '*.jar']);
 
     // Should populate the output env variable
     expect(core.exportVariable).toHaveBeenCalledTimes(1);

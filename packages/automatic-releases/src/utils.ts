@@ -1,14 +1,27 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import * as core from '@actions/core';
-import * as Octokit from '@octokit/rest';
+import * as github from '@actions/github';
 import defaultChangelogOpts from 'conventional-changelog-angular/conventional-recommended-bump';
+import {Endpoints} from '@octokit/types';
+import {components} from '@octokit/openapi-types';
+
+export type GitHub = ReturnType<typeof github.getOctokit>;
+export type GithubCommitType = components['schemas']['commit'];
+export type UploadReleaseAssetParameters =
+  Endpoints['POST {origin}/repos/{owner}/{repo}/releases/{release_id}/assets{?name,label}']['parameters'];
+export type ListTagsParameters = Endpoints['GET /repos/{owner}/{repo}/tags']['parameters'];
+export type CreateReleaseParameters = Endpoints['POST /repos/{owner}/{repo}/releases']['parameters'];
+export type CreateReleaseResponse = Endpoints['POST /repos/{owner}/{repo}/releases']['response'];
+export type GetReleaseByTagParameters = Endpoints['GET /repos/{owner}/{repo}/releases/tags/{tag}']['parameters'];
+export type CreateRefParameters = Endpoints['POST /repos/{owner}/{repo}/git/refs']['parameters'];
+export type GetRefParameters = Endpoints['GET /repos/{owner}/{repo}/git/ref/{ref}']['parameters'];
 
 export const getShortSHA = (sha: string): string => {
   const coreAbbrev = 7;
   return sha.substring(0, coreAbbrev);
 };
 
-export type ParsedCommitsExtraCommit = Octokit.ReposCompareCommitsResponseCommitsItem & {
+export type ParsedCommitsExtraCommit = GithubCommitType & {
   author: {
     email: string;
     name: string;
@@ -76,14 +89,11 @@ export type ParsedCommits = {
 };
 
 const getFormattedChangelogEntry = (parsedCommit: ParsedCommits): string => {
-  let entry = '';
-
   const url = parsedCommit.extra.commit.html_url;
   const sha = getShortSHA(parsedCommit.extra.commit.sha);
-  const author = parsedCommit.extra.commit.commit.author.name;
+  const author = parsedCommit.extra.commit.commit?.author?.name || 'unknown';
 
-  let prString = '';
-  prString = parsedCommit.extra.pullRequests.reduce((acc, pr) => {
+  let prString = parsedCommit.extra.pullRequests.reduce((acc, pr) => {
     // e.g. #1
     // e.g. #1,#2
     // e.g. ''
@@ -92,11 +102,12 @@ const getFormattedChangelogEntry = (parsedCommit: ParsedCommits): string => {
     }
     return `${acc}[#${pr.number}](${pr.url})`;
   }, '');
+
   if (prString) {
     prString = ' ' + prString;
   }
 
-  entry = `- ${sha}: ${parsedCommit.header} (${author})${prString}`;
+  let entry = `- ${sha}: ${parsedCommit.header} (${author})${prString}`;
   if (parsedCommit.type) {
     const scopeStr = parsedCommit.scope ? `**${parsedCommit.scope}**: ` : '';
     entry = `- ${scopeStr}${parsedCommit.subject}${prString} ([${author}](${url}))`;
@@ -110,7 +121,7 @@ export const generateChangelogFromParsedCommits = (parsedCommits: ParsedCommits[
 
   // Breaking Changes
   const breaking = parsedCommits
-    .filter((val) => val.extra.breakingChange === true)
+    .filter((val) => val.extra.breakingChange)
     .map((val) => getFormattedChangelogEntry(val))
     .reduce((acc, line) => `${acc}\n${line}`, '');
   if (breaking) {

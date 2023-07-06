@@ -1,13 +1,14 @@
 import * as core from '@actions/core';
-import * as github from '@actions/github';
 import globby from 'globby';
 import {lstatSync, readFileSync} from 'fs';
 import path from 'path';
 import md5File from 'md5-file';
 
+import type {GitHub, UploadReleaseAssetParameters} from './utils';
+
 export const uploadReleaseArtifacts = async (
-  client: github.GitHub,
-  uploadUrl: string,
+  client: GitHub,
+  params: Pick<UploadReleaseAssetParameters, 'owner' | 'repo' | 'release_id'>,
   files: string[],
 ): Promise<void> => {
   core.startGroup('Uploading release artifacts');
@@ -21,17 +22,17 @@ export const uploadReleaseArtifacts = async (
       core.info(`Uploading: ${filePath}`);
       const nameWithExt = path.basename(filePath);
       const uploadArgs = {
-        url: uploadUrl,
+        ...params,
         headers: {
           'content-length': lstatSync(filePath).size,
           'content-type': 'application/octet-stream',
         },
         name: nameWithExt,
-        file: readFileSync(filePath),
-      };
+        data: readFileSync(filePath, 'utf8'),
+      } as UploadReleaseAssetParameters;
 
       try {
-        await client.repos.uploadReleaseAsset(uploadArgs);
+        await client.rest.repos.uploadReleaseAsset(uploadArgs);
       } catch (err: any) {
         core.info(
           `Problem uploading ${filePath} as a release asset (${err.message}). Will retry with the md5 hash appended to the filename.`,
@@ -40,7 +41,7 @@ export const uploadReleaseArtifacts = async (
         const basename = path.basename(filePath, path.extname(filePath));
         const ext = path.extname(filePath);
         const newName = `${basename}-${hash}${ext}`;
-        await client.repos.uploadReleaseAsset({
+        await client.rest.repos.uploadReleaseAsset({
           ...uploadArgs,
           name: newName,
         });

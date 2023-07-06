@@ -40,7 +40,7 @@ describe('main handler processing automatic releases', () => {
     process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'payloads', 'git-push.json');
     process.env['GITHUB_REPOSITORY'] = 'marvinpinto/private-actions-tester';
 
-    mockedUploadReleaseArtifacts.mockImplementation().mockResolvedValue({});
+    mockedUploadReleaseArtifacts.mockImplementation().mockResolvedValue(Promise.resolve());
   });
 
   afterEach(() => {
@@ -63,6 +63,7 @@ describe('main handler processing automatic releases', () => {
 
   it('should create a new release tag', async () => {
     delete process.env.INPUT_FILES;
+    const releaseId = '123';
     const releaseUploadUrl = 'https://releaseupload.example.com';
     const compareCommitsPayload = JSON.parse(
       fs.readFileSync(path.join(__dirname, 'payloads', 'compare-commits.json'), 'utf8'),
@@ -75,7 +76,7 @@ describe('main handler processing automatic releases', () => {
 
     const getRef = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
-      .get(`/repos/marvinpinto/private-actions-tester/git/refs/tags/${testInputAutomaticReleaseTag}`)
+      .get(`/repos/marvinpinto/private-actions-tester/git/ref/tags%2F${testInputAutomaticReleaseTag}`)
       .reply(404);
 
     const listAssociatedPRs = nock('https://api.github.com')
@@ -111,6 +112,7 @@ describe('main handler processing automatic releases', () => {
         body: testInputBody,
       })
       .reply(200, {
+        id: releaseId,
         upload_url: releaseUploadUrl,
       });
 
@@ -125,7 +127,11 @@ describe('main handler processing automatic releases', () => {
     expect(listAssociatedPRs.isDone()).toBe(true);
 
     expect(mockedUploadReleaseArtifacts).toHaveBeenCalledTimes(1);
-    expect(mockedUploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
+    expect(mockedUploadReleaseArtifacts.mock.calls[0][1]).toEqual({
+      owner: 'marvinpinto',
+      release_id: releaseId,
+      repo: 'private-actions-tester',
+    });
     // Should not attempt to upload any release artifacts, as there are none
     expect(mockedUploadReleaseArtifacts.mock.calls[0][2]).toEqual([]);
 
@@ -134,8 +140,9 @@ describe('main handler processing automatic releases', () => {
     expect(core.exportVariable).toHaveBeenCalledWith('AUTOMATIC_RELEASES_TAG', testInputAutomaticReleaseTag);
 
     // Should output the releasetag and the release upload url
-    expect(core.setOutput).toHaveBeenCalledTimes(2);
+    expect(core.setOutput).toHaveBeenCalledTimes(3);
     expect(core.setOutput).toHaveBeenCalledWith('automatic_releases_tag', testInputAutomaticReleaseTag);
+    expect(core.setOutput).toHaveBeenCalledWith('release_id', releaseId);
     expect(core.setOutput).toHaveBeenCalledWith('upload_url', releaseUploadUrl);
   });
 
@@ -150,7 +157,7 @@ describe('main handler processing automatic releases', () => {
 
     const getPreviousReleaseSHA = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
-      .get(`/repos/marvinpinto/private-actions-tester/git/refs/tags/${testInputAutomaticReleaseTag}`)
+      .get(`/repos/marvinpinto/private-actions-tester/git/ref/tags%2F${testInputAutomaticReleaseTag}`)
       .reply(200, {
         object: {
           sha: previousReleaseSHA,
@@ -177,7 +184,7 @@ describe('main handler processing automatic releases', () => {
 
     const updateRef = nock('https://api.github.com')
       .matchHeader('authorization', `token ${testGhToken}`)
-      .patch(`/repos/marvinpinto/private-actions-tester/git/refs/tags/${testInputAutomaticReleaseTag}`, {
+      .patch(`/repos/marvinpinto/private-actions-tester/git/refs/tags%2F${testInputAutomaticReleaseTag}`, {
         sha: testGhSHA,
         force: true,
       })
@@ -205,6 +212,7 @@ describe('main handler processing automatic releases', () => {
         body: testInputBody,
       })
       .reply(200, {
+        id: foundReleaseId,
         upload_url: releaseUploadUrl,
       });
 
@@ -224,7 +232,11 @@ describe('main handler processing automatic releases', () => {
     expect(mockedUploadReleaseArtifacts).toHaveBeenCalledTimes(1);
     expect(dumpGitHubEventPayload).toHaveBeenCalledTimes(1);
 
-    expect(mockedUploadReleaseArtifacts.mock.calls[0][1]).toBe(releaseUploadUrl);
+    expect(mockedUploadReleaseArtifacts.mock.calls[0][1]).toEqual({
+      owner: 'marvinpinto',
+      release_id: foundReleaseId,
+      repo: 'private-actions-tester',
+    });
     expect(mockedUploadReleaseArtifacts.mock.calls[0][2]).toEqual(['file1.txt', 'file2.txt', '*.jar']);
 
     // Should populate the output env variable
@@ -232,8 +244,9 @@ describe('main handler processing automatic releases', () => {
     expect(core.exportVariable).toHaveBeenCalledWith('AUTOMATIC_RELEASES_TAG', testInputAutomaticReleaseTag);
 
     // Should output the releasetag and the release upload url
-    expect(core.setOutput).toHaveBeenCalledTimes(2);
+    expect(core.setOutput).toHaveBeenCalledTimes(3);
     expect(core.setOutput).toHaveBeenCalledWith('automatic_releases_tag', testInputAutomaticReleaseTag);
+    expect(core.setOutput).toHaveBeenCalledWith('release_id', foundReleaseId);
     expect(core.setOutput).toHaveBeenCalledWith('upload_url', releaseUploadUrl);
   });
 });
