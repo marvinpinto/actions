@@ -1,5 +1,12 @@
 # Collection of GitHub Actions
 
+![unmaintained](http://img.shields.io/badge/status-unmaintained-red.png)
+
+Generating release notes & automatically maintaining releases was much needed when GitHub Actions launched many years ago, but our ecosystem has evolved and there are much better alternatives these days.
+
+For example, the [semantic-release](https://github.com/semantic-release/semantic-release) project + their associated [GitHub Action](https://github.com/semantic-release/github) gives you full control over when releases occur, changelog formatting, custom exec scripts, and much more. Another popular option is the [action-gh-release](https://github.com/softprops/action-gh-release) which also allows you to do many of the things this project originally enabled.
+
+
 ## Contents
 
 1. [What are GitHub Actions](#what-are-github-actions)
