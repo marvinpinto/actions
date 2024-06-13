@@ -33,7 +33,7 @@ const getAndValidateArgs = (): Args => {
 
   const inputFilesStr = core.getInput('files', {required: false});
   if (inputFilesStr) {
-    args.files = inputFilesStr.split(/\r?\n/);
+    args.files = inputFilesStr.split(/\r?\n/).filter((path) => !/^\s*$/.test(path));
   }
 
   return args;
