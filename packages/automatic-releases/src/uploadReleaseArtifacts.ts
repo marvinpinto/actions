@@ -10,6 +10,7 @@ export const uploadReleaseArtifacts = async (
   uploadUrl: string,
   files: string[],
 ): Promise<void> => {
+  if (files.length === 0) return;
   core.startGroup('Uploading release artifacts');
   for (const fileGlob of files) {
     const paths = await globby(fileGlob);
